@@ -2,6 +2,7 @@
     "name": "mcamara/laravel-localization",
     "description": "Easy localization for Laravel 4",
     "license": "MIT",
+    "version": "0.1",
     "authors": [
         {
             "name": "LaravelLocalization",
