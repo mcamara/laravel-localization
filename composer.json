@@ -1,0 +1,23 @@
+{
+    "name": "mcamara/laravel-localization",
+    "description": "Easy localization for Laravel 4",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "LaravelLocalization",
+            "email": "mcamara88@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.0.x"
+    },
+    "autoload": {
+        "classmap": [
+        ],
+        "psr-0": {
+            "Mcamara\\LaravelLocalization": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
