@@ -52,7 +52,7 @@ class LaravelLocalization
 						in_array(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2), $languages))
 					$locale_app = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
 				else
-					$locale_app = $this->configRepository->get('application.locale');
+					$locale_app = $this->configRepository->get('app.locale');
 
 				App::setLocale($locale_app);
 				Session::put('language', $locale_app);
