@@ -32,7 +32,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
 
 		$this->app['laravellocalization'] = $this->app->share(function($app)
         {
-            return new LaravelLocalization($app['config'], $app['session']);
+            return new LaravelLocalization($app['config'], $app['view']);
         });
 	}
 
