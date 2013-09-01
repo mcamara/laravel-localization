@@ -41,7 +41,7 @@ Open `app/config/app.php` and find the `providers` key. Add `LaravelLocalization
 	...
 ```
 
-You also can add an alias to the list of class aliases in the same app.php
+You can also add an alias to the list of class aliases in the same app.php
 
 ```php
 	...
@@ -49,7 +49,7 @@ You also can add an alias to the list of class aliases in the same app.php
 	...
 ```
 
-To finish, publish config settings `php artisan config:publish mcamara/laravel-localization` . It will create a file in `app/config/packages/mcamara/laravel-localization/config.php`, having most common setting options.
+To finish, publish configuration file using the command `php artisan config:publish mcamara/laravel-localization` in your laravel root path. This will create a file in `app/config/packages/mcamara/laravel-localization/config.php`, containing the most common setting options.
 
 ## Usage
 
@@ -85,13 +85,13 @@ Once this group is added to the routes file, an user can access to all languages
 
 If language is not present in the url or it is not defined into the 'languagesAllowed' array, the system will take the application default language (by default) or the user's browser default language (if defined in config file).
 
-Once the language is defined, the language variable will be stored in a session, so it is not necessary to write the /lang/ section in the url after defining it once, using the last known language for the user. If the user accesses to a different language, this session value would be changed, translating any other page he visits with the last chosen language.
+Once the language is defined, the language variable will be stored in a session, so it is not necessary to write the /lang/ section in the url after defining it once, using the last known language for the user. If the user accesses to a different language this session value would be changed, translating any other page he visits with the last chosen language.
 
 Templates files and all language files should follow the [Lang class](http://laravel.com/docs/localization).
 
 ## Helpers
 
-This package comes with three useful functions, these are:
+This package comes with three useful functions:
 
 ### Get Language Bar
 
@@ -107,7 +107,7 @@ This package comes with three useful functions, these are:
 	{{ LaravelLocalization::getLanguageBar(optional boolean $abbr) }}
 ```
 
-It returns an html string, with `<a>` links to the very same page into another allowed language. Having english, catalan and spanish allowed as languages, being in url-to-laravel/test and english as the current language, this function would return...
+It returns an html string with `<a>` links to the very same page into another allowed language. Having english, catalan and spanish allowed as languages, being in url-to-laravel/test and english as the current language, this function would return...
 
 ```html
 	<ul class="laravel_language_chooser">
@@ -152,9 +152,9 @@ It returns an string, without any trace of language in it.
 
 ## Config
 
-For default, only english and spanish are allowed, but it can be changed using config.php file that exists in `app/config/packages/mcamara/laravel-localization/config.php` . If this file does not exist, use the following artisan command `php artisan config:publish mcamara/laravel-localization`  in order to create it.
+For default only english and spanish are allowed but it can be changed using config.php file that exists in `app/config/packages/mcamara/laravel-localization/config.php` . If this file does not exist, use the following artisan command `php artisan config:publish mcamara/laravel-localization`  in order to create it.
 
-This file have some interesting configuration settings, as the allowed languages or browser language detection, feel free to play with it, all variables are self-explained.
+This file have some interesting configuration settings (as the allowed languages or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
 
