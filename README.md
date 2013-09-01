@@ -107,13 +107,13 @@ This package comes with three useful functions, these are:
 	{{ LaravelLocalization::getLanguageBar(optional boolean $abbr) }}
 ```
 
-It returns an html string, with `<a>` links to the very same page into another allowed language. Having english, catalan and spanish allowed as languages and english as the chosen one, this functions would return...
+It returns an html string, with `<a>` links to the very same page into another allowed language. Having english, catalan and spanish allowed as languages, being in url-to-laravel/test and english as the current language, this function would return...
 
 ```html
 	<ul class="laravel_language_chooser">
 		<li class="active">EN</li>
-		<li><a href="http://localhost:8000/ca/test">CA</a></li>
-		<li><a href="http://localhost:8000/es/test">ES</a></li>
+		<li><a href="http://url-to-laravel/ca/test">CA</a></li>
+		<li><a href="http://url-to-laravel/es/test">ES</a></li>
 	</ul>
 ```
 ### Get Clean routes
