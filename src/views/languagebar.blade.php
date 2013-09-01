@@ -1,4 +1,4 @@
-<ul class="qtrans_language_chooser">
+<ul class="laravel_language_chooser">
 	@foreach($languages as $key => $lang)
 		@if($key == $active) 
 			<li class="active">{{$lang}}</li>

@@ -74,8 +74,8 @@ class LaravelLocalization
 
 	/**
 	 * Returns html with language selector
-	 * @param  boolean $abbr Should languages be abbreviate (2 characters) or full named?
-	 * @return [type]        [description]
+	 * @param  boolean $abbr 	Should languages be abbreviate (2 characters) or full named?
+	 * @return String 			Returns an html view with a language bar
 	 */
 	public function getLanguageBar($abbr = false)
 	{
@@ -94,28 +94,33 @@ class LaravelLocalization
 		$active = $this->configRepository->get('application.language');
 		$urls = array();
 		foreach ($this->configRepository->get('laravel-localization::languagesAllowed') as $lang)
-			$urls[$lang] = $this->getURLLanguage(Request::url(),$lang);
+			$urls[$lang] = $this->getURLLanguage($lang);
 		return $this->view->make('laravel-localization::languagebar', compact('languages','active','urls'));
 	}
 
 	/**
 	 * Returns an URL adapted to $language language
-	 * @param  String $route    URL to adapt
 	 * @param  String $language Language to adapt
+	 * @param  String $route    URL to adapt, if false, current url would be taken
 	 * @return String           URL translated
 	 */
-	public function getURLLanguage($route,$language)
+	public function getURLLanguage($language,$route = false)
 	{
+		if(!in_array($language, $this->configRepository->get('laravel-localization::languagesAllowed')))
+			return false;
+		if(!$route)
+			$route = Request::url();
 		return str_replace(url(), url($language), $this->getCleanRoute($route));
 	}
 
 	/**
 	 * It returns an URL without language (if it has it)
-	 * @param  String $route URL to clean
+	 * @param  String $route URL to clean, if false, current url would be taken
 	 * @return String        Clean URL
 	 */
-	private function getCleanRoute($route)
+	public function getCleanRoute($route = false)
 	{
+		if(!$route) $route = Request::url();
 		return str_replace("/".$this->configRepository->get('application.language')."/","/",$route);
 	}
 }
