@@ -1,6 +1,6 @@
 # Laravel Localization
 
-Easy localization for Laravel 4, an useful tool to combine with Laravel localization classes.
+Easy i18n localization for Laravel 4, an useful tool to combine with Laravel localization classes.
 
 
 ## Table of Contents
