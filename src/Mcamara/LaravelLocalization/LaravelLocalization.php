@@ -121,6 +121,7 @@ class LaravelLocalization
 	public function getCleanRoute($route = false)
 	{
 		if(!$route) $route = Request::url();
+		if(substr($route, -1) !== "/") $route .= "/";
 		return str_replace("/".$this->configRepository->get('application.language')."/","/",$route);
 	}
 }
