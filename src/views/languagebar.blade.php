@@ -1,4 +1,4 @@
-<ul class="laravel_language_chooser">
+<ul class="{{ Config::get('laravel-localization::languageBarClass') }}">
 	@foreach($languages as $key => $lang)
 		@if($key == $active) 
 			<li class="active">{{$lang}}</li>
