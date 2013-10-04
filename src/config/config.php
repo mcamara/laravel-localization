@@ -15,7 +15,8 @@
 		// Should application use the language stored in a session
 		// if the language is not defined in the url?
 		// If false and language not defined in the url, system will
-		// take the default language (defined in config/app.php)
+		// take the default language (defined in config/app.php) or
+		// the browser preferred language (if useBrowserLanguage is true)
 		'useSessionLanguage' => true,
 		
 		// List of all languages supported
