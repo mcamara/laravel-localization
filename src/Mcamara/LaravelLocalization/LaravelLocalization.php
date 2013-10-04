@@ -68,8 +68,9 @@ class LaravelLocalization
 				$locale_app = $this->configRepository->get('app.locale');
 			}
 			App::setLocale($locale_app);
-			Session::put('language', $locale_app);
 			$this->configRepository->set('application.language',  $locale_app);
+			if($this->configRepository->get('laravel-localization::useSessionLanguage'))
+				Session::put('language', $locale_app);
 		}
 		return $locale;
 	}
