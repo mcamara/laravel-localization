@@ -12,8 +12,15 @@
 		// Specify custom class for language bar unordered list
 		'languageBarClass' => 'laravel_language_chooser',
 		
+		// Should application use the language stored in a session
+		// if the language is not defined in the url?
+		// If false and language not defined in the url, system will
+		// take the default language (defined in config/app.php)
+		'useSessionLanguage' => true,
+		
 		// List of all languages supported
 		// Feel free to add a new one
+		// or change their names
 		'supportedLanguages' => array(
 			"ab" => "Abkhaz",
 			"aa" => "Afar",

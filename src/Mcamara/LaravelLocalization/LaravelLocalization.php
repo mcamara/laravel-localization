@@ -48,26 +48,28 @@ class LaravelLocalization
 		}
 		else
 		{
-			$locale = null;
-			if(Session::has('language'))
+			$locale = $locale_app = null;
+			// get session language...
+			if($this->configRepository->get('laravel-localization::useSessionLanguage') && Session::has('language'))
 			{
-				App::setLocale(Session::get('language'));
-				$this->configRepository->set('application.language',  Session::get('language'));
+				$locale_app = Session::get('language');
 			}
-			else
-			{
-				//take browser language
-				if($this->configRepository->get('laravel-localization::useBrowserLanguage') &&
+			// or get browser language...
+			else if($this->configRepository->get('laravel-localization::useBrowserLanguage') &&
 						isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && 
 						in_array(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2), $languages))
-					$locale_app = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
-				else
-					$locale_app = $this->configRepository->get('app.locale');
+			{
+				$locale_app = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
 
-				App::setLocale($locale_app);
-				Session::put('language', $locale_app);
-				$this->configRepository->set('application.language',  $locale_app);
 			}
+			// or get application default language
+			else
+			{
+				$locale_app = $this->configRepository->get('app.locale');
+			}
+			App::setLocale($locale_app);
+			Session::put('language', $locale_app);
+			$this->configRepository->set('application.language',  $locale_app);
 		}
 		return $locale;
 	}
