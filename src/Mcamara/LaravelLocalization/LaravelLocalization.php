@@ -36,6 +36,7 @@ class LaravelLocalization
 
 	/**
 	 * Set and return current language
+	 * @return String 			Returns language (if route has any) or null (if route has not a language)
 	 */
 	public function setLanguage()
 	{
@@ -70,7 +71,9 @@ class LaravelLocalization
 			App::setLocale($locale_app);
 			$this->configRepository->set('application.language',  $locale_app);
 			if($this->configRepository->get('laravel-localization::useSessionLanguage'))
+			{
 				Session::put('language', $locale_app);
+			}
 		}
 		return $locale;
 	}
