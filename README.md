@@ -174,4 +174,4 @@ This file have some interesting configuration settings (as the allowed languages
 
 ## License
 
-Laravel Localization is licensed under the 2-clause BSD, see the `LICENSE` file for more details.
+Laravel Localization is an open-sourced laravel package licensed under the MIT license
