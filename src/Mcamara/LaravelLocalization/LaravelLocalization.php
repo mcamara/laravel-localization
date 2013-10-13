@@ -6,6 +6,7 @@ use Request;
 use Session;
 use App;
 use View;
+use Config;
 
 class LaravelLocalization 
 {
@@ -24,6 +25,13 @@ class LaravelLocalization
     protected $view;
 
     /**
+     * Default language
+     *
+     * @var string
+     */
+    protected $default;
+
+    /**
      * Creates new instance.
      *
      * @param \Illuminate\Config\Repository $configRepository
@@ -32,6 +40,9 @@ class LaravelLocalization
     {
         $this->configRepository = $configRepository;
         $this->view = $view;
+
+        // set default language
+        $this->default = Config::get('app.locale');
     }
 
 	/**
@@ -129,5 +140,21 @@ class LaravelLocalization
 		if(!$route) $route = Request::url();
 		if(substr($route, -1) !== "/") $route .= "/";
 		return str_replace("/".$this->configRepository->get('application.language')."/","/",$route);
+	}
+
+	/**
+	 * Appends i18n language segment to the URI
+	 * 
+	 * @param  string $uri
+	 *
+	 * @return string
+	 */
+	public function getURI($uri, $append_default = false)
+	{
+		$current = Config::get('app.locale');
+
+		if ($this->default == $current and $append_default == false)	return $uri;
+
+		return $current . '/' . $uri;
 	}
 }
