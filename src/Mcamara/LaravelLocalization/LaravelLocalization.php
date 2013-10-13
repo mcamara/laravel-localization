@@ -157,4 +157,14 @@ class LaravelLocalization
 
 		return $current . '/' . $uri;
 	}
+
+	/**
+	 * Returns default language
+	 *
+	 * @return string
+	 */
+	public function getDefault()
+	{
+		return $this->default;
+	}
 }
