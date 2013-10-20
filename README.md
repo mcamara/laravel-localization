@@ -94,7 +94,7 @@ Templates files and all language files should follow the [Lang class](http://lar
 
 Moreover, this package includes a filter to redirect all "non-languaged" routes to a "languaged" one (thanks to Sangar82). 
 
-So, if a user accesses to http://url-to-laravel and the system have this filter actived and 'en' as a current language for this user, it would redirect (301) him automatically to http://url-to-laravel/en. This is mainly used to avoid duplicate content and improve SEO performance.
+So, if a user accesses to http://url-to-laravel/test and the system have this filter actived and 'en' as a current language for this user, it would redirect (301) him automatically to http://url-to-laravel/en/test. This is mainly used to avoid duplicate content and improve SEO performance.
 
 
 ```php
