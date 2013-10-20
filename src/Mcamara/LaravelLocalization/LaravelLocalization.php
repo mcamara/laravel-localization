@@ -195,7 +195,9 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 		$languages = Config::get('laravel-localization::languagesAllowed');
 		if(!in_array($language, $languages))
 		{
-			//we use the first language in the array as default
+			// If the current url does not contain any language
+			// The system redirect the user to the very same url "languaged"
+			// we use the current language to redirect him
 			$default_language = LaravelLocalization::getCurrentLanguage();
 			return Redirect::to($default_language.'/'.Request::path(), 301);
 		}
