@@ -10,6 +10,7 @@ Easy i18n localization for Laravel 4, an useful tool to combine with Laravel loc
     - <a href="#manually">Manually</a>
     - <a href="#laravel-4">Laravel 4</a>
 - <a href="#usage">Usage</a>
+    - <a href="#filters">Filters</a>
 - <a href="#helpers">Helpers</a>
 - <a href="#config">Config</a>
 - <a href="#changelog">Changelog</a>
@@ -89,6 +90,39 @@ Once the language is defined, the language variable will be stored in a session,
 
 Templates files and all language files should follow the [Lang class](http://laravel.com/docs/localization).
 
+### Filters
+
+Moreover, this package includes a filter to redirect all "non-languaged" routes to a "languaged" one (thanks to Sangar82). 
+
+So, if a user accesses to http://url-to-laravel and the system have this filter actived and 'en' as a current language for this user, it would redirect (301) him automatically to http://url-to-laravel/en. This is mainly used to avoid duplicate content and improve SEO performance.
+
+
+```php
+	// app/routes.php
+
+	Route::group(
+	array(
+		'prefix' => LaravelLocalization::setLanguage(),
+		'before' => 'LaravelLocalizationRedirectFilter' // LaravelLocalization filter
+	), 
+	function()
+	{
+		/** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
+		Route::get('/', function()
+		{
+			return View::make('hello');
+		});
+
+		Route::get('test',function(){
+			return View::make('test');
+		});
+	});
+
+	/** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
+
+```
+In order to active it, you just have to attach this filter to the routes you want to be accessible localized.
+
 ## Helpers
 
 This package comes with three useful functions:
@@ -158,6 +192,10 @@ This file have some interesting configuration settings (as the allowed languages
 
 ## Changelog
 
+### 0.3
+- Added 'LaravelLocalizationRedirectFilter' filter
+- To Be Done: Tests
+
 ### 0.2
 
 - Added `getURLLanguage` method.
@@ -166,7 +204,6 @@ This file have some interesting configuration settings (as the allowed languages
 - Added config file
 - Added `useBrowserLanguage` config value
 - Added README
-- To Be Done: Tests
 
 ### 0.1
 

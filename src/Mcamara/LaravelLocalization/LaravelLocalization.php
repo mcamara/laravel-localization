@@ -7,6 +7,8 @@ use Session;
 use App;
 use View;
 use Config;
+use Redirect;
+use Route;
 
 class LaravelLocalization 
 {
@@ -29,7 +31,7 @@ class LaravelLocalization
      *
      * @var string
      */
-    protected $default;
+    protected $defaultLanguage;
 
     /**
      * Creates new instance.
@@ -42,7 +44,7 @@ class LaravelLocalization
         $this->view = $view;
 
         // set default language
-        $this->default = Config::get('app.locale');
+        $this->defaultLanguage = Config::get('app.locale');
     }
 
 	/**
@@ -60,25 +62,8 @@ class LaravelLocalization
 		}
 		else
 		{
-			$locale = $locale_app = null;
-			// get session language...
-			if($this->configRepository->get('laravel-localization::useSessionLanguage') && Session::has('language'))
-			{
-				$locale_app = Session::get('language');
-			}
-			// or get browser language...
-			else if($this->configRepository->get('laravel-localization::useBrowserLanguage') &&
-						isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && 
-						in_array(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2), $languages))
-			{
-				$locale_app = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
-
-			}
-			// or get application default language
-			else
-			{
-				$locale_app = $this->configRepository->get('app.locale');
-			}
+			$locale = null;
+			$locale_app = LaravelLocalization::getCurrentLanguage();
 			App::setLocale($locale_app);
 			$this->configRepository->set('application.language',  $locale_app);
 			if($this->configRepository->get('laravel-localization::useSessionLanguage'))
@@ -100,7 +85,9 @@ class LaravelLocalization
 		if($abbr)
 		{
 			foreach ($this->configRepository->get('laravel-localization::languagesAllowed') as $lang)
+			{
 				$languages[$lang] = strtoupper($lang);
+			}
 		}
 		else
 		{
@@ -111,7 +98,9 @@ class LaravelLocalization
 		$active = $this->configRepository->get('application.language');
 		$urls = array();
 		foreach ($this->configRepository->get('laravel-localization::languagesAllowed') as $lang)
-			$urls[$lang] = $this->getURLLanguage($lang);
+		{
+			$urls[$lang] = $this->getURLLanguage($lang);	
+		}
 		return $this->view->make('laravel-localization::languagebar', compact('languages','active','urls'));
 	}
 
@@ -124,9 +113,13 @@ class LaravelLocalization
 	public function getURLLanguage($language,$route = false)
 	{
 		if(!in_array($language, $this->configRepository->get('laravel-localization::languagesAllowed')))
+		{
 			return false;
+		}
 		if(!$route)
+		{
 			$route = Request::url();
+		}
 		return str_replace(url(), url($language), $this->getCleanRoute($route));
 	}
 
@@ -144,27 +137,67 @@ class LaravelLocalization
 
 	/**
 	 * Appends i18n language segment to the URI
-	 * 
 	 * @param  string $uri
-	 *
 	 * @return string
 	 */
 	public function getURI($uri, $append_default = false)
 	{
 		$current = Config::get('app.locale');
-
-		if ($this->default == $current and $append_default == false)	return $uri;
-
+		if ($this->defaultLanguage === $current && $append_default === false)
+		{
+			return $uri;
+		}
 		return $current . '/' . $uri;
 	}
 
 	/**
 	 * Returns default language
-	 *
 	 * @return string
 	 */
 	public function getDefault()
 	{
-		return $this->default;
+		return $this->defaultLanguage;
 	}
+
+	/**
+	 * Returns current language
+	 * @return string current language
+	 */
+	public static function getCurrentLanguage()
+	{
+		$languages = Config::get('laravel-localization::languagesAllowed');
+		// get session language...
+		if(Config::get('laravel-localization::useSessionLanguage') && Session::has('language'))
+		{
+			return Session::get('language');
+		}
+		// or get browser language...
+		else if(Config::get('laravel-localization::useBrowserLanguage') &&
+					isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && 
+					in_array(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2), $languages))
+		{
+			return substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+		}
+		// or get application default language
+		else
+		{
+			return Config::get('app.locale');
+		}
+	}
+
 }
+
+Route::filter('LaravelLocalizationRedirectFilter', function()
+{
+	$params = explode('/', Request::path());
+	if(count($params) > 0){
+		$language = $params[0];
+		$languages = Config::get('laravel-localization::languagesAllowed');
+		if(!in_array($language, $languages))
+		{
+			//we use the first language in the array as default
+			$default_language = LaravelLocalization::getCurrentLanguage();
+			return Redirect::to($default_language.'/'.Request::path(), 301);
+		}
+	} 
+});
