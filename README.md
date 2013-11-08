@@ -146,8 +146,8 @@ It returns an html string with `<a>` links to the very same page into another al
 ```html
 	<ul class="laravel_language_chooser">
 		<li class="active">EN</li>
-		<li><a href="http://url-to-laravel/ca/test">CA</a></li>
-		<li><a href="http://url-to-laravel/es/test">ES</a></li>
+		<li><a rel="alternate" href="ca" href="http://url-to-laravel/ca/test">CA</a></li>
+		<li><a rel="alternate" href="es" href="http://url-to-laravel/es/test">ES</a></li>
 	</ul>
 ```
 ### Get Clean routes
