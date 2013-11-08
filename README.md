@@ -125,7 +125,7 @@ In order to active it, you just have to attach this filter to the routes you wan
 
 ## Helpers
 
-This package comes with three useful functions:
+This package comes with some useful functions, like:
 
 ### Get Language Bar
 
@@ -182,6 +182,21 @@ It returns an string, giving url passed through the function clean of any langua
 ```
 
 It returns an string, without any trace of language in it.
+
+### Get Allowed Languages
+
+```php
+	/**
+	 * Returns all allowed languages
+	 * @return array Array with all allowed languages
+	 */
+	public function getAllowedLanguages()
+
+	//Should be called like this:
+	{{ LaravelLocalization::getAllowedLanguages() }}
+```
+
+It returns an array, each position contains an allowed language.
 
 
 ## Config

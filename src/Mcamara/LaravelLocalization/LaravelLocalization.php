@@ -160,6 +160,15 @@ class LaravelLocalization
 	}
 
 	/**
+	 * Returns all allowed languages
+	 * @return array Array with all allowed languages
+	 */
+	public function getAllowedLanguages()
+	{
+		return $this->configRepository->get('laravel-localization::languagesAllowed');
+	}
+
+	/**
 	 * Returns current language
 	 * @return string current language
 	 */
