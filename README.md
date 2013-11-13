@@ -12,6 +12,7 @@ Easy i18n localization for Laravel 4, an useful tool to combine with Laravel loc
 - <a href="#usage">Usage</a>
     - <a href="#filters">Filters</a>
 - <a href="#helpers">Helpers</a>
+- <a href="#view">View</a>
 - <a href="#config">Config</a>
 - <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
@@ -198,6 +199,11 @@ It returns an string, without any trace of language in it.
 
 It returns an array, each position contains an allowed language.
 
+## View
+
+You can edit the default view for the language bar executing `php artisan view:publish mcamara/laravel-localization`.
+
+This command will create a blade view in your app/views folder containing the default code for the language bar, edit it to style and edit your language bar that adapts you the best.
 
 ## Config
 
@@ -206,6 +212,10 @@ For default only english and spanish are allowed but it can be changed using con
 This file have some interesting configuration settings (as the allowed languages or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
+
+### 0.4
+- Added the ability to edit the language bar code
+- To Be Done: Tests
 
 ### 0.3
 - Added 'LaravelLocalizationRedirectFilter' filter

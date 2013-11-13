@@ -101,7 +101,14 @@ class LaravelLocalization
 		{
 			$urls[$lang] = $this->getURLLanguage($lang);	
 		}
-		return $this->view->make('laravel-localization::languagebar', compact('languages','active','urls'));
+		if($this->view->exists('mcamara/laravel-localization/languagebar'))
+		{
+			return $this->view->make('mcamara/laravel-localization/languagebar', compact('languages','active','urls'));
+		}
+		else
+		{
+			return $this->view->make('laravel-localization::languagebar', compact('languages','active','urls'));
+		}
 	}
 
 	/**

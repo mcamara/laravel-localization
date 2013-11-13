@@ -1,12 +1,15 @@
 {
     "name": "mcamara/laravel-localization",
     "description": "Easy localization for Laravel 4",
+    "keywords": ["localization", "laravel", "php"],
+    "homepage": "https://github.com/mcamara/laravel-localization",
     "license": "MIT",
-    "version": "0.1",
+    "version": "0.4",
     "authors": [
         {
             "name": "LaravelLocalization",
-            "email": "mcamara88@gmail.com"
+            "email": "mcamara88@gmail.com",
+            "role": "Developer"
         }
     ],
     "require": {
