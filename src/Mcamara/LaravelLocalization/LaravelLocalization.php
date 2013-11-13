@@ -169,6 +169,24 @@ class LaravelLocalization
 	}
 
 	/**
+	 * Returns the class name of the language bar
+	 * @return string Language bar class name
+	 */
+	public function getLanguageBarClassName()
+	{
+		return $this->configRepository->get('laravel-localization::languageBarClass');
+	}
+
+	/**
+	 * Returns if the current language should be printed in the language bar
+	 * @return boolean Should the current language be printed?
+	 */
+	public function getPrintCurrentLanguage()
+	{
+		return $this->configRepository->get('laravel-localization::printCurrentLanguageInBar');
+	}
+
+	/**
 	 * Returns current language
 	 * @return string current language
 	 */

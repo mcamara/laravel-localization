@@ -18,6 +18,10 @@
 		// take the default language (defined in config/app.php) or
 		// the browser preferred language (if useBrowserLanguage is true)
 		'useSessionLanguage' => true,
+
+		// Should the current language be printed in the language bar?
+		// If false, only other languages would be printed
+		'printCurrentLanguageInBar' => true,
 		
 		// List of all languages supported
 		// Feel free to add a new one
