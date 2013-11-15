@@ -10,7 +10,7 @@ use Config;
 use Redirect;
 use Route;
 
-class LaravelLocalization 
+class LaravelLocalization
 {
     /**
      * Config repository.
@@ -18,7 +18,7 @@ class LaravelLocalization
      * @var \Illuminate\Config\Repository
      */
     protected $configRepository;
-	
+
 	/**
      * Illuminate view environment.
      *
@@ -99,7 +99,7 @@ class LaravelLocalization
 		$urls = array();
 		foreach ($this->configRepository->get('laravel-localization::languagesAllowed') as $lang)
 		{
-			$urls[$lang] = $this->getURLLanguage($lang);	
+			$urls[$lang] = $this->getURLLanguage($lang);
 		}
 		if($this->view->exists('mcamara/laravel-localization/languagebar'))
 		{
@@ -137,9 +137,11 @@ class LaravelLocalization
 	 */
 	public function getCleanRoute($route = false)
 	{
+		$cleanRoute = "";
 		if(!$route) $route = Request::url();
 		if(substr($route, -1) !== "/") $route .= "/";
-		return str_replace("/".$this->configRepository->get('application.language')."/","/",$route);
+		$cleanRoute = str_replace("/".$this->configRepository->get('application.language')."/","/",$route);
+		return rtrim($cleanRoute, "/");
 	}
 
 	/**
@@ -207,7 +209,7 @@ class LaravelLocalization
 		}
 		// or get browser language...
 		else if(Config::get('laravel-localization::useBrowserLanguage') &&
-					isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && 
+					isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) &&
 					in_array(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2), $languages))
 		{
 			return substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
@@ -235,5 +237,5 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 			$default_language = LaravelLocalization::getCurrentLanguage();
 			return Redirect::to($default_language.'/'.Request::path(), 301);
 		}
-	} 
+	}
 });
