@@ -13,6 +13,7 @@ Easy i18n localization for Laravel 4, an useful tool to combine with Laravel loc
     - <a href="#filters">Filters</a>
 - <a href="#helpers">Helpers</a>
 - <a href="#view">View</a>
+- <a href="#translated-routes">Translated Routes</a>
 - <a href="#config">Config</a>
 - <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
@@ -151,6 +152,9 @@ It returns an html string with `<a>` links to the very same page into another al
 		<li><a rel="alternate" hreflang="es" href="http://url-to-laravel/es/test">ES</a></li>
 	</ul>
 ```
+
+If you are using translation routes, be sure that all keys exists for all languages. Otherwise, the language bar would not show the untranslated routes but it would show all the other links.
+
 ### Get Clean routes
 
 ```php
@@ -182,7 +186,25 @@ It returns an string, giving url passed through the function clean of any langua
 	{{ LaravelLocalization::getURLLanguage(string $lang, optional string $route) }}
 ```
 
-It returns an string, without any trace of language in it.
+It returns an string, translated to the desired language. If you pass a route to the function it has to be written in the current language, otherwise, the function won't return the desired result.
+
+### Get URL for an specific translation key
+
+```php
+	/**
+	 * Returns an URL adapted to the route name and the language given
+	 * @param  String $language 		Language to adapt
+	 * @param  String $transKeyName  	Translation key name of the url to adapt
+	 * @param  Array $array  			Attributes for the route (only needed if transKeyName need them)
+	 * @return string 	             	URL translated
+	 */
+	public function getURLFromRouteNameTranslated($language, $transKeyName = false, $attributes = array())
+
+	//Should be called in a view like this:
+	{{ LaravelLocalization::getURLFromRouteNameTranslated(string $lang, optional string $transKeyName, optiona array $attributes) }}
+```
+
+It returns an string, translated to the desired language using the translation key given. If the translation key does not exist in the language given, this function will return false.
 
 ### Get Allowed Languages
 
@@ -205,6 +227,61 @@ You can edit the default view for the language bar executing `php artisan view:p
 
 This command will create a blade view in your app/views folder containing the default code for the language bar, edit it to style and edit your language bar that adapts you the best.
 
+## Translated Routes
+_**New in version 0.5**_
+
+You can adapt your URLs depending on the language you want to show them. For example, http://url/en/about and http://url/es/acerca (acerca is about in spanish) or http://url/en/view/5 and http://url/es/ver/5 (view == ver in spanish) would be redirected to the same controller using the proper filter and setting up the translation files as follows:
+```php
+	// app/routes.php
+
+	Route::group(
+	array(
+		'prefix' => LaravelLocalization::setLanguage(),
+		'before' => 'LaravelLocalizationRoutes' // Route translate filter
+	), 
+	function()
+	{
+      /** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
+      Route::get('/', function()
+      {
+      	// This routes is useless to translate
+      	return View::make('hello');
+      });
+
+      Route::get(LaravelLocalization::transRoute('routes.about'),function(){
+          return View::make('about');
+      });
+      Route::get(LaravelLocalization::transRoute('routes.view'),function($id){
+          return View::make('view',array('id'=>$id));
+      });
+	});
+
+	/** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
+```
+In the routes file you just have to add the `LaravelLocalizationRoutes` filter and the `LaravelLocalization::transRoute` function to every route you want to translate using the translation key. 
+
+_Tip:_ If you want to use this filter with other filters (like `LaravelLocalizationRedirectFilter`) you just have to join them in the Laravel way, using | (eg: `'before' => 'LaravelLocalizationRoutes|LaravelLocalizationRedirectFilter'` )
+
+Then you have to create the translations files and add there every key you want to translate. I suggest you to create a routes.php file inside your app/lang/language_abbreviation folder. For the previous example, I have created two translations files, these two files would look like:
+```php
+	// app/lang/en/routes.php
+    return array(
+      "about" 		=> 	"about",
+      "view" 		=> 	"view/{id}", //we add a route parameter
+      // other translated routes
+	);
+```
+```php
+	// app/lang/es/routes.php
+    return array(
+      "about" 		=> 	"acerca",
+      "view" 		=> 	"ver/{id}", //we add a route parameter
+      // other translated routes
+	);
+```
+
+Once the files are saved, you can access to http://url/en/about , http://url/es/acerca , http://url/en/view/5 and http://url/es/ver/5 without any problem. The getLanguageBar function would work as desired and it will translate the routes to all translated languages (don't forget to add any new route to the translation file).
+
 ## Config
 
 For default only english and spanish are allowed but it can be changed using config.php file that exists in `app/config/packages/mcamara/laravel-localization/config.php` . If this file does not exist, use the following artisan command `php artisan config:publish mcamara/laravel-localization`  in order to create it.
@@ -212,14 +289,15 @@ For default only english and spanish are allowed but it can be changed using con
 This file have some interesting configuration settings (as the allowed languages or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
+### 0.5
+- Added multi-language routes
+- Function `getCurrentLanguage` is not static
 
 ### 0.4
 - Added the ability to edit the language bar code
-- To Be Done: Tests
 
 ### 0.3
 - Added 'LaravelLocalizationRedirectFilter' filter
-- To Be Done: Tests
 
 ### 0.2
 
