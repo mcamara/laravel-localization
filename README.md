@@ -211,12 +211,13 @@ It returns an string, translated to the desired language using the translation k
 ```php
 	/**
 	 * Returns all allowed languages
+	 * @param  Boolean $abbr should the languages be abbreviated?
 	 * @return array Array with all allowed languages
 	 */
-	public function getAllowedLanguages()
+	public function getAllowedLanguages($abbr = true)
 
 	//Should be called like this:
-	{{ LaravelLocalization::getAllowedLanguages() }}
+	{{ LaravelLocalization::getAllowedLanguages(optional boolean $abbr) }}
 ```
 
 It returns an array, each position contains an allowed language.
