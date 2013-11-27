@@ -201,7 +201,7 @@ It returns an string, translated to the desired language. If you pass a route to
 	public function getURLFromRouteNameTranslated($language, $transKeyName = false, $attributes = array())
 
 	//Should be called in a view like this:
-	{{ LaravelLocalization::getURLFromRouteNameTranslated(string $lang, optional string $transKeyName, optiona array $attributes) }}
+	{{ LaravelLocalization::getURLFromRouteNameTranslated(string $lang, optional string $transKeyName, optional array $attributes) }}
 ```
 
 It returns an string, translated to the desired language using the translation key given. If the translation key does not exist in the language given, this function will return false.
@@ -280,7 +280,7 @@ Then you have to create the translations files and add there every key you want 
 	);
 ```
 
-Once the files are saved, you can access to http://url/en/about , http://url/es/acerca , http://url/en/view/5 and http://url/es/ver/5 without any problem. The getLanguageBar function would work as desired and it will translate the routes to all translated languages (don't forget to add any new route to the translation file).
+Once files are saved, you can access to http://url/en/about , http://url/es/acerca , http://url/en/view/5 and http://url/es/ver/5 without any problem. The getLanguageBar function would work as desired and it will translate the routes to all translated languages (don't forget to add any new route to the translation file).
 
 ## Config
 

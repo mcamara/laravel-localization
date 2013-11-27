@@ -112,8 +112,7 @@ class LaravelLocalization
 		}
 		else
 		{
-			$languages = array_intersect_key($this->configRepository->get('laravel-localization::supportedLanguages'),
-							array_flip($this->configRepository->get('laravel-localization::languagesAllowed')));
+			$languages = $this->getAllowedLanguages(false);
 
 		}
 		$active = $this->configRepository->get('application.language');
@@ -265,11 +264,21 @@ class LaravelLocalization
 
 	/**
 	 * Returns all allowed languages
+	 * @param  Boolean $abbr should the languages be abbreviated?
 	 * @return array Array with all allowed languages
 	 */
-	public function getAllowedLanguages()
+	public function getAllowedLanguages($abbr = true)
 	{
-		return $this->configRepository->get('laravel-localization::languagesAllowed');
+		if($abbr)
+		{
+			return $this->configRepository->get('laravel-localization::languagesAllowed');
+		}
+		else
+		{
+			$languages = array_intersect_key($this->configRepository->get('laravel-localization::supportedLanguages'),
+							array_flip($this->configRepository->get('laravel-localization::languagesAllowed')));
+			return $languages;
+		}
 	}
 
 	/**
