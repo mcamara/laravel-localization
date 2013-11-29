@@ -52,7 +52,7 @@ You can also add an alias to the list of class aliases in the same app.php
 	...
 ```
 
-To finish, publish configuration file using the command `php artisan config:publish mcamara/laravel-localization` in your laravel root path. This will create a file in `app/config/packages/mcamara/laravel-localization/config.php`, containing the most common setting options.
+To finish, publish the configuration file using the command `php artisan config:publish mcamara/laravel-localization` in your laravel root path. This will create the following file `app/config/packages/mcamara/laravel-localization/config.php`, containing the most common setting options.
 
 ## Usage
 
@@ -78,7 +78,7 @@ Laravel Localization uses the URL given for the request. In order to achieve thi
 
 ```
 
-Once this group is added to the routes file, an user can access to all languages added into the 'languagesAllowed' ('en' and 'es' for default, look at the config section to change that option). For example, an user can now access to two different languages, using the following addresses:
+Once this group is added to the routes file, a user can access all languages added into the 'languagesAllowed' ('en' and 'es' by default, look at the config section to change that option). For example, a user can now access to two different languages, using the following addresses:
 
 ```
 	http://url-to-laravel/en
@@ -86,7 +86,7 @@ Once this group is added to the routes file, an user can access to all languages
 	http://url-to-laravel
 ```
 
-If language is not present in the url or it is not defined into the 'languagesAllowed' array, the system will take the application default language (by default) or the user's browser default language (if defined in config file).
+If the language is not present in the url or it is not defined in the 'languagesAllowed' array, the system will take the application default language (by default) or the user's browser default language (if defined in config file).
 
 Once the language is defined, the language variable will be stored in a session, so it is not necessary to write the /lang/ section in the url after defining it once, using the last known language for the user. If the user accesses to a different language this session value would be changed, translating any other page he visits with the last chosen language.
 
@@ -153,7 +153,7 @@ It returns an html string with `<a>` links to the very same page into another al
 	</ul>
 ```
 
-If you are using translation routes, be sure that all keys exists for all languages. Otherwise, the language bar would not show the untranslated routes but it would show all the other links.
+If you are using translation routes, be sure that all keys exist for all languages. Otherwise, the language bar would not show the untranslated routes but it would show all the other links.
 
 ### Get Clean routes
 
@@ -169,7 +169,7 @@ If you are using translation routes, be sure that all keys exists for all langua
 	{{ LaravelLocalization::getCleanRoute(optional string $route) }}
 ```
 
-It returns an string, giving url passed through the function clean of any language section. 
+It returns a string, giving url passed through the function clean of any language section. 
 
 ### Get URL for an specific language
 
@@ -186,7 +186,7 @@ It returns an string, giving url passed through the function clean of any langua
 	{{ LaravelLocalization::getURLLanguage(string $lang, optional string $route) }}
 ```
 
-It returns an string, translated to the desired language. If you pass a route to the function it has to be written in the current language, otherwise, the function won't return the desired result.
+It returns a string, translated to the desired language. If you pass a route to the function it has to be written in the current language, otherwise the function won't return the desired result.
 
 ### Get URL for an specific translation key
 
@@ -204,7 +204,7 @@ It returns an string, translated to the desired language. If you pass a route to
 	{{ LaravelLocalization::getURLFromRouteNameTranslated(string $lang, optional string $transKeyName, optional array $attributes) }}
 ```
 
-It returns an string, translated to the desired language using the translation key given. If the translation key does not exist in the language given, this function will return false.
+It returns a string, translated to the desired language using the translation key given. If the translation key does not exist in the language given, this function will return false.
 
 ### Get Allowed Languages
 
@@ -226,7 +226,7 @@ It returns an array, each position contains an allowed language.
 
 You can edit the default view for the language bar executing `php artisan view:publish mcamara/laravel-localization`.
 
-This command will create a blade view in your app/views folder containing the default code for the language bar, edit it to style and edit your language bar that adapts you the best.
+This command will create a blade view in your app/views folder containing the default code for the language bar, edit it to style and edit your language bar that suits you the best.
 
 ## Translated Routes
 _**New in version 0.5**_
@@ -263,7 +263,7 @@ In the routes file you just have to add the `LaravelLocalizationRoutes` filter a
 
 _Tip:_ If you want to use this filter with other filters (like `LaravelLocalizationRedirectFilter`) you just have to join them in the Laravel way, using | (eg: `'before' => 'LaravelLocalizationRoutes|LaravelLocalizationRedirectFilter'` )
 
-Then you have to create the translations files and add there every key you want to translate. I suggest you to create a routes.php file inside your app/lang/language_abbreviation folder. For the previous example, I have created two translations files, these two files would look like:
+Then you have to create the translation files and add there every key you want to translate. I suggest you to create a routes.php file inside your app/lang/language_abbreviation folder. For the previous example, I have created two translations files, these two files would look like:
 ```php
 	// app/lang/en/routes.php
     return array(
@@ -285,7 +285,7 @@ Once files are saved, you can access to http://url/en/about , http://url/es/acer
 
 ## Config
 
-For default only english and spanish are allowed but it can be changed using config.php file that exists in `app/config/packages/mcamara/laravel-localization/config.php` . If this file does not exist, use the following artisan command `php artisan config:publish mcamara/laravel-localization`  in order to create it.
+By default only english and spanish are allowed but it can be changed using config.php file that is located at `app/config/packages/mcamara/laravel-localization/config.php` . If this file does not exist, use the following artisan command `php artisan config:publish mcamara/laravel-localization`  in order to create it.
 
 This file have some interesting configuration settings (as the allowed languages or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
