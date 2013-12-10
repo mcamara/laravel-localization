@@ -42,6 +42,13 @@ class LaravelLocalization
     protected $defaultLanguage;
 
     /**
+     * Current language
+     *
+     * @var string
+     */
+    protected $currentLanguage = false;
+
+    /**
      * An array that contains all routes that should be translated
      * @var array
      */
@@ -77,6 +84,7 @@ class LaravelLocalization
 		$languages = $this->configRepository->get('laravel-localization::languagesAllowed');
 		$locale = Request::segment(1);
 		if(in_array($locale, $languages)){
+			$this->currentLanguage = $locale;
 			App::setLocale($locale);
 			Session::put('language', $locale);
 			$this->configRepository->set('application.language',  $locale);
@@ -84,12 +92,12 @@ class LaravelLocalization
 		else
 		{
 			$locale = null;
-			$locale_app = $this->getCurrentLanguage();
-			App::setLocale($locale_app);
-			$this->configRepository->set('application.language',  $locale_app);
+			$this->currentLanguage = $this->getCurrentLanguage();
+			App::setLocale($this->currentLanguage);
+			$this->configRepository->set('application.language',  $this->currentLanguage);
 			if($this->configRepository->get('laravel-localization::useSessionLanguage'))
 			{
-				Session::put('language', $locale_app);
+				Session::put('language', $this->currentLanguage);
 			}
 		}
 		return $locale;
@@ -115,7 +123,7 @@ class LaravelLocalization
 			$languages = $this->getAllowedLanguages(false);
 
 		}
-		$active = $this->configRepository->get('application.language');
+		$active = $this->currentLanguage;
 		$urls = array();
 		foreach ($this->configRepository->get('laravel-localization::languagesAllowed') as $lang)
 		{
@@ -234,7 +242,7 @@ class LaravelLocalization
 		$cleanRoute = "";
 		if(!$route) $route = Request::url();
 		if(substr($route, -1) !== "/") $route .= "/";
-		$cleanRoute = str_replace("/".$this->configRepository->get('application.language')."/","/",$route);
+		$cleanRoute = str_replace("/".$this->currentLanguage."/","/",$route);
 		return rtrim($cleanRoute, "/");
 	}
 
@@ -305,6 +313,10 @@ class LaravelLocalization
 	 */
 	public function getCurrentLanguage()
 	{
+		if($this->currentLanguage)
+		{
+			return $this->currentLanguage;
+		}
 		$languages = $this->configRepository->get('laravel-localization::languagesAllowed');
 		// get session language...
 		if($this->configRepository->get('laravel-localization::useSessionLanguage') && Session::has('language'))
@@ -362,7 +374,7 @@ class LaravelLocalization
 	public function getRouteNameFromAPath($path)
 	{
 		$path = str_replace(url(), "", $path);
-	    $path = str_replace("/".$this->configRepository->get('application.language')."/","",$path);
+	    $path = str_replace("/".$this->currentLanguage."/","",$path);
 	    $path = trim($path,"/");
 
 	    foreach ($this->translatedRoutes as $route) {
@@ -379,17 +391,27 @@ class LaravelLocalization
 Route::filter('LaravelLocalizationRedirectFilter', function()
 {
 	global $app;
+	$currentLanguage = $app['laravellocalization']->getCurrentLanguage();
+	$defaultLanguage = $app['laravellocalization']->getDefault();
 	$params = explode('/', Request::path());
 	if(count($params) > 0){
 		$language = $params[0];
 		$languages = Config::get('laravel-localization::languagesAllowed');
-		if(!in_array($language, $languages))
+
+		if(in_array($language, $languages) && $language === $defaultLanguage &&
+			Config::get('laravel-localization::hideDefaultLanguageInRoute') )
+		{
+			return Redirect::to($app['laravellocalization']->getCleanRoute(), 301);
+		}
+
+		if(!in_array($language, $languages) && 
+			($currentLanguage !== $defaultLanguage || !Config::get('laravel-localization::hideDefaultLanguageInRoute'))
+		)
 		{
 			// If the current url does not contain any language
 			// The system redirect the user to the very same url "languaged"
 			// we use the current language to redirect him
-			$default_language = $app['laravellocalization']->getCurrentLanguage();
-			return Redirect::to($default_language.'/'.Request::path(), 301);
+			return Redirect::to($currentLanguage.'/'.Request::path(), 301);
 		}
 	}
 });

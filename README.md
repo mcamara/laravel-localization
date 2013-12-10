@@ -125,6 +125,8 @@ So, if a user accesses to http://url-to-laravel/test and the system have this fi
 ```
 In order to active it, you just have to attach this filter to the routes you want to be accessible localized.
 
+If you want to hide the default language but always show other languages in the url, switch the 'hideDefaultLanguageInRoute' config value to true. Once it's true, if the default language is english all url containing /en/ would be redirected to the same url without this fragment but mantaining the language (all the website will be in english).
+
 ## Helpers
 
 This package comes with some useful functions, like:
