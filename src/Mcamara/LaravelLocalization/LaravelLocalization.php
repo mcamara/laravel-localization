@@ -206,7 +206,18 @@ class LaravelLocalization
 			{
 				// if there are no attributes and the current url has some
 				// the system will take the same
-				$attributes = Route::getCurrentRoute()->getParameters();
+				global $app;
+				$router = $app['router'];
+				if (method_exists($router, 'getCurrentRoute'))
+				{
+					// Laravel 4.0
+					$attributes = $router->getCurrentRoute()->getParameters();
+				}
+				else
+				{
+					// Laravel 4.1
+					$attributes = $router->current()->parameters();
+				}
 			}
 		}
 
@@ -422,7 +433,17 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 Route::filter('LaravelLocalizationRoutes', function()
 {
 	global $app;
-    $routeName = $app['laravellocalization']->getRouteNameFromAPath(Route::getCurrentRoute()->getPath());
-    $app['laravellocalization']->setRouteName($routeName);
-    return;
+	$router = $app['router'];
+	if (method_exists($router, 'getCurrentRoute'))
+	{
+		// Laravel 4.0
+		$routeName = $app['laravellocalization']->getRouteNameFromAPath($router->getCurrentRoute()->getPath());
+	}
+	else
+	{
+		// Laravel 4.1
+		$routeName = $app['laravellocalization']->getRouteNameFromAPath($router->current()->uri());
+	}
+	$app['laravellocalization']->setRouteName($routeName);
+	return;
 });
