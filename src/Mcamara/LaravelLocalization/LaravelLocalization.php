@@ -385,7 +385,11 @@ class LaravelLocalization
 	public function getRouteNameFromAPath($path)
 	{
 		$path = str_replace(url(), "", $path);
-	    $path = str_replace("/".$this->currentLanguage."/","",$path);
+		if($path[0] !== '/')
+		{
+			$path = '/' . $path;
+		}
+		$path = str_replace('/' . $this->currentLanguage . '/', '', $path);
 	    $path = trim($path,"/");
 
 	    foreach ($this->translatedRoutes as $route) {
