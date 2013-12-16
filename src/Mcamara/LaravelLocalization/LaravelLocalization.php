@@ -105,10 +105,11 @@ class LaravelLocalization
 
 	/**
 	 * Returns html with language selector
-	 * @param  boolean $abbr 	Should languages be abbreviate (2 characters) or full named?
-	 * @return String 			Returns an html view with a language bar
+	 * @param  string  $customView  The custom view to use to build the bar
+	 * @param  boolean $abbr 		Should languages be abbreviate (2 characters) or full named?
+	 * @return String 				Returns an html view with a language bar
 	 */
-	public function getLanguageBar($abbr = false)
+	public function getLanguageBar($customView = null, $abbr = false)
 	{
 		$languages = array();
 		if($abbr)
@@ -140,7 +141,10 @@ class LaravelLocalization
 				unset($languages[$lang]);
 			}
 		}
-		if($this->view->exists('mcamara/laravel-localization/languagebar'))
+		if(is_string($customView) && $this->view->exists($customView)) {
+			return $this->view->make($customView, compact('languages','active','urls'));
+		}
+		elseif($this->view->exists('mcamara/laravel-localization/languagebar'))
 		{
 			return $this->view->make('mcamara/laravel-localization/languagebar', compact('languages','active','urls'));
 		}
@@ -228,7 +232,7 @@ class LaravelLocalization
 			$route = url($language."/".$translation);
 			if(is_array($attributes))
 			{
-				foreach ($attributes as $key => $value) 
+				foreach ($attributes as $key => $value)
 				{
 					$route = str_replace("{".$key."}", $value, $route);
 					$route = str_replace("{".$key."?}", $value, $route);
@@ -419,7 +423,7 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 			return Redirect::to($app['laravellocalization']->getCleanRoute(), 301);
 		}
 
-		if(!in_array($language, $languages) && 
+		if(!in_array($language, $languages) &&
 			($currentLanguage !== $defaultLanguage || !Config::get('laravel-localization::hideDefaultLanguageInRoute'))
 		)
 		{
@@ -432,7 +436,7 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 });
 
 /**
- * 	This filter would set the translated route name 
+ * 	This filter would set the translated route name
  */
 Route::filter('LaravelLocalizationRoutes', function()
 {
