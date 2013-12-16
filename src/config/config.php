@@ -10,6 +10,7 @@
 		'useBrowserLanguage'	=> true,
 
 		// Specify custom class for language bar unordered list
+		// It only makes sense if you use the default language bar
 		'languageBarClass' => 'laravel_language_chooser',
 		
 		// Should application use the language stored in a session
