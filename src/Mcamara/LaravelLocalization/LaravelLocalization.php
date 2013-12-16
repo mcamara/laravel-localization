@@ -105,10 +105,11 @@ class LaravelLocalization
 
 	/**
 	 * Returns html with language selector
-	 * @param  boolean $abbr 	Should languages be abbreviate (2 characters) or full named?
-	 * @return String 			Returns an html view with a language bar
+	 * @param  boolean $abbr 		Should languages be abbreviate (2 characters) or full named?
+	 * @param  string $customView 	Which template should the language bar have?
+	 * @return String 				Returns an html view with a language bar
 	 */
-	public function getLanguageBar($abbr = false)
+	public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
 	{
 		$languages = array();
 		if($abbr)
@@ -140,14 +141,15 @@ class LaravelLocalization
 				unset($languages[$lang]);
 			}
 		}
-		if($this->view->exists('mcamara/laravel-localization/languagebar'))
+		if(is_string($customView) && $this->view->exists($customView))
 		{
-			return $this->view->make('mcamara/laravel-localization/languagebar', compact('languages','active','urls'));
+			$view = $customView;
 		}
 		else
 		{
-			return $this->view->make('laravel-localization::languagebar', compact('languages','active','urls'));
+			$view = 'laravel-localization::languagebar';
 		}
+		return $this->view->make($view, compact('languages','active','urls'));
 	}
 
     /**

@@ -135,14 +135,15 @@ This package comes with some useful functions, like:
 
 ```php
 	/**
-		* Returns html with language selector
-		* @param  boolean $abbr 	Should languages be abbreviate (2 characters) or full named?
-		* @return String 			Returns an html view with a language bar
-	*/
-	public function getLanguageBar($abbr = false)
+	 * Returns html with language selector
+	 * @param  Boolean $abbr 		Should languages be abbreviate (2 characters) or full named?
+	 * @param  String $customView 	Which template should the language bar have?
+	 * @return String 				Returns an html view with a language bar
+	 */
+	public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
 
 	//Should be called in a view like this:
-	{{ LaravelLocalization::getLanguageBar(optional boolean $abbr) }}
+	{{ LaravelLocalization::getLanguageBar(optional boolean $abbr, optional string $customView) }}
 ```
 
 It returns an html string with `<a>` links to the very same page into another allowed language. Having english, catalan and spanish allowed as languages, being in url-to-laravel/test and english as the current language, this function would return...
@@ -156,6 +157,8 @@ It returns an html string with `<a>` links to the very same page into another al
 ```
 
 If you are using translation routes, be sure that all keys exist for all languages. Otherwise, the language bar would not show the untranslated routes but it would show all the other links.
+
+You can also define which view you want to use to show the language bar. If you want to create your own language bar from the example given in the package, you should publish it using the command `php artisan view:publish mcamara/laravel-localization`, it would create a language bar template (take a look at view section). If you rename the view, you should pass the new name as the $customView variable when the languageBar function is called, this function will look at this custom view within the app/view folder. In case this file does not exist, the language bar function would show the default bar.
 
 ### Get Clean routes
 
