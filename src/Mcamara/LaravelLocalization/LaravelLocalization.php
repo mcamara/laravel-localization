@@ -77,7 +77,7 @@ class LaravelLocalization
 
 	/**
 	 * Set and return current language
-	 * @param  string $locale	Language to set the App to (optionnal)
+	 * @param  string $locale	Language to set the App to (optional)
 	 * @return String 			Returns language (if route has any) or null (if route has not a language)
 	 */
 	public function setLanguage($locale = null)
