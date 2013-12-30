@@ -83,7 +83,7 @@ class LaravelLocalization
 	public function setLanguage($locale = null)
 	{
 		$languages = $this->configRepository->get('laravel-localization::languagesAllowed');
-		if(is_null($locale))
+		if(is_null($locale) || !is_string($locale))
 		{
 			$locale = Request::segment(1);
 		}
