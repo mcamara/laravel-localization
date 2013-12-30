@@ -77,13 +77,19 @@ class LaravelLocalization
 
 	/**
 	 * Set and return current language
+	 * @param  string $locale	Language to set the App to (optionnal)
 	 * @return String 			Returns language (if route has any) or null (if route has not a language)
 	 */
-	public function setLanguage()
+	public function setLanguage($locale = null)
 	{
 		$languages = $this->configRepository->get('laravel-localization::languagesAllowed');
-		$locale = Request::segment(1);
-		if(in_array($locale, $languages)){
+		if(is_null($locale))
+		{
+			$locale = Request::segment(1);
+		}
+		
+		if(in_array($locale, $languages))
+		{
 			$this->currentLanguage = $locale;
 		}
 		else
