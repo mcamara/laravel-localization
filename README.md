@@ -227,6 +227,24 @@ It returns a string, translated to the desired language using the translation ke
 
 It returns an array, each position contains an allowed language.
 
+### Set Language
+
+```php
+	/**
+	 * Set and return current language
+	 * @param  string $locale	Language to set the App to (optional)
+	 * @return String 			Returns language (if route has any) or null (if route has not a language)
+	 */
+	public function setLanguage($locale = null)
+
+	//Should be called in a view like this:
+	{{ LaravelLocalization::setLanguage(optional string $lang) }}
+```
+
+This function will change the application current language, if the language is not passed through its call, it would take the language from the session (if stored previously), browser language or the default application language (depending on your config file).
+
+The function have to be called in the prefix of any route that should be translated (see Filters sections for further information).
+
 ## View
 
 You can edit the default view for the language bar executing `php artisan view:publish mcamara/laravel-localization`.

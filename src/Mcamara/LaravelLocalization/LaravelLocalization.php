@@ -85,6 +85,8 @@ class LaravelLocalization
 		$languages = $this->configRepository->get('laravel-localization::languagesAllowed');
 		if(is_null($locale) || !is_string($locale))
 		{
+			// If the locale has not been passed through the function
+			// it tries to get it from the first segment of the url
 			$locale = Request::segment(1);
 		}
 		
@@ -94,6 +96,10 @@ class LaravelLocalization
 		}
 		else
 		{
+			// if the first segment/language passed is not valid
+			// the system would ask which language have to take
+			// it could be taken by session, browser or app default
+			// depending on your configuration
 			$locale = null;
 			$this->currentLanguage = $this->getCurrentLanguage();
 		}
