@@ -220,15 +220,15 @@ class LaravelLocalization
 				// the system will take the same
 				global $app;
 				$router = $app['router'];
-				if (method_exists($router, 'getCurrentRoute'))
-				{
-					// Laravel 4.0
-					$attributes = $router->getCurrentRoute()->getParameters();
-				}
-				else
+				if(App::make('laravel-localization.4.1'))
 				{
 					// Laravel 4.1
 					$attributes = $router->current()->parameters();
+				}
+				else
+				{
+					// Laravel 4.0
+					$attributes = $router->getCurrentRoute()->getParameters();
 				}
 			}
 		}
@@ -450,15 +450,15 @@ Route::filter('LaravelLocalizationRoutes', function()
 {
 	global $app;
 	$router = $app['router'];
-	if (method_exists($router, 'getCurrentRoute'))
-	{
-		// Laravel 4.0
-		$routeName = $app['laravellocalization']->getRouteNameFromAPath($router->getCurrentRoute()->getPath());
-	}
-	else
+	if(App::make('laravel-localization.4.1'))
 	{
 		// Laravel 4.1
 		$routeName = $app['laravellocalization']->getRouteNameFromAPath($router->current()->uri());
+	}
+	else
+	{
+		// Laravel 4.0
+		$routeName = $app['laravellocalization']->getRouteNameFromAPath($router->getCurrentRoute()->getPath());
 	}
 	$app['laravellocalization']->setRouteName($routeName);
 	return;
