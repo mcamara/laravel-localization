@@ -204,7 +204,7 @@ class LaravelLocalization
      *
 	 * @param  string $language 		Language to adapt
 	 * @param  string $transKeyName  	Translation key name of the url to adapt
-	 * @param  array $attributes  			Attributes for the route (only needed if transKeyName needs them)
+	 * @param  array $attributes  		Attributes for the route (only needed if transKeyName needs them)
      *
 	 * @return string 	             	URL translated
 	 */
