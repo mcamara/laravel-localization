@@ -363,11 +363,9 @@ class LaravelLocalization
             return Cookie::get('language');
         }
 		// or get browser language...
-		else if($this->configRepository->get('laravel-localization::useBrowserLanguage') &&
-            Request::header('Accept-Language') &&
-            in_array(substr(Request::header('Accept-Language'), 0, 2), $languages))
+		else if($this->configRepository->get('laravel-localization::useBrowserLanguage'))
 		{
-			return substr(Request::header('Accept-Language'), 0, 2);
+			return $this->negotiateLanguage();
 		}
 
 		// or get application default language
@@ -426,6 +424,94 @@ class LaravelLocalization
 	    }
 	    return false;
 	}
+
+    /**
+     * Negotiates language with the user's browser through the Accept-Language
+     * HTTP header or the user's host address.  Language codes are generally in
+     * the form "ll" for a language spoken in only one country, or "ll-CC" for a
+     * language spoken in a particular country.  For example, U.S. English is
+     * "en-US", while British English is "en-UK".  Portugese as spoken in
+     * Portugal is "pt-PT", while Brazilian Portugese is "pt-BR".
+     *
+     * This function is based on negotiateLanguage from Pear HTTP2
+     * http://pear.php.net/package/HTTP2/
+     *
+     * Quality factors in the Accept-Language: header are supported, e.g.:
+     *      Accept-Language: en-UK;q=0.7, en-US;q=0.6, no, dk;q=0.8
+     *
+     * @return string  The negotiated language result or app.locale.
+     */
+    public function negotiateLanguage()
+    {
+        $default = $this->configRepository->get('app.locale');
+        $supported = array();
+        foreach ($this->configRepository->get('laravel-localization::languagesAllowed') as $lang) {
+            $supported[strtolower($lang)] = $lang;
+        }
+
+        if (!count($supported)) {
+            return $default;
+        }
+
+        if (Request::header('Accept-Language')) {
+            $matches = array();
+            $generic_matches = array();
+            foreach (explode(',', Request::header('Accept-Language')) as $option) {
+                $option = array_map('trim', explode(';', $option));
+
+                $l = strtolower($option[0]);
+                if (isset($option[1])) {
+                    $q = (float) str_replace('q=', '', $option[1]);
+                } else {
+                    $q = null;
+                    // Assign default low weight for generic values
+                    if ($l == '*/*') {
+                        $q = 0.01;
+                    } elseif (substr($l, -1) == '*') {
+                        $q = 0.02;
+                    }
+                }
+                // Unweighted values, get high weight by their position in the
+                // list
+                $q = isset($q) ? $q : 1000 - count($matches);
+                $matches[$l] = $q;
+
+                //If for some reason the Accept-Language header only sends language with country
+                //we should make the language without country an accepted option, with a value
+                //less than it's parent.
+                $l_ops = explode('-', $l);
+                array_pop($l_ops);
+                while (!empty($l_ops)) {
+                    //The new generic option needs to be slightly less important than it's base
+                    $q -= 0.001;
+                    $generic_matches[implode('-', $l_ops)] = $q;
+                    array_pop($l_ops);
+                }
+            }
+            $matches = array_merge($generic_matches, $matches);
+
+            arsort($matches, SORT_NUMERIC);
+
+            foreach ($matches as $key => $q) {
+                if (isset($supported[$key])) {
+                    return $supported[$key];
+                }
+            }
+            // If any (i.e. "*") is acceptable, return the first supported format
+            if (isset($matches['*'])) {
+                return array_shift($supported);
+            }
+        }
+
+        if (Request::server('REMOTE_HOST')) {
+            $lang = strtolower(end($h = explode('.', Request::server('REMOTE_HOST'))));
+            if (isset($supported[$lang])) {
+                return $supported[$lang];
+            }
+        }
+
+        return $default;
+    }
 
 }
 
