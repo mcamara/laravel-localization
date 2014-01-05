@@ -259,8 +259,8 @@ class LaravelLocalization
 				}
 			}
 			// delete empty optional arguments
-			$route = preg_replace("/\/{[^)]+\?}/","",$route);
-			return rtrim($route, "/");
+			$route = preg_replace('/\/{[^)]+\?}/','',$route);
+			return rtrim($route, '/');
 		}
 		// This language does not have any key for this route name
 		return false;
