@@ -425,15 +425,14 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 		$language = $params[0];
 		$languages = Config::get('laravel-localization::languagesAllowed');
 
-		if(in_array($language, $languages) && $language === $defaultLanguage &&
-			Config::get('laravel-localization::hideDefaultLanguageInRoute') )
-		{
-			return Redirect::to($app['laravellocalization']->getCleanRoute(), 301);
-		}
-
-		if(!in_array($language, $languages) && 
-			($currentLanguage !== $defaultLanguage || !Config::get('laravel-localization::hideDefaultLanguageInRoute'))
-		)
+		if (in_array($language, $languages))
+        {
+            if ($language === $defaultLanguage && Config::get('laravel-localization::hideDefaultLanguageInRoute'))
+            {
+                return Redirect::to($app['laravellocalization']->getCleanRoute(), 301);
+            }
+        }
+		else if ($currentLanguage !== $defaultLanguage || !Config::get('laravel-localization::hideDefaultLanguageInRoute'))
 		{
 			// If the current url does not contain any language
 			// The system redirect the user to the very same url "languaged"
