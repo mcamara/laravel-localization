@@ -364,10 +364,10 @@ class LaravelLocalization
         }
 		// or get browser language...
 		else if($this->configRepository->get('laravel-localization::useBrowserLanguage') &&
-					isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) &&
-					in_array(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2), $languages))
+            Request::header('Accept-Language') &&
+            in_array(substr(Request::header('Accept-Language'), 0, 2), $languages))
 		{
-			return substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+			return substr(Request::header('Accept-Language'), 0, 2);
 		}
 
 		// or get application default language
