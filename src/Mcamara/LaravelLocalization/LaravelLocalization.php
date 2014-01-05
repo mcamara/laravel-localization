@@ -23,14 +23,14 @@ class LaravelLocalization
 	/**
      * Illuminate view environment.
      *
-     * @var Illuminate\View\Environment
+     * @var \Illuminate\View\Environment
      */
     protected $view;
 
 	/**
      * Illuminate translator class.
      *
-     * @var Illuminate\Translation\Translator
+     * @var \Illuminate\Translation\Translator
      */
     protected $translator;
 
@@ -50,12 +50,14 @@ class LaravelLocalization
 
     /**
      * An array that contains all routes that should be translated
+     *
      * @var array
      */
     protected $translatedRoutes = array();
 
     /**
      * Name of the translation key of the current route, it is used for url translations
+     *
      * @var string
      */
     protected $routeName = false;
@@ -64,6 +66,8 @@ class LaravelLocalization
      * Creates new instance.
      *
      * @param \Illuminate\Config\Repository $configRepository
+     * @param \Illuminate\View\Environment $view
+     * @param \Illuminate\Translation\Translator $translator
      */
     public function __construct(Repository $configRepository, Environment $view, Translator $translator)
     {
@@ -77,8 +81,10 @@ class LaravelLocalization
 
 	/**
 	 * Set and return current language
+     *
 	 * @param  string $locale	Language to set the App to (optional)
-	 * @return String 			Returns language (if route has any) or null (if route has not a language)
+     *
+	 * @return string 			Returns language (if route has any) or null (if route has not a language)
 	 */
 	public function setLanguage($locale = null)
 	{
@@ -115,9 +121,11 @@ class LaravelLocalization
 
 	/**
 	 * Returns html with language selector
+     *
 	 * @param  boolean $abbr 		Should languages be abbreviate (2 characters) or full named?
 	 * @param  string $customView 	Which template should the language bar have?
-	 * @return String 				Returns an html view with a language bar
+     *
+	 * @return string 				Returns an html view with a language bar
 	 */
 	public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
 	{
@@ -164,17 +172,19 @@ class LaravelLocalization
 
     /**
      * Returns an URL adapted to $language language
-     * @param  String $language Language to adapt
-     * @param  String $route    URL to adapt, if false, current url would be taken
-     * @return String           URL translated
+     *
+     * @param  string $language Language to adapt
+     * @param  string $route    URL to adapt, if false, current url would be taken
+     *
+     * @return string           URL translated
      */
-    public function getURLLanguage($language,$route = false)
+    public function getURLLanguage($language, $route = null)
     {
         if(!in_array($language, $this->configRepository->get('laravel-localization::languagesAllowed')))
         {
 			return false;
         }
-        if(!$route)
+        if(!isset($route))
         {
         	if($this->routeName)
         	{
@@ -191,12 +201,14 @@ class LaravelLocalization
 
 	/**
 	 * Returns an URL adapted to the route name and the language given
-	 * @param  String $language 		Language to adapt
-	 * @param  String $transKeyName  	Translation key name of the url to adapt
-	 * @param  Array $array  			Attributes for the route (only needed if transKeyName need them)
+     *
+	 * @param  string $language 		Language to adapt
+	 * @param  string $transKeyName  	Translation key name of the url to adapt
+	 * @param  array $attributes  			Attributes for the route (only needed if transKeyName needs them)
+     *
 	 * @return string 	             	URL translated
 	 */
-	public function getURLFromRouteNameTranslated($language, $transKeyName = false, $attributes = array())
+	public function getURLFromRouteNameTranslated($language, $transKeyName = null, $attributes = array())
 	{
 		if(!in_array($language, $this->configRepository->get('laravel-localization::languagesAllowed')))
 		{
@@ -204,7 +216,7 @@ class LaravelLocalization
 			return false;
 		}
 
-		if(!$transKeyName)
+		if(!isset($transKeyName))
 		{
 			// if translation key name is not given
 			// the system would try to get the current one...
@@ -257,13 +269,14 @@ class LaravelLocalization
 
 	/**
 	 * It returns an URL without language (if it has it)
-	 * @param  String $route URL to clean, if false, current url would be taken
-	 * @return String        Clean URL
+     *
+	 * @param  string $route URL to clean, if false, current url would be taken
+     *
+	 * @return string        Clean URL
 	 */
-	public function getCleanRoute($route = false)
+	public function getCleanRoute($route = null)
 	{
-		$cleanRoute = "";
-		if(!$route) $route = Request::url();
+		if(!isset($route)) $route = Request::url();
 		if(substr($route, -1) !== "/") $route .= "/";
 		$cleanRoute = str_replace("/".$this->currentLanguage."/","/",$route);
 		return rtrim($cleanRoute, "/");
@@ -271,7 +284,10 @@ class LaravelLocalization
 
 	/**
 	 * Appends i18n language segment to the URI
+     *
 	 * @param  string $uri
+     * @param  boolean $append_default  If true, append the default language to the path
+     *
 	 * @return string
 	 */
 	public function getURI($uri, $append_default = false)
@@ -286,6 +302,7 @@ class LaravelLocalization
 
 	/**
 	 * Returns default language
+     *
 	 * @return string
 	 */
 	public function getDefault()
@@ -295,7 +312,9 @@ class LaravelLocalization
 
 	/**
 	 * Returns all allowed languages
-	 * @param  Boolean $abbr should the languages be abbreviated?
+     *
+	 * @param  boolean $abbr should the languages be abbreviated?
+     *
 	 * @return array Array with all allowed languages
 	 */
 	public function getAllowedLanguages($abbr = true)
@@ -314,6 +333,7 @@ class LaravelLocalization
 
 	/**
 	 * Returns the class name of the language bar
+     *
 	 * @return string Language bar class name
 	 */
 	public function getLanguageBarClassName()
@@ -323,6 +343,7 @@ class LaravelLocalization
 
 	/**
 	 * Returns if the current language should be printed in the language bar
+     *
 	 * @return boolean Should the current language be printed?
 	 */
 	public function getPrintCurrentLanguage()
@@ -332,6 +353,7 @@ class LaravelLocalization
 
 	/**
 	 * Returns current language
+     *
 	 * @return string current language
 	 */
 	public function getCurrentLanguage()
@@ -362,6 +384,7 @@ class LaravelLocalization
 
 	/**
 	 * Returns translated routes
+     *
 	 * @return array translated routes
 	 */
 	public function getTranslatedRoutes()
@@ -380,7 +403,9 @@ class LaravelLocalization
 
 	/**
 	 * Translate routes and save them to the translated routes array (used in the localize route filter)
+     *
 	 * @param  string $routeName key of the translated string
+     *
 	 * @return string            translated string
 	 */
 	public function transRoute($routeName)
@@ -391,7 +416,9 @@ class LaravelLocalization
 
 	/**
 	 * Returns the translation key for a given path
+     *
 	 * @param  string $path [description]
+     *
 	 * @return string       [description]
 	 */
 	public function getRouteNameFromAPath($path)
