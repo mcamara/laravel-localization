@@ -5,6 +5,7 @@ use Illuminate\View\Environment;
 use Illuminate\Translation\Translator;
 use Request;
 use Session;
+use Cookie;
 use App;
 use View;
 use Config;
@@ -109,7 +110,15 @@ class LaravelLocalization
 		{
 			Session::put('language', $this->currentLanguage);
 		}
-
+        if($this->configRepository->get('laravel-localization::useCookieLanguage'))
+        {
+            Cookie::queue(Cookie::forever('language', $this->currentLanguage));
+        }
+        //Forget the language cookie if it's disabled and exists
+        else if (Cookie::get('language') != null)
+        {
+            Cookie::forget('language');
+        }
 		return $locale;
 	}
 
@@ -240,7 +249,7 @@ class LaravelLocalization
 			$route = url($language."/".$translation);
 			if(is_array($attributes))
 			{
-				foreach ($attributes as $key => $value) 
+				foreach ($attributes as $key => $value)
 				{
 					$route = str_replace("{".$key."}", $value, $route);
 					$route = str_replace("{".$key."?}", $value, $route);
@@ -346,6 +355,13 @@ class LaravelLocalization
 		{
 			return Session::get('language');
 		}
+        // or get cookie language...
+        else if($this->configRepository->get('laravel-localization::useCookieLanguage') &&
+            Cookie::get('language') != null &&
+            in_array(Cookie::get('language'), $languages))
+        {
+            return Cookie::get('language');
+        }
 		// or get browser language...
 		else if($this->configRepository->get('laravel-localization::useBrowserLanguage') &&
 					isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) &&
@@ -353,11 +369,9 @@ class LaravelLocalization
 		{
 			return substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
 		}
+
 		// or get application default language
-		else
-		{
-			return $this->configRepository->get('app.locale');
-		}
+		return $this->configRepository->get('app.locale');
 	}
 
 	/**
