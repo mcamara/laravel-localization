@@ -272,15 +272,18 @@ class LaravelLocalization
      *
 	 * @param  string $route URL to clean, if false, current url would be taken
      *
-	 * @return string        Clean URL
+	 * @return string        Route with no language path
 	 */
 	public function getCleanRoute($route = null)
 	{
-		if(!isset($route)) $route = Request::url();
-		if(substr($route, -1) !== "/") $route .= "/";
-		$cleanRoute = str_replace("/".$this->currentLanguage."/","/",$route);
-		return rtrim($cleanRoute, "/");
-	}
+        if (empty($route)) {
+            $route = Request::url();
+        }
+        $parsed_route = parse_url($route);
+        $new_path = preg_replace('%^/?'.$this->currentLanguage.'(/?)%', '$1', $parsed_route['path']);
+
+        return str_replace($parsed_route['path'], $new_path, $route);
+    }
 
 	/**
 	 * Appends i18n language segment to the URI
