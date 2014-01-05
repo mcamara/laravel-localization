@@ -429,7 +429,7 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
         {
             if ($language === $defaultLanguage && Config::get('laravel-localization::hideDefaultLanguageInRoute'))
             {
-                return Redirect::to($app['laravellocalization']->getCleanRoute(), 301);
+                return Redirect::to($app['laravellocalization']->getCleanRoute(), 302)->header('Vary','Accept-Language');
             }
         }
 		else if ($currentLanguage !== $defaultLanguage || !Config::get('laravel-localization::hideDefaultLanguageInRoute'))
@@ -437,7 +437,7 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 			// If the current url does not contain any language
 			// The system redirect the user to the very same url "languaged"
 			// we use the current language to redirect him
-			return Redirect::to($currentLanguage.'/'.Request::path(), 301);
+			return Redirect::to($currentLanguage.'/'.Request::path(), 302)->header('Vary','Accept-Language');
 		}
 	}
 });
