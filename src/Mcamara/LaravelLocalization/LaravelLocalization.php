@@ -262,11 +262,13 @@ class LaravelLocalization
 	 */
 	public function getCleanRoute($route = false)
 	{
-		$cleanRoute = "";
-		if(!$route) $route = Request::url();
-		if(substr($route, -1) !== "/") $route .= "/";
-		$cleanRoute = str_replace("/".$this->currentLanguage."/","/",$route);
-		return rtrim($cleanRoute, "/");
+		if (empty($route)) {
+            $route = Request::url();
+        }
+        $parsed_route = parse_url($route);
+        $new_path = preg_replace('%^/?'.$this->currentLanguage.'(/?)%', '$1', $parsed_route['path']);
+
+        return str_replace($parsed_route['path'], $new_path, $route);
 	}
 
 	/**
