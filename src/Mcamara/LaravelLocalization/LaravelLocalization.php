@@ -484,7 +484,10 @@ class LaravelLocalization
                 while (!empty($l_ops)) {
                     //The new generic option needs to be slightly less important than it's base
                     $q -= 0.001;
-                    $generic_matches[implode('-', $l_ops)] = $q;
+                    $op = implode('-', $l_ops);
+                    if (empty($generic_matches[$op]) || $generic_matches[$op] > $q) {
+                        $generic_matches[$op] = $q;
+                    }
                     array_pop($l_ops);
                 }
             }
