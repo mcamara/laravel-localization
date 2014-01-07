@@ -289,9 +289,17 @@ class LaravelLocalization
             $route = Request::url();
         }
         $parsed_route = parse_url($route);
-        $new_path = preg_replace('%^/?'.$this->currentLanguage.'(/?)%', '$1', $parsed_route['path']);
+        if(empty($parsed_route['path']))
+        {
+        	$path = "";
+        }
+        else
+        {
+        	$path = $parsed_route['path'];
+        }
+        $new_path = preg_replace('%^/?'.$this->currentLanguage.'(/?)%', '$1', $path);
 
-        return str_replace($parsed_route['path'], $new_path, $route);
+        return str_replace($path, $new_path, $route);
     }
 
 	/**
