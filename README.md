@@ -135,12 +135,14 @@ This package comes with some useful functions, like:
 
 ```php
 	/**
-	 * Returns html with language selector
-	 * @param  Boolean $abbr 		Should languages be abbreviate (2 characters) or full named?
-	 * @param  String $customView 	Which template should the language bar have?
-	 * @return String 				Returns an html view with a language bar
-	 */
-	public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
+     * Returns html with language selector
+     *
+     * @param  boolean $abbr 		Should languages be abbreviate (2 characters) or full named?
+     * @param  string $customView 	Which template should the language bar have?
+     *
+     * @return string 				Returns an html view with a language bar
+     */
+    public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
 
 	//Should be called in a view like this:
 	{{ LaravelLocalization::getLanguageBar(optional boolean $abbr, optional string $customView) }}
@@ -164,11 +166,13 @@ You can also define which view you want to use to show the language bar. If you 
 
 ```php
 	/**
-		 * It returns an URL without language (if it has it)
-		 * @param  String $route URL to clean, if false, current url would be taken
-		 * @return String        Clean URL
-	 */
-	public function getCleanRoute($route = false)
+     * It returns an URL without language (if it has it)
+     *
+     * @param  string $route URL to clean, if false, current url would be taken
+     *
+     * @return string        Route with no language path
+     */
+    public function getCleanRoute($route = null)
 
 	//Should be called in a view like this:
 	{{ LaravelLocalization::getCleanRoute(optional string $route) }}
@@ -179,13 +183,15 @@ It returns a string, giving url passed through the function clean of any languag
 ### Get URL for an specific language
 
 ```php
-	/**
-		* Returns an URL adapted to $language language
-		* @param  String $language Language to adapt
-		* @param  String $route    URL to adapt, if false, current url would be taken
-		* @return String           URL translated
-	*/
-	public function getURLLanguage($language,$route = false)
+    /**
+     * Returns an URL adapted to $language language
+     *
+     * @param  string $language Language to adapt
+     * @param  string $route    URL to adapt, if false, current url would be taken
+     *
+     * @return string           URL translated
+     */
+    public function getURLLanguage($language, $route = null)
 
 	//Should be called in a view like this:
 	{{ LaravelLocalization::getURLLanguage(string $lang, optional string $route) }}
@@ -197,13 +203,15 @@ It returns a string, translated to the desired language. If you pass a route to 
 
 ```php
 	/**
-	 * Returns an URL adapted to the route name and the language given
-	 * @param  String $language 		Language to adapt
-	 * @param  String $transKeyName  	Translation key name of the url to adapt
-	 * @param  Array $array  			Attributes for the route (only needed if transKeyName need them)
-	 * @return string 	             	URL translated
-	 */
-	public function getURLFromRouteNameTranslated($language, $transKeyName = false, $attributes = array())
+     * Returns an URL adapted to the route name and the language given
+     *
+     * @param  string $language 		Language to adapt
+     * @param  string $transKeyName  	Translation key name of the url to adapt
+     * @param  array $attributes  		Attributes for the route (only needed if transKeyName needs them)
+     *
+     * @return string 	             	URL translated
+     */
+    public function getURLFromRouteNameTranslated($language, $transKeyName = null, $attributes = array())
 
 	//Should be called in a view like this:
 	{{ LaravelLocalization::getURLFromRouteNameTranslated(string $lang, optional string $transKeyName, optional array $attributes) }}
@@ -215,11 +223,13 @@ It returns a string, translated to the desired language using the translation ke
 
 ```php
 	/**
-	 * Returns all allowed languages
-	 * @param  Boolean $abbr should the languages be abbreviated?
-	 * @return array Array with all allowed languages
-	 */
-	public function getAllowedLanguages($abbr = true)
+     * Returns all allowed languages
+     *
+     * @param  boolean $abbr should the languages be abbreviated?
+     *
+     * @return array Array with all allowed languages
+     */
+    public function getAllowedLanguages($abbr = true)
 
 	//Should be called like this:
 	{{ LaravelLocalization::getAllowedLanguages(optional boolean $abbr) }}
@@ -231,11 +241,13 @@ It returns an array, each position contains an allowed language.
 
 ```php
 	/**
-	 * Set and return current language
-	 * @param  string $locale	Language to set the App to (optional)
-	 * @return String 			Returns language (if route has any) or null (if route has not a language)
-	 */
-	public function setLanguage($locale = null)
+     * Set and return current language
+     *
+     * @param  string $locale	Language to set the App to (optional)
+     *
+     * @return string 			Returns language (if route has any) or null (if route has not a language)
+     */
+    public function setLanguage($locale = null)
 
 	//Should be called in a view like this:
 	{{ LaravelLocalization::setLanguage(optional string $lang) }}
