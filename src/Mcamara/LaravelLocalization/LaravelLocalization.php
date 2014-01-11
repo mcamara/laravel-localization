@@ -258,7 +258,16 @@ class LaravelLocalization
 		{
 			$translation = $this->translator->trans($transKeyName,array(),array(),$language);
 
-			$route = url($language."/".$translation);
+			// If hideDefaultLanguageInRoute is true, make sure not to include the default locale in the transalted url
+			if($this->configRepository->get('laravel-localization::hideDefaultLanguageInRoute') && Config::get('app.locale') == $language )
+			{
+				$route = url($translation);
+			}
+			else
+			{
+				$route = url($language."/".$translation);
+			}
+			
 			if(is_array($attributes))
 			{
 				foreach ($attributes as $key => $value)
