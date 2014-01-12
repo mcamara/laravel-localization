@@ -5,8 +5,8 @@
 		// Other prefixes will show a 404 page (if route is not defined)
 		'languagesAllowed' 		=> array ('en','es'),
 
-		// Take the browser language if it's not defined in the route? 
-		// If false, system will take app.php locale attribute 
+		// Take the browser language if it's not defined in the route?
+		// If false, system will take app.php locale attribute
 		'useBrowserLanguage'	=> true,
 
 		// Specify custom class for language bar unordered list
@@ -35,7 +35,7 @@
 		// If LaravelLocalizationRedirectFilter is actived and hideDefaultLanguageInRoute
 		// is true, the url would not have the default application language
 		'hideDefaultLanguageInRoute'	=> false,
-		
+
 		// List of all languages supported
 		// Feel free to add a new one
 		// or change their names
@@ -66,6 +66,7 @@
 			"bg" => "Bulgarian",
 			"my" => "Burmese",
 			"ca" => "Catalan",
+			"ny" => "Chewa",
 			"ch" => "Chamorro",
 			"ce" => "Chechen",
 			"zh" => "Chinese",
@@ -86,6 +87,7 @@
 			"fj" => "Fijian",
 			"fi" => "Finnish",
 			"fr" => "French",
+			"ff" => "Fula",
 			"gl" => "Galician",
 			"lg" => "Ganda",
 			"ka" => "Georgian",
@@ -113,6 +115,7 @@
 			"ks" => "Kashmiri",
 			"kk" => "Kazakh",
 			"km" => "Khmer",
+			"kn" => "Kannada",
 			"ki" => "Kikuyu",
 			"rw" => "Kinyarwanda",
 			"rn" => "Kirundi",
@@ -146,6 +149,7 @@
 			"oc" => "Occitan",
 			"or" => "Oriya",
 			"om" => "Oromo",
+			"ps" => "Pashto",
 			"fa" => "Persian",
 			"pl" => "Polish",
 			"pt" => "Portuguese",
@@ -165,6 +169,7 @@
 			"nr" => "South Ndebele",
 			"st" => "Southern Sotho",
 			"es" => "Spanish",
+			"si" => "Sinhala",
 			"su" => "Sundanese",
 			"sw" => "Swahili",
 			"ss" => "Swati",
@@ -184,6 +189,7 @@
 			"tw" => "Twi",
 			"uk" => "Ukrainian",
 			"ur" => "Urdu",
+			"ug" => "Uyghur",
 			"uz" => "Uzbek",
 			"ve" => "Venda",
 			"vi" => "Vietnamese",
