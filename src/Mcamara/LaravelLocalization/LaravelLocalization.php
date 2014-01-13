@@ -107,8 +107,21 @@ class LaravelLocalization
 			// the system would ask which language have to take
 			// it could be taken by session, browser or app default
 			// depending on your configuration
+			
 			$locale = null;
-			$this->currentLanguage = $this->getCurrentLanguage();
+			
+			// if we reached this point and hideDefaultLanguageInRoute is true
+			// we have to assume we are routing to a defaultLanguage route. 
+			if( Config::get('laravel-localization::hideDefaultLanguageInRoute') )
+			{
+				$this->currentLanguage = $this->defaultLanguage;
+			}
+			// but if hideDefaultLanguageInRoute is false, we have 
+			// to retrieve it from the session/cookie/browser...
+			else
+			{
+				$this->currentLanguage = $this->getCurrentLanguage();
+			}
 		}
 		App::setLocale($this->currentLanguage);
 		$this->configRepository->set('application.language',  $this->currentLanguage);
@@ -259,7 +272,7 @@ class LaravelLocalization
 			$translation = $this->translator->trans($transKeyName,array(),array(),$language);
 
 			// If hideDefaultLanguageInRoute is true, make sure not to include the default locale in the transalted url
-			if($this->configRepository->get('laravel-localization::hideDefaultLanguageInRoute') && Config::get('app.locale') == $language )
+			if($language === $this->defaultLanguage && Config::get('laravel-localization::hideDefaultLanguageInRoute') )
 			{
 				$route = url($translation);
 			}
