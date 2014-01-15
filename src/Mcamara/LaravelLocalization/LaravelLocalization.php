@@ -43,6 +43,13 @@ class LaravelLocalization
     protected $defaultLanguage;
 
     /**
+     * Supported Languages
+     *
+     * @var array
+     */
+    protected $supportedLanguages;
+
+    /**
      * Current language
      *
      * @var string
@@ -78,6 +85,9 @@ class LaravelLocalization
 
         // set default language
         $this->defaultLanguage = Config::get('app.locale');
+
+        // get supported languages
+        $this->supportedLanguages = $this->configRepository->get('laravel-localization::supportedLanguages');
     }
 
 	/**
@@ -96,7 +106,7 @@ class LaravelLocalization
 			// it tries to get it from the first segment of the url
 			$locale = Request::segment(1);
 		}
-		
+
 		if(in_array($locale, $languages))
 		{
 			$this->currentLanguage = $locale;
@@ -267,7 +277,7 @@ class LaravelLocalization
 			{
 				$route = url($language."/".$translation);
 			}
-			
+
 			if(is_array($attributes))
 			{
 				foreach ($attributes as $key => $value)
@@ -354,10 +364,52 @@ class LaravelLocalization
 		}
 		else
 		{
-			$languages = array_intersect_key($this->configRepository->get('laravel-localization::supportedLanguages'),
-							array_flip($this->configRepository->get('laravel-localization::languagesAllowed')));
+			$languages = array_intersect_key($this->getSupportedLanguages(), array_flip($this->configRepository->get('laravel-localization::languagesAllowed')));
 			return $languages;
 		}
+	}
+
+	/**
+	 * Returns all supported languages
+	 *
+	 * @return array Array with all supported languages
+	 */
+	public function getSupportedLanguages()
+	{
+		$names = array();
+
+		foreach ($this->supportedLanguages as $language => $properties)
+		{
+			foreach ($properties as $key => $val)
+			{
+				if ($key == 'name')
+				{
+					$names[$language] = $val;
+				}
+			}
+		}
+
+		return $names;
+	}
+
+	/**
+	 * Returns current language direction
+	 *
+	 * @return string current language direction
+	 */
+	public function getCurrentLanguageDirection()
+	{
+		return $this->supportedLanguages[$this->getCurrentLanguage()]['dir'];
+	}
+
+	/**
+	 * Returns current language script
+	 *
+	 * @return string current language script
+	 */
+	public function getCurrentLanguageScript()
+	{
+		return $this->supportedLanguages[$this->getCurrentLanguage()]['script'];
 	}
 
 	/**
@@ -593,7 +645,7 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 });
 
 /**
- * 	This filter would set the translated route name 
+ * 	This filter would set the translated route name
  */
 Route::filter('LaravelLocalizationRoutes', function()
 {
