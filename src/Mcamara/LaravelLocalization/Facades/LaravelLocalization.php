@@ -9,9 +9,9 @@ class LaravelLocalization extends Facade {
 	*
 	* @return string
 	*/
-	protected static function getFacadeAccessor() 
-	{ 
-		return 'laravellocalization'; 
+	protected static function getFacadeAccessor()
+	{
+		return 'laravellocalization';
 	}
 
 }

@@ -43,6 +43,13 @@ class LaravelLocalization
     protected $defaultLanguage;
 
     /**
+     * Supported Languages
+     *
+     * @var array
+     */
+    protected $supportedLanguages;
+
+    /**
      * Current language
      *
      * @var string
@@ -78,6 +85,9 @@ class LaravelLocalization
 
         // set default language
         $this->defaultLanguage = Config::get('app.locale');
+
+        // get supported languages
+        $this->supportedLanguages = $this->configRepository->get('laravel-localization::supportedLanguages');
     }
 
 	/**
@@ -96,7 +106,7 @@ class LaravelLocalization
 			// it tries to get it from the first segment of the url
 			$locale = Request::segment(1);
 		}
-		
+
 		if(in_array($locale, $languages))
 		{
 			$this->currentLanguage = $locale;
@@ -107,16 +117,16 @@ class LaravelLocalization
 			// the system would ask which language have to take
 			// it could be taken by session, browser or app default
 			// depending on your configuration
-			
+
 			$locale = null;
-			
+
 			// if we reached this point and hideDefaultLanguageInRoute is true
-			// we have to assume we are routing to a defaultLanguage route. 
+			// we have to assume we are routing to a defaultLanguage route.
 			if( Config::get('laravel-localization::hideDefaultLanguageInRoute') )
 			{
 				$this->currentLanguage = $this->defaultLanguage;
 			}
-			// but if hideDefaultLanguageInRoute is false, we have 
+			// but if hideDefaultLanguageInRoute is false, we have
 			// to retrieve it from the session/cookie/browser...
 			else
 			{
@@ -280,7 +290,7 @@ class LaravelLocalization
 			{
 				$route = url($language."/".$translation);
 			}
-			
+
 			if(is_array($attributes))
 			{
 				foreach ($attributes as $key => $value)
@@ -367,10 +377,52 @@ class LaravelLocalization
 		}
 		else
 		{
-			$languages = array_intersect_key($this->configRepository->get('laravel-localization::supportedLanguages'),
-							array_flip($this->configRepository->get('laravel-localization::languagesAllowed')));
+			$languages = array_intersect_key($this->getSupportedLanguages(), array_flip($this->configRepository->get('laravel-localization::languagesAllowed')));
 			return $languages;
 		}
+	}
+
+	/**
+	 * Returns all supported languages
+	 *
+	 * @return array Array with all supported languages
+	 */
+	public function getSupportedLanguages()
+	{
+		$names = array();
+
+		foreach ($this->supportedLanguages as $language => $properties)
+		{
+			foreach ($properties as $key => $val)
+			{
+				if ($key == 'name')
+				{
+					$names[$language] = $val;
+				}
+			}
+		}
+
+		return $names;
+	}
+
+	/**
+	 * Returns current language direction
+	 *
+	 * @return string current language direction
+	 */
+	public function getCurrentLanguageDirection()
+	{
+		return $this->supportedLanguages[$this->getCurrentLanguage()]['dir'];
+	}
+
+	/**
+	 * Returns current language script
+	 *
+	 * @return string current language script
+	 */
+	public function getCurrentLanguageScript()
+	{
+		return $this->supportedLanguages[$this->getCurrentLanguage()]['script'];
 	}
 
 	/**
@@ -606,7 +658,7 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 });
 
 /**
- * 	This filter would set the translated route name 
+ * 	This filter would set the translated route name
  */
 Route::filter('LaravelLocalizationRoutes', function()
 {

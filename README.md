@@ -94,7 +94,7 @@ Templates files and all language files should follow the [Lang class](http://lar
 
 ### Filters
 
-Moreover, this package includes a filter to redirect all "non-languaged" routes to a "languaged" one (thanks to Sangar82). 
+Moreover, this package includes a filter to redirect all "non-languaged" routes to a "languaged" one (thanks to Sangar82).
 
 So, if a user accesses to http://url-to-laravel/test and the system have this filter actived and 'en' as a current language for this user, it would redirect (301) him automatically to http://url-to-laravel/en/test. This is mainly used to avoid duplicate content and improve SEO performance.
 
@@ -106,7 +106,7 @@ So, if a user accesses to http://url-to-laravel/test and the system have this fi
 	array(
 		'prefix' => LaravelLocalization::setLanguage(),
 		'before' => 'LaravelLocalizationRedirectFilter' // LaravelLocalization filter
-	), 
+	),
 	function()
 	{
 		/** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
@@ -178,7 +178,7 @@ You can also define which view you want to use to show the language bar. If you 
 	{{ LaravelLocalization::getCleanRoute(optional string $route) }}
 ```
 
-It returns a string, giving url passed through the function clean of any language section. 
+It returns a string, giving url passed through the function clean of any language section.
 
 ### Get URL for an specific language
 
@@ -257,6 +257,56 @@ This function will change the application current language, if the language is n
 
 The function have to be called in the prefix of any route that should be translated (see Filters sections for further information).
 
+### Get Supported Languages
+
+```php
+	/**
+	 * Returns all supported languages
+	 *
+	 * @return array Array with all supported languages
+	 */
+	public function getSupportedLanguages()
+
+	//Should be called in a view like this:
+	{{ LaravelLocalization::getSupportedLanguages() }}
+```
+
+This function will return all supported languages as array.
+
+### Get Current Language Direction
+
+```php
+	/**
+	 * Returns current language direction
+	 *
+	 * @return string current language direction
+	 */
+	public function getCurrentLanguageDirection()
+
+	//Should be called in a view like this:
+	{{ LaravelLocalization::getCurrentLanguageDirection() }}
+```
+
+This function will return current language direction as string (ltr/rtl).
+
+
+### Get Current Language Script
+
+```php
+	/**
+	 * Returns current language script
+	 *
+	 * @return string current language script
+	 */
+	public function getCurrentLanguageScript()
+
+	//Should be called in a view like this:
+	{{ LaravelLocalization::getCurrentLanguageScript() }}
+```
+
+This function will return current language script as string (Latin/Cyrillic/Arabic/ ..etc).
+
+
 ## View
 
 You can edit the default view for the language bar executing `php artisan view:publish mcamara/laravel-localization`.
@@ -274,7 +324,7 @@ You can adapt your URLs depending on the language you want to show them. For exa
 	array(
 		'prefix' => LaravelLocalization::setLanguage(),
 		'before' => 'LaravelLocalizationRoutes' // Route translate filter
-	), 
+	),
 	function()
 	{
       /** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
@@ -294,7 +344,7 @@ You can adapt your URLs depending on the language you want to show them. For exa
 
 	/** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
 ```
-In the routes file you just have to add the `LaravelLocalizationRoutes` filter and the `LaravelLocalization::transRoute` function to every route you want to translate using the translation key. 
+In the routes file you just have to add the `LaravelLocalizationRoutes` filter and the `LaravelLocalization::transRoute` function to every route you want to translate using the translation key.
 
 _Tip:_ If you want to use this filter with other filters (like `LaravelLocalizationRedirectFilter`) you just have to join them in the Laravel way, using | (eg: `'before' => 'LaravelLocalizationRoutes|LaravelLocalizationRedirectFilter'` )
 
@@ -325,6 +375,9 @@ By default only english and spanish are allowed but it can be changed using conf
 This file have some interesting configuration settings (as the allowed languages or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
+### 0.6
+- Added support for language script and direction
+
 ### 0.5
 - Added multi-language routes
 - Function `getCurrentLanguage` is not static
