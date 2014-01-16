@@ -393,11 +393,18 @@ class LaravelLocalization
 
 		foreach ($this->supportedLanguages as $language => $properties)
 		{
-			foreach ($properties as $key => $val)
+			if(is_string($properties))
 			{
-				if ($key == 'name')
+				// this is for avoiding breaking old config files
+				$names[$language] = $properties;
+			}
+			elseif (is_array($properties)) {
+				foreach ($properties as $key => $val)
 				{
-					$names[$language] = $val;
+					if ($key == 'name')
+					{
+						$names[$language] = $val;
+					}
 				}
 			}
 		}
