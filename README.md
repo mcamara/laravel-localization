@@ -14,6 +14,7 @@ Easy i18n localization for Laravel 4, an useful tool to combine with Laravel loc
 - <a href="#helpers">Helpers</a>
 - <a href="#view">View</a>
 - <a href="#translated-routes">Translated Routes</a>
+- <a href="#translated-language-description">Translated Language Description</a>
 - <a href="#config">Config</a>
 - <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
@@ -367,6 +368,50 @@ Then you have to create the translation files and add there every key you want t
 ```
 
 Once files are saved, you can access to http://url/en/about , http://url/es/acerca , http://url/en/view/5 and http://url/es/ver/5 without any problem. The getLanguageBar function would work as desired and it will translate the routes to all translated languages (don't forget to add any new route to the translation file).
+
+## Translated Language Description
+
+To have yours language description translated for the current language just create a localization.php file inside your language folder.
+For a route like this below you have:
+
+```php
+   Route::get('/test', function ()
+   {
+      return LaravelLocalization::getAllowedLanguages(false);
+   });
+```   
+
+http://url/en/test
+
+{"en":"English","fr":"French","it":"Italian","pt":"Portuguese","es":"Spanish"}
+
+http://url/es/test
+
+{"en":"Ingl&eacute;s","fr":"French","it":"Italiano","pt":"Portugu&eacute;s","es":"Espa&ntilde;ol"}
+
+Note that the French language wasn't translated for Spanish. This is because the language don't exist in localization.php.
+
+For the example above we have the follow files:
+```php
+<?php // app/lang/en/localization.php
+
+return array(
+   'en' => 'English',
+   'es' => 'Spanish',
+   'pt' => 'Portuguese',
+   'it' => 'Italian'
+);
+```
+```php
+<?php // app/lang/es/localization.php
+
+return array(
+   'en' => 'Ingl&eacute;s',
+   'es' => 'Espa&ntilde;ol',
+   'pt' => 'Portugu&eacute;s',
+   'it' => 'Italiano'
+);
+```
 
 ## Config
 
