@@ -393,20 +393,7 @@ class LaravelLocalization
 
 		foreach ($this->supportedLanguages as $language => $properties)
 		{
-			if(is_string($properties))
-			{
-				// this is for avoiding breaking old config files
-				$names[$language] = $properties;
-			}
-			elseif (is_array($properties)) {
-				foreach ($properties as $key => $val)
-				{
-					if ($key == 'name')
-					{
-						$names[$language] = $val;
-					}
-				}
-			}
+			$names[$language] = $this->getTranslatedDescription($language);
 		}
 
 		return $names;
@@ -635,6 +622,40 @@ class LaravelLocalization
         return $default;
     }
 
+	/*
+	 * Receive the language code and returns the language name translated
+	 * for the current language.
+	 *
+	 * @param string $lang The language code for translate.
+	 *
+	 * string The name translated.
+	 */
+   protected function getTranslatedDescription($lang)
+	{
+		// Search in localization.php
+		$description = $this->translator->trans('localization.' . $lang);
+
+		if ($description == 'localization.' . $lang)
+		{
+			if(is_string($this->supportedLanguages[$lang]))
+			{
+				// this is for avoiding breaking old config files
+				$description = $this->supportedLanguages[$lang];
+			}
+			elseif (is_array($this->supportedLanguages[$lang]))
+			{
+				foreach ($this->supportedLanguages[$lang] as $key => $val)
+				{
+					if ($key == 'name')
+					{
+						$description = $val;
+					}
+				}
+			}
+		}
+
+		return $description;
+	}
 }
 
 Route::filter('LaravelLocalizationRedirectFilter', function()
