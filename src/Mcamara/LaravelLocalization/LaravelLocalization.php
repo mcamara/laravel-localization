@@ -43,11 +43,11 @@ class LaravelLocalization
     protected $defaultLanguage;
 
     /**
-     * Supported Languages
+     * Supported Locales
      *
      * @var array
      */
-    protected $supportedLanguages;
+    protected $supportedLocales;
 
     /**
      * Current language
@@ -85,31 +85,28 @@ class LaravelLocalization
 
         // set default language
         $this->defaultLanguage = Config::get('app.locale');
-
-        // get supported languages
-        $this->supportedLanguages = $this->configRepository->get('laravel-localization::supportedLanguages');
     }
 
 	/**
 	 * Set and return current language
      *
-	 * @param  string $locale	Language to set the App to (optional)
+	 * @param  string $localeCode	Language to set the App to (optional)
      *
 	 * @return string 			Returns language (if route has any) or null (if route has not a language)
 	 */
-	public function setLanguage($locale = null)
+	public function setLanguage($localeCode = null)
 	{
-		$languages = $this->configRepository->get('laravel-localization::languagesAllowed');
-		if(is_null($locale) || !is_string($locale))
+		$languages = $this->getSupportedLocales();
+		if(is_null($localeCode) || !is_string($localeCode))
 		{
 			// If the locale has not been passed through the function
 			// it tries to get it from the first segment of the url
-			$locale = Request::segment(1);
+            $localeCode = Request::segment(1);
 		}
 
-		if(in_array($locale, $languages))
+		if(!empty($languages[$localeCode]))
 		{
-			$this->currentLanguage = $locale;
+			$this->currentLanguage = $localeCode;
 		}
 		else
 		{
@@ -118,7 +115,7 @@ class LaravelLocalization
 			// it could be taken by session, browser or app default
 			// depending on your configuration
 
-			$locale = null;
+            $localeCode = null;
 
 			// if we reached this point and hideDefaultLanguageInRoute is true
 			// we have to assume we are routing to a defaultLanguage route.
@@ -148,7 +145,7 @@ class LaravelLocalization
         {
             Cookie::forget('language');
         }
-		return $locale;
+		return $localeCode;
 	}
 
 	/**
@@ -158,61 +155,58 @@ class LaravelLocalization
 	 * @param  string $customView 	Which template should the language bar have?
      *
 	 * @return string 				Returns an html view with a language bar
+     *
+     * @deprecated use getLanguageChooser
 	 */
-	public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
-	{
-		$languages = array();
-		if($abbr)
-		{
-			foreach ($this->configRepository->get('laravel-localization::languagesAllowed') as $lang)
-			{
-				$languages[$lang] = strtoupper($lang);
-			}
-		}
-		else
-		{
-			$languages = $this->getAllowedLanguages(false);
+    public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
+    {
+        $languages = array();
+        $active = $this->currentLanguage;
+        $urls = array();
 
-		}
-		$active = $this->currentLanguage;
-		$urls = array();
-		foreach ($this->configRepository->get('laravel-localization::languagesAllowed') as $lang)
-		{
-			$langUrl = $this->getURLLanguage($lang);
+        foreach ($this->getSupportedLocales() as $localeCode => $language) {
+            if ($abbr) {
+                $languages[$localeCode] = $localeCode;
+            } else if (!empty($language['native'])) {
+                $languages[$localeCode] = $language['native'];
+            } else {
+                $languages[$localeCode] = $language['name'];
+            }
 
-			// check if the url is set for the language
-			if($langUrl)
-			{
-				$urls[$lang] = $langUrl;
-			}
-			else
-			{
-				// the url is not set for the language (check lang/$lang/routes.php)
-				unset($languages[$lang]);
-			}
-		}
-		if(is_string($customView) && $this->view->exists($customView))
-		{
-			$view = $customView;
-		}
-		else
-		{
-			$view = 'laravel-localization::languagebar';
-		}
-		return $this->view->make($view, compact('languages','active','urls'));
-	}
+            $langUrl = $this->getURLLanguage($localeCode);
+
+            // check if the url is set for the language
+            if($langUrl) {
+                $urls[$localeCode] = $langUrl;
+            } else  {
+                // the url is not set for the language (check lang/$lang/routes.php)
+                unset($languages[$localeCode]);
+            }
+        }
+
+        if(is_string($customView) && $this->view->exists($customView))
+        {
+            $view = $customView;
+        }
+        else
+        {
+            $view = 'laravel-localization::languagebar';
+        }
+        return $this->view->make($view, compact('languages','active','urls'));
+    }
 
     /**
      * Returns an URL adapted to $language language
      *
-     * @param  string $language Language to adapt
+     * @param  string $localeCode Language to adapt
      * @param  string $route    URL to adapt, if false, current url would be taken
      *
      * @return string           URL translated
      */
-    public function getURLLanguage($language, $route = null)
+    public function getURLLanguage($localeCode, $route = null)
     {
-        if(!in_array($language, $this->configRepository->get('laravel-localization::languagesAllowed')))
+        $locales = $this->getSupportedLocales();
+        if(empty($locales[$localeCode]))
         {
 			return false;
         }
@@ -223,11 +217,11 @@ class LaravelLocalization
         		// if the system is going to translate the current url
         		// and it is a translated route
         		// the system would return the translated one
-        		return $this->getURLFromRouteNameTranslated($language);
+        		return $this->getURLFromRouteNameTranslated($localeCode);
         	}
 			$route = Request::url();
         }
-        return str_replace(url(), url($language), $this->getCleanRoute($route));
+        return str_replace(url(), url($localeCode), $this->getCleanRoute($route));
     }
 
 
@@ -368,42 +362,44 @@ class LaravelLocalization
 	 * @param  boolean $abbr should the languages be abbreviated?
      *
 	 * @return array Array with all allowed languages
+     *
+     * @deprecated use getSupportedLocales instead.
 	 */
 	public function getAllowedLanguages($abbr = true)
 	{
-		if($abbr)
-		{
-			return $this->configRepository->get('laravel-localization::languagesAllowed');
-		}
-		else
-		{
-			$languages = array_intersect_key($this->getSupportedLanguages(), array_flip($this->configRepository->get('laravel-localization::languagesAllowed')));
-			return $languages;
-		}
+		$allowed = array();
+
+        foreach ($this->getSupportedLocales() as $localeCode => $properties) {
+            $allowed[$localeCode] = $abbr ? $localeCode : $properties['name'];
+        }
+
+        return $allowed;
 	}
 
 	/**
 	 * Returns all supported languages
 	 *
 	 * @return array Array with all supported languages
+     *
+     * @deprecated use getSupportedLocales instead.
 	 */
 	public function getSupportedLanguages()
 	{
 		$names = array();
 
-		foreach ($this->supportedLanguages as $language => $properties)
+		foreach ($this->getSupportedLocales() as $localeCode => $properties)
 		{
 			if(is_string($properties))
 			{
 				// this is for avoiding breaking old config files
-				$names[$language] = $properties;
+				$names[$localeCode] = $properties;
 			}
 			elseif (is_array($properties)) {
 				foreach ($properties as $key => $val)
 				{
 					if ($key == 'name')
 					{
-						$names[$language] = $val;
+						$names[$localeCode] = $val;
 					}
 				}
 			}
@@ -412,6 +408,49 @@ class LaravelLocalization
 		return $names;
 	}
 
+    /**
+     * Build the new supported Locales array using deprecated config options
+     *
+     * @return array|boolean
+     */
+    private function buildDeprecatedConfig() {
+        //Use deprecated languagesAllowed & languagesSupported to build supportedLocales.
+        $allowed = $this->configRepository->get('laravel-localization::languagesAllowed');
+        if (empty($allowed)) {
+            return false;
+        }
+
+        $supported = $this->configRepository->get('laravel-localization::supportedLanguages');
+
+        $locales = array();
+        foreach ($allowed as $localeCode) {
+            $locales[$localeCode] = array(
+                'name' => $supported[$localeCode]
+            );
+        }
+        return $locales;
+    }
+
+    /**
+     * Return an array of all supported Locales
+     *
+     * @return array
+     */
+    public function getSupportedLocales() {
+        if (!empty($this->supportedLocales)) {
+            return $this->supportedLocales;
+        }
+
+        $locales = $this->buildDeprecatedConfig();
+        if (empty($locales)) {
+            $locales = $this->configRepository->get('laravel-localization::supportedLocales');
+        }
+
+        $this->supportedLocales = $locales;
+
+        return $locales;
+    }
+
 	/**
 	 * Returns current language direction
 	 *
@@ -419,7 +458,7 @@ class LaravelLocalization
 	 */
 	public function getCurrentLanguageDirection()
 	{
-		return $this->supportedLanguages[$this->getCurrentLanguage()]['dir'];
+		return $this->supportedLocales[$this->getCurrentLanguage()]['dir'];
 	}
 
 	/**
@@ -429,8 +468,18 @@ class LaravelLocalization
 	 */
 	public function getCurrentLanguageScript()
 	{
-		return $this->supportedLanguages[$this->getCurrentLanguage()]['script'];
+		return $this->supportedLocales[$this->getCurrentLanguage()]['script'];
 	}
+
+    /**
+     * Returns current language's native reading
+     *
+     * @return string current language's native reading
+     */
+    public function getCurrentLanguageNativeReading()
+    {
+        return $this->supportedLocales[$this->getCurrentLanguage()]['native'];
+    }
 
 	/**
 	 * Returns the class name of the language bar
@@ -463,7 +512,7 @@ class LaravelLocalization
 		{
 			return $this->currentLanguage;
 		}
-		$languages = $this->configRepository->get('laravel-localization::languagesAllowed');
+		$locales = $this->getSupportedLocales();
 		// get session language...
 		if($this->configRepository->get('laravel-localization::useSessionLanguage') && Session::has('language'))
 		{
@@ -472,7 +521,7 @@ class LaravelLocalization
         // or get cookie language...
         else if($this->configRepository->get('laravel-localization::useCookieLanguage') &&
             Cookie::get('language') != null &&
-            in_array(Cookie::get('language'), $languages))
+            !empty($locales[Cookie::get('language')]))
         {
             return Cookie::get('language');
         }
@@ -640,26 +689,26 @@ class LaravelLocalization
 Route::filter('LaravelLocalizationRedirectFilter', function()
 {
 	global $app;
-	$currentLanguage = $app['laravellocalization']->getCurrentLanguage();
-	$defaultLanguage = $app['laravellocalization']->getDefault();
+	$currentLocale = $app['laravellocalization']->getCurrentLanguage();
+	$defaultLocale = $app['laravellocalization']->getDefault();
 	$params = explode('/', Request::path());
 	if(count($params) > 0){
-		$language = $params[0];
-		$languages = Config::get('laravel-localization::languagesAllowed');
+        $localeCode = $params[0];
+        $locales = $app['laravellocalization']->getSupportedLocales();
 
-		if (in_array($language, $languages))
+		if (!empty($locales[$localeCode]))
         {
-            if ($language === $defaultLanguage && Config::get('laravel-localization::hideDefaultLanguageInRoute'))
+            if ($localeCode === $defaultLocale && Config::get('laravel-localization::hideDefaultLanguageInRoute'))
             {
                 return Redirect::to($app['laravellocalization']->getCleanRoute(), 302)->header('Vary','Accept-Language');
             }
         }
-		else if ($currentLanguage !== $defaultLanguage || !Config::get('laravel-localization::hideDefaultLanguageInRoute'))
+		else if ($currentLocale !== $defaultLocale || !Config::get('laravel-localization::hideDefaultLanguageInRoute'))
 		{
 			// If the current url does not contain any language
 			// The system redirect the user to the very same url "languaged"
 			// we use the current language to redirect him
-			return Redirect::to($currentLanguage.'/'.Request::path(), 302)->header('Vary','Accept-Language');
+			return Redirect::to($currentLocale.'/'.Request::path(), 302)->header('Vary','Accept-Language');
 		}
 	}
 });
