@@ -156,41 +156,28 @@ class LaravelLocalization
      *
 	 * @return string 				Returns an html view with a language bar
 	 */
-    public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
-    {
-        $languages = array();
-        $active = $this->currentLanguage;
-        $urls = array();
-
-        foreach ($this->getSupportedLocales() as $localeCode => $language) {
-            if ($abbr) {
-                $languages[$localeCode] = $localeCode;
-            } else if (!empty($language['native'])) {
-                $languages[$localeCode] = $language['native'];
-            } else {
-                $languages[$localeCode] = $language['name'];
-            }
-
-            $langUrl = $this->getURLLanguage($localeCode);
-
-            // check if the url is set for the language
-            if($langUrl) {
-                $urls[$localeCode] = $langUrl;
-            } else  {
-                // the url is not set for the language (check lang/$lang/routes.php)
-                unset($languages[$localeCode]);
-            }
-        }
-
-        if(is_string($customView) && $this->view->exists($customView))
-        {
+    public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar') {
+        if (is_string($customView) && $this->view->exists($customView)) {
             $view = $customView;
-        }
-        else
-        {
+        } else {
             $view = 'laravel-localization::languagebar';
         }
-        return $this->view->make($view, compact('languages','active','urls'));
+        return $this->view->make($view, compact('abbr'));
+    }
+
+    /**
+     * Returns an URL adapted to $language language
+     *
+     * @param  string $localeCode Language to adapt
+     * @param  string $route    URL to adapt, if false, current url would be taken
+     *
+     * @return string           URL translated
+     *
+     * @deprecated use getLocalizedURL
+     */
+    public function getURLLanguage($localeCode, $route = null)
+    {
+        return $this->getLocalizedURL($localeCode, $route = null);
     }
 
     /**
@@ -201,23 +188,21 @@ class LaravelLocalization
      *
      * @return string           URL translated
      */
-    public function getURLLanguage($localeCode, $route = null)
+    public function getLocalizedURL($localeCode, $route = null)
     {
         $locales = $this->getSupportedLocales();
-        if(empty($locales[$localeCode]))
-        {
-			return false;
+        if (empty($locales[$localeCode])) {
+            return false;
         }
-        if(!isset($route))
-        {
-        	if($this->routeName)
-        	{
-        		// if the system is going to translate the current url
-        		// and it is a translated route
-        		// the system would return the translated one
-        		return $this->getURLFromRouteNameTranslated($localeCode);
-        	}
-			$route = Request::url();
+
+        if (!isset($route)) {
+            if ($this->routeName) {
+                // if the system is going to translate the current url
+                // and it is a translated route
+                // the system would return the translated one
+                return $this->getURLFromRouteNameTranslated($localeCode);
+            }
+            $route = Request::url();
         }
         return str_replace(url(), url($localeCode), $this->getCleanRoute($route));
     }
@@ -493,10 +478,16 @@ class LaravelLocalization
 	 * Returns if the current language should be printed in the language bar
      *
 	 * @return boolean Should the current language be printed?
+     *
+     * @deprecated will be removed in v1.0
 	 */
 	public function getPrintCurrentLanguage()
 	{
-		return $this->configRepository->get('laravel-localization::printCurrentLanguageInBar');
+        $print = $this->configRepository->get('laravel-localization::printCurrentLanguageInBar');
+        if (isset($print)) {
+		    return $this->configRepository->get('laravel-localization::printCurrentLanguageInBar');
+        }
+        return true;
 	}
 
 	/**

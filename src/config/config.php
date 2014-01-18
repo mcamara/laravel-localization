@@ -33,10 +33,6 @@
         // or the browser preferred language (if useBrowserLanguage is true)
         'useCookieLanguage' => true,
 
-		// Should the current language be printed in the language bar?
-		// If false, only other languages would be printed
-		'printCurrentLanguageInBar' => true,
-
 		// If LaravelLocalizationRedirectFilter is actived and hideDefaultLanguageInRoute
 		// is true, the url would not have the default application language
 		'hideDefaultLanguageInRoute'	=> false,
