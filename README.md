@@ -186,15 +186,15 @@ It returns a string, giving url passed through the function clean of any languag
     /**
      * Returns an URL adapted to $language language
      *
-     * @param  string $language Language to adapt
+     * @param  string $localeCode Language to adapt
      * @param  string $route    URL to adapt, if false, current url would be taken
      *
      * @return string           URL translated
      */
-    public function getURLLanguage($language, $route = null)
+    public function getLocalizedURL($localeCode, $route = null)
 
 	//Should be called in a view like this:
-	{{ LaravelLocalization::getURLLanguage(string $lang, optional string $route) }}
+	{{ LaravelLocalization::getLocalizedURL(string $lang, optional string $route) }}
 ```
 
 It returns a string, translated to the desired language. If you pass a route to the function it has to be written in the current language, otherwise the function won't return the desired result.
