@@ -468,10 +468,14 @@ class LaravelLocalization
 	 * Returns the class name of the language bar
      *
 	 * @return string Language bar class name
+     *
+     * @deprecated will be removed in v1.0
 	 */
 	public function getLanguageBarClassName()
 	{
-		return $this->configRepository->get('laravel-localization::languageBarClass');
+        $className = $this->configRepository->get('laravel-localization::languageBarClass');
+
+		return empty($className) ? 'laravel_language_chooser' : $className;
 	}
 
 	/**
