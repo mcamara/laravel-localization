@@ -1,7 +1,7 @@
 <?php namespace Mcamara\LaravelLocalization;
 
 use Illuminate\Config\Repository;
-use Illuminate\View\Environment;
+use Illuminate\View\Factory;
 use Illuminate\Translation\Translator;
 use Request;
 use Session;
@@ -22,9 +22,9 @@ class LaravelLocalization
     protected $configRepository;
 
 	/**
-     * Illuminate view environment.
+     * Illuminate view factory.
      *
-     * @var \Illuminate\View\Environment
+     * @var \Illuminate\View\Factory
      */
     protected $view;
 
@@ -74,10 +74,10 @@ class LaravelLocalization
      * Creates new instance.
      *
      * @param \Illuminate\Config\Repository $configRepository
-     * @param \Illuminate\View\Environment $view
+     * @param \Illuminate\View\Factory $view
      * @param \Illuminate\Translation\Translator $translator
      */
-    public function __construct(Repository $configRepository, Environment $view, Translator $translator)
+    public function __construct(Repository $configRepository, Factory $view, Translator $translator)
     {
         $this->configRepository = $configRepository;
         $this->view = $view;
