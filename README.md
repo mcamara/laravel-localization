@@ -219,23 +219,21 @@ It returns a string, translated to the desired language. If you pass a route to 
 
 It returns a string, translated to the desired language using the translation key given. If the translation key does not exist in the language given, this function will return false.
 
-### Get Allowed Languages
+### Get Supported Locales
 
 ```php
 	/**
-     * Returns all allowed languages
+     * Return an array of all supported Locales
      *
-     * @param  boolean $abbr should the languages be abbreviated?
-     *
-     * @return array Array with all allowed languages
+     * @return array
      */
-    public function getAllowedLanguages($abbr = true)
+     public function getSupportedLocales()
 
 	//Should be called like this:
-	{{ LaravelLocalization::getAllowedLanguages(optional boolean $abbr) }}
+	{{ LaravelLocalization::getSupportedLocales() }}
 ```
 
-It returns an array, each position contains an allowed language.
+This function will return all supported languages and it's properties as array.
 
 ### Set Language
 
@@ -257,21 +255,6 @@ This function will change the application current language, if the language is n
 
 The function have to be called in the prefix of any route that should be translated (see Filters sections for further information).
 
-### Get Supported Languages
-
-```php
-	/**
-	 * Returns all supported languages
-	 *
-	 * @return array Array with all supported languages
-	 */
-	public function getSupportedLanguages()
-
-	//Should be called in a view like this:
-	{{ LaravelLocalization::getSupportedLanguages() }}
-```
-
-This function will return all supported languages as array.
 
 ### Get Current Language Direction
 
@@ -375,6 +358,13 @@ By default only english and spanish are allowed but it can be changed using conf
 This file have some interesting configuration settings (as the allowed languages or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
+### 0.7
+- Merged languagesAllowed & supportedLanguages
+- Added native for language names
+- Added new function getSupportedLocales
+- Deprecated getAllowedLanguages use getSupportedLocales instead
+- Deprecated getSupportedLanguages use getSupportedLocales instead
+
 ### 0.6
 - Added support for language script and direction
 
