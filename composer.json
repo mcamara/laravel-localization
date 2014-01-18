@@ -4,7 +4,7 @@
     "keywords": ["localization", "laravel", "php"],
     "homepage": "https://github.com/mcamara/laravel-localization",
     "license": "MIT",
-    "version": "0.4",
+    "version": "0.7",
     "authors": [
         {
             "name": "LaravelLocalization",
