@@ -155,8 +155,6 @@ class LaravelLocalization
 	 * @param  string $customView 	Which template should the language bar have?
      *
 	 * @return string 				Returns an html view with a language bar
-     *
-     * @deprecated use getLanguageChooser
 	 */
     public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
     {
