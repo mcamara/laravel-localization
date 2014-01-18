@@ -14,10 +14,6 @@
 		// If false, system will take app.php locale attribute
 		'useBrowserLanguage'	=> true,
 
-		// Specify custom class for language bar unordered list
-		// It only makes sense if you use the default language bar
-		'languageBarClass' => 'laravel_language_chooser',
-
         // Should application use the language stored in a session
         // if the language is not defined in the url?
         // If false and language not defined in the url, system will
@@ -32,10 +28,6 @@
         // system will take the default language (defined in config/app.php)
         // or the browser preferred language (if useBrowserLanguage is true)
         'useCookieLanguage' => true,
-
-		// Should the current language be printed in the language bar?
-		// If false, only other languages would be printed
-		'printCurrentLanguageInBar' => true,
 
 		// If LaravelLocalizationRedirectFilter is actived and hideDefaultLanguageInRoute
 		// is true, the url would not have the default application language

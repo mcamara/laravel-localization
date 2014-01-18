@@ -358,6 +358,11 @@ By default only english and spanish are allowed but it can be changed using conf
 This file have some interesting configuration settings (as the allowed languages or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
+### 0.8
+- Changed getLanguageBar to just return view.  All other code has been moved to languagebar view.
+- Deprecated getPrintCurrentLanguage
+- Deprecated getLanguageBarClassName
+
 ### 0.7
 - Merged languagesAllowed & supportedLanguages
 - Added native for language names
