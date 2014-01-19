@@ -219,7 +219,7 @@ class LaravelLocalization
 	 */
 	public function getURLFromRouteNameTranslated($language, $transKeyName = null, $attributes = array())
 	{
-		if(!in_array($language, $this->configRepository->get('laravel-localization::languagesAllowed')))
+		if(!in_array($language, array_keys($this->configRepository->get('laravel-localization::supportedLocales'))))
 		{
 			// if a language is not accepted, return false
 			return false;
@@ -606,8 +606,8 @@ class LaravelLocalization
     {
         $default = $this->configRepository->get('app.locale');
         $supported = array();
-        foreach ($this->configRepository->get('laravel-localization::languagesAllowed') as $lang) {
-            $supported[strtolower($lang)] = $lang;
+        foreach ($this->configRepository->get('laravel-localization::supportedLocales') as $lang => $language) {
+            $supported[$lang] = $lang;
         }
 
         if (!count($supported)) {
