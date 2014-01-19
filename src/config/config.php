@@ -7,7 +7,7 @@
         // A list of many languages has been added to the bottom of this file for your convenience.
         'supportedLocales' => array(
             "en" => array("name" => "English",			"script" => "Latin",		"dir" => "ltr",		"native" =>  "English"),
-            "es" => array("name" => "Spanish",			"script" => "Latin",		"dir" => "ltr",		"native" =>  "español"),
+            "es" => array("name" => "Spanish",			"script" => "Latin",		"dir" => "ltr",		"native" =>  "Español"),
         ),
 
 		// Take the browser language if it's not defined in the route?
