@@ -195,7 +195,7 @@ class LaravelLocalization
             return false;
         }
 
-        if (!isset($route)) {
+        if (!is_null($route)) {
             if ($this->routeName) {
                 // if the system is going to translate the current url
                 // and it is a translated route
