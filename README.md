@@ -61,7 +61,7 @@ Laravel Localization uses the URL given for the request. In order to achieve thi
 ```php
 	// app/routes.php
 
-	Route::group(array('prefix' => LaravelLocalization::setLanguage()), function()
+	Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
 	{
 		/** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
 		Route::get('/', function()
