@@ -360,7 +360,8 @@ class LaravelLocalization
         foreach ($this->getSupportedLocales() as $locale => $lang)
         {
             $new_path = preg_replace('%^/?'.$locale.'(/?)%', '$1', $path);
-            if ($new_path != $path) {
+            if ($new_path != $path)
+            {
                 break;
             }
         }
