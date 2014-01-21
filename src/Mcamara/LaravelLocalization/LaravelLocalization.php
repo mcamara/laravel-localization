@@ -130,13 +130,13 @@ class LaravelLocalization
 
             $locale = null;
 
-            // if we reached this point and hideDefaultLocaleInRoute is true
+            // if we reached this point and hideDefaultLocaleInURL is true
             // we have to assume we are routing to a defaultLocale route.
-            if ( Config::get('laravel-localization::hideDefaultLocaleInRoute') )
+            if ($this->hideDefaultLocaleInURL())
             {
                 $this->currentLocale = $this->defaultLocale;
             }
-            // but if hideDefaultLocaleInRoute is false, we have
+            // but if hideDefaultLocaleInURL is false, we have
             // to retrieve it from the session/cookie/browser...
             else
             {
@@ -145,11 +145,11 @@ class LaravelLocalization
         }
         App::setLocale($this->currentLocale);
 
-        if ($this->configRepository->get('laravel-localization::useSessionLanguage'))
+        if ($this->useSessionLocale())
         {
             Session::put('language', $this->currentLocale);
         }
-        if ($this->configRepository->get('laravel-localization::useCookieLanguage'))
+        if ($this->useCookieLocale())
         {
             Cookie::queue(Cookie::forever('language', $this->currentLocale));
         }
@@ -164,7 +164,7 @@ class LaravelLocalization
     /**
      * Returns html with language selector
      *
-     * @param  boolean $abbr 		    Should languages be abbreviate (2 characters) or full named?
+     * @param  boolean $abbr 		    Should languages be abbreviate to their locale codes?
      * @param  string $customView 	    Which template should the language bar have?
      *
      * @return string 				    Returns an html view with a language bar
@@ -186,7 +186,7 @@ class LaravelLocalization
      * Returns an URL adapted to $language
      *
      * @param  string $language     Language to adapt
-     * @param  string $route        URL to adapt, if false, current url would be taken
+     * @param  string $route        URL to adapt. If not passed, the current url would be taken.
      *
      * @return string               URL translated
      *
@@ -201,7 +201,7 @@ class LaravelLocalization
      * Returns an URL adapted to $locale
      *
      * @param  string $locale       Locale to adapt
-     * @param  string $url          URL to adapt, if false, current url would be taken
+     * @param  string $url          URL to adapt. If not passed, the current url would be taken.
      *
      * @throws UnsupportedLocaleException
      *
@@ -226,9 +226,9 @@ class LaravelLocalization
             }
             $url = Request::url();
         }
-        $url = $this->getCleanRoute($url);
+        $url = $this->getNonLocalizedURL($url);
 
-        if ($locale == $this->defaultLocale && Config::get('laravel-localization::hideDefaultLocaleInRoute'))
+        if ($locale == $this->defaultLocale && $this->hideDefaultLocaleInURL())
         {
             return $url;
         }
@@ -244,13 +244,13 @@ class LaravelLocalization
 
 
     /**
-     * Returns an URL adapted to the route name and the language given
+     * Returns an URL adapted to the route name and the locale given
      *
      * @param  string $locale 		    Locale to adapt
      * @param  string $transKeyName  	Translation key name of the url to adapt
      * @param  array $attributes  		Attributes for the route (only needed if transKeyName needs them)
      *
-     * @return string 	             	URL translated
+     * @return string|boolean 	        URL translated
      */
     public function getURLFromRouteNameTranslated($locale, $transKeyName = null, $attributes = array())
     {
@@ -293,8 +293,8 @@ class LaravelLocalization
         {
             $translation = $this->translator->trans($transKeyName,array(),array(),$locale);
 
-            // If hideDefaultLocaleInRoute is true, make sure not to include the default locale in the transalted url
-            if ($locale === $this->defaultLocale && Config::get('laravel-localization::hideDefaultLocaleInRoute') )
+            // If hideDefaultLocaleInURL is true, make sure not to include the default locale in the transalted url
+            if ($locale === $this->defaultLocale && $this->hideDefaultLocaleInURL())
             {
                 $route = url($translation);
             }
@@ -326,6 +326,8 @@ class LaravelLocalization
      * @param  string $route URL to clean, if false, current url would be taken
      *
      * @return string        Route with no language in path
+     *
+     * @deprecated will be removed in v1.0 use getDefaultLocale instead.
      */
     public function getCleanRoute($route = null)
     {
@@ -497,7 +499,7 @@ class LaravelLocalization
      *
      * @return string current language direction
      */
-    public function getCurrentLocaleDirection()
+    public function getCurrentLanguageDirection()
     {
         return $this->supportedLocales[$this->getCurrentLocale()]['dir'];
     }
@@ -507,7 +509,7 @@ class LaravelLocalization
      *
      * @return string current language script
      */
-    public function getCurrentLocaleScript()
+    public function getCurrentLanguageScript()
     {
         return $this->supportedLocales[$this->getCurrentLocale()]['script'];
     }
@@ -566,19 +568,19 @@ class LaravelLocalization
         }
         $locales = $this->getSupportedLocales();
         // get session language...
-        if ($this->configRepository->get('laravel-localization::useSessionLanguage') && Session::has('language'))
+        if ($this->useSessionLocale() && Session::has('language'))
         {
             return Session::get('language');
         }
         // or get cookie language...
-        else if ($this->configRepository->get('laravel-localization::useCookieLanguage') &&
+        else if ($this->useCookieLocale() &&
             Cookie::get('language') != null &&
             !empty($locales[Cookie::get('language')]))
         {
             return Cookie::get('language');
         }
         // or get browser language...
-        else if ($this->configRepository->get('laravel-localization::useBrowserLanguage'))
+        else if ($this->useAcceptLanguageHeader())
         {
             return $this->negotiateLanguage();
         }
@@ -644,6 +646,47 @@ class LaravelLocalization
             }
         }
         return false;
+    }
+
+
+    /**
+     * Returns the translation key for a given path
+     *
+     * @return boolean       Returns value of useSessionLocale in config.
+     */
+    private function useSessionLocale()
+    {
+        return $this->configRepository->get('laravel-localization::useSessionLocale') || $this->configRepository->get('laravel-localization::useSessionLanguage');
+    }
+
+    /**
+     * Returns the translation key for a given path
+     *
+     * @return boolean       Returns value of useCookieLocale in config.
+     */
+    private function useCookieLocale()
+    {
+        return $this->configRepository->get('laravel-localization::useCookieLocale') || $this->configRepository->get('laravel-localization::useCookieLanguage');
+    }
+
+    /**
+     * Returns the translation key for a given path
+     *
+     * @return boolean       Returns value of useAcceptLanguageHeader in config.
+     */
+    private function useAcceptLanguageHeader()
+    {
+        return $this->configRepository->get('laravel-localization::useAcceptLanguageHeader') || $this->configRepository->get('laravel-localization::useBrowserLanguage');
+    }
+
+    /**
+     * Returns the translation key for a given path
+     *
+     * @return boolean       Returns value of hideDefaultLocaleInURL in config.
+     */
+    private function hideDefaultLocaleInURL()
+    {
+        return Config::get('laravel-localization::hideDefaultLocaleInURL') || Config::get('laravel-localization::hideDefaultLocaleInRoute');
     }
 
     /**
