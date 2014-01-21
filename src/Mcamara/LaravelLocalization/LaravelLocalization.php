@@ -591,6 +591,18 @@ class LaravelLocalization
     }
 
     /**
+     * Returns an URL adapted to $language
+     *
+     * @return string current language
+     *
+     * @deprecated will be removed in v1.0 use getCurrentLocale
+     */
+    public function getCurrentLanguage()
+    {
+        return $this->getCurrentLocale();
+    }
+
+    /**
      * Returns translated routes
      *
      * @return array translated routes
