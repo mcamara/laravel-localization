@@ -24,7 +24,7 @@ Easy i18n localization for Laravel 4, an useful tool to combine with Laravel loc
 
 Add Laravel Localization to your `composer.json` file.
 
-    "mcamara/laravel-localization": "dev-master"
+    "mcamara/laravel-localization": "0.10"
 
 Run `composer install` to get the latest version of the package.
 
@@ -78,7 +78,7 @@ Laravel Localization uses the URL given for the request. In order to achieve thi
 
 ```
 
-Once this group is added to the routes file, a user can access all languages added into the 'languagesAllowed' ('en' and 'es' by default, look at the config section to change that option). For example, a user can now access to two different languages, using the following addresses:
+Once this group is added to the routes file, a user can access all locales added into 'supportedLocales' ('en' and 'es' by default, look at the config section to change that option). For example, a user can now access to two different locales, using the following addresses:
 
 ```
 	http://url-to-laravel/en
@@ -86,17 +86,17 @@ Once this group is added to the routes file, a user can access all languages add
 	http://url-to-laravel
 ```
 
-If the language is not present in the url or it is not defined in the 'languagesAllowed' array, the system will take the application default language (by default) or the user's browser default language (if defined in config file).
+If the locale is not present in the url or it is not defined in 'supportedLocales', the system will use the application default locale or the user's browser default locale (if defined in config file).
 
-Once the language is defined, the language variable will be stored in a session, so it is not necessary to write the /lang/ section in the url after defining it once, using the last known language for the user. If the user accesses to a different language this session value would be changed, translating any other page he visits with the last chosen language.
+Once the locale is defined, the locale variable will be stored in a session, so it is not necessary to write the /lang/ section in the url after defining it once, using the last known locale for the user. If the user accesses to a different locale this session value would be changed, translating any other page he visits with the last chosen locale.
 
-Templates files and all language files should follow the [Lang class](http://laravel.com/docs/localization).
+Templates files and all locale files should follow the [Lang class](http://laravel.com/docs/localization).
 
 ### Filters
 
-Moreover, this package includes a filter to redirect all "non-languaged" routes to a "languaged" one (thanks to Sangar82).
+Moreover, this package includes a filter to redirect all "non-localized" routes to a "localized" one (thanks to Sangar82).
 
-So, if a user accesses to http://url-to-laravel/test and the system have this filter actived and 'en' as a current language for this user, it would redirect (301) him automatically to http://url-to-laravel/en/test. This is mainly used to avoid duplicate content and improve SEO performance.
+So, if a user accesses to http://url-to-laravel/test and the system have this filter active and 'en' as a current locale for this user, it would redirect (301) him automatically to http://url-to-laravel/en/test. This is mainly used to avoid duplicate content and improve SEO performance.
 
 
 ```php
@@ -104,7 +104,7 @@ So, if a user accesses to http://url-to-laravel/test and the system have this fi
 
 	Route::group(
 	array(
-		'prefix' => LaravelLocalization::setLanguage(),
+		'prefix' => LaravelLocalization::setLocale(),
 		'before' => 'LaravelLocalizationRedirectFilter' // LaravelLocalization filter
 	),
 	function()
@@ -125,7 +125,7 @@ So, if a user accesses to http://url-to-laravel/test and the system have this fi
 ```
 In order to active it, you just have to attach this filter to the routes you want to be accessible localized.
 
-If you want to hide the default language but always show other languages in the url, switch the 'hideDefaultLanguageInRoute' config value to true. Once it's true, if the default language is english all url containing /en/ would be redirected to the same url without this fragment but mantaining the language (all the website will be in english).
+If you want to hide the default locale but always show other locales in the url, switch the 'hideDefaultLocaleInURL' config value to true. Once it's true, if the default locale is en (english) all URLs containing /en/ would be redirected to the same url without this fragment '/' but maintaining the locale as en (English).
 
 ## Helpers
 
@@ -137,10 +137,10 @@ This package comes with some useful functions, like:
 	/**
      * Returns html with language selector
      *
-     * @param  boolean $abbr 		Should languages be abbreviate (2 characters) or full named?
-     * @param  string $customView 	Which template should the language bar have?
+     * @param  boolean $abbr 		    Should languages be abbreviate to their locale codes?
+     * @param  string $customView 	    Which template should the language bar have?
      *
-     * @return string 				Returns an html view with a language bar
+     * @return string 				    Returns an html view with a language bar
      */
     public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
 
@@ -148,17 +148,18 @@ This package comes with some useful functions, like:
 	{{ LaravelLocalization::getLanguageBar(optional boolean $abbr, optional string $customView) }}
 ```
 
-It returns an html string with `<a>` links to the very same page into another allowed language. Having english, catalan and spanish allowed as languages, being in url-to-laravel/test and english as the current language, this function would return...
+It returns an html string with links to the current URL localized to all other supportedLocales.
+For example, if currently viewing the site in English and Catalan and Spanish are allowed as locales, and the current URL is http://url-to-laravel/test or http://url-to-laravel/en/test this function would return...
 
 ```html
 	<ul class="laravel_language_chooser">
-		<li class="active">EN</li>
-		<li><a rel="alternate" hreflang="ca" href="http://url-to-laravel/ca/test">CA</a></li>
-		<li><a rel="alternate" hreflang="es" href="http://url-to-laravel/es/test">ES</a></li>
+		<li class="active">English</li>
+		<li><a rel="alternate" hreflang="ca" href="http://url-to-laravel/ca/test">Catalan</a></li>
+		<li><a rel="alternate" hreflang="es" href="http://url-to-laravel/es/test">Español</a></li>
 	</ul>
 ```
 
-If you are using translation routes, be sure that all keys exist for all languages. Otherwise, the language bar would not show the untranslated routes but it would show all the other links.
+If you are using translation routes, be sure that all keys exist for all locales. Otherwise, the language bar would not show the untranslated routes but it would show all the other links.
 
 You can also define which view you want to use to show the language bar. If you want to create your own language bar from the example given in the package, you should publish it using the command `php artisan view:publish mcamara/laravel-localization`, it would create a language bar template (take a look at view section). If you rename the view, you should pass the new name as the $customView variable when the languageBar function is called, this function will look at this custom view within the app/view folder. In case this file does not exist, the language bar function would show the default bar.
 
@@ -166,58 +167,60 @@ You can also define which view you want to use to show the language bar. If you 
 
 ```php
 	/**
-     * It returns an URL without language (if it has it)
+     * It returns an URL without locale (if it has it)
      *
-     * @param  string $route URL to clean, if false, current url would be taken
+     * @param  string $url      URL to clean, if false, current url would be taken
      *
-     * @return string        Route with no language path
+     * @return string           URL with no locale in path
      */
-    public function getCleanRoute($route = null)
+    public function getNonLocalizedURL($url = null)
 
 	//Should be called in a view like this:
-	{{ LaravelLocalization::getCleanRoute(optional string $route) }}
+	{{ LaravelLocalization::getNonLocalizedURL(optional string $url) }}
 ```
 
-It returns a string, giving url passed through the function clean of any language section.
+It returns a URL clean of any localization.
 
-### Get URL for an specific language
+### Get URL for an specific locale
 
 ```php
     /**
-     * Returns an URL adapted to $language language
+     * Returns an URL adapted to $locale
      *
-     * @param  string $localeCode Language to adapt
-     * @param  string $route    URL to adapt, if false, current url would be taken
+     * @param  string $locale       Locale to adapt
+     * @param  string $url          URL to adapt. If not passed, the current url would be taken
      *
-     * @return string           URL translated
+     * @throws UnsupportedLocaleException
+     *
+     * @return string               URL translated
      */
-    public function getLocalizedURL($localeCode, $route = null)
+    public function getLocalizedURL($locale, $url = null)
 
 	//Should be called in a view like this:
-	{{ LaravelLocalization::getLocalizedURL(string $lang, optional string $route) }}
+	{{ LaravelLocalization::getLocalizedURL(string $locale, optional string $url) }}
 ```
 
-It returns a string, translated to the desired language. If you pass a route to the function it has to be written in the current language, otherwise the function won't return the desired result.
+It returns a URL localized to the desired locale.
 
 ### Get URL for an specific translation key
 
 ```php
 	/**
-     * Returns an URL adapted to the route name and the language given
+     * Returns an URL adapted to the route name and the locale given
      *
-     * @param  string $language 		Language to adapt
+     * @param  string $locale 		    Locale to adapt
      * @param  string $transKeyName  	Translation key name of the url to adapt
      * @param  array $attributes  		Attributes for the route (only needed if transKeyName needs them)
      *
-     * @return string 	             	URL translated
+     * @return string|boolean  	        URL translated
      */
-    public function getURLFromRouteNameTranslated($language, $transKeyName = null, $attributes = array())
+    public function getURLFromRouteNameTranslated($locale, $transKeyName = null, $attributes = array())
 
 	//Should be called in a view like this:
-	{{ LaravelLocalization::getURLFromRouteNameTranslated(string $lang, optional string $transKeyName, optional array $attributes) }}
+	{{ LaravelLocalization::getURLFromRouteNameTranslated(string $locale, optional string $transKeyName, optional array $attributes) }}
 ```
 
-It returns a string, translated to the desired language using the translation key given. If the translation key does not exist in the language given, this function will return false.
+It returns a route, localized to the desired locale using the locale passed. If the translation key does not exist in the locale given, this function will return false.
 
 ### Get Supported Locales
 
@@ -233,36 +236,37 @@ It returns a string, translated to the desired language using the translation ke
 	{{ LaravelLocalization::getSupportedLocales() }}
 ```
 
-This function will return all supported languages and it's properties as array.
+This function will return all supported locales and their properties as an array.
 
-### Set Language
+### Set Locale
 
 ```php
 	/**
-     * Set and return current language
+     * Set and return current locale
      *
-     * @param  string $locale	Language to set the App to (optional)
+     * @param  string $locale	        Locale to set the App to (optional)
      *
-     * @return string 			Returns language (if route has any) or null (if route has not a language)
+     * @return string 			        Returns locale (if route has any) or null (if route does not have a locale)
      */
-    public function setLanguage($locale = null)
+    public function setLocale($locale = null)
 
 	//Should be called in a view like this:
-	{{ LaravelLocalization::setLanguage(optional string $lang) }}
+	{{ LaravelLocalization::setLocale(optional string $locale) }}
 ```
 
-This function will change the application current language, if the language is not passed through its call, it would take the language from the session (if stored previously), browser language or the default application language (depending on your config file).
+This function will change the application's current locale.
+If the locale is not passed, the locale will be determined via a cookie (if stored previously), the session (if stored previously), browser Accept-Language header or the default application locale (depending on your config file).
 
 The function have to be called in the prefix of any route that should be translated (see Filters sections for further information).
 
 
-### Get Current Language Direction
+### Get Current Locale Direction
 
 ```php
 	/**
-	 * Returns current language direction
+	 * Returns current locale direction
 	 *
-	 * @return string current language direction
+	 * @return string current locale direction
 	 */
 	public function getCurrentLanguageDirection()
 
@@ -305,7 +309,7 @@ You can adapt your URLs depending on the language you want to show them. For exa
 
 	Route::group(
 	array(
-		'prefix' => LaravelLocalization::setLanguage(),
+		'prefix' => LaravelLocalization::setLocale(),
 		'before' => 'LaravelLocalizationRoutes' // Route translate filter
 	),
 	function()
@@ -355,9 +359,13 @@ Once files are saved, you can access to http://url/en/about , http://url/es/acer
 
 By default only english and spanish are allowed but it can be changed using config.php file that is located at `app/config/packages/mcamara/laravel-localization/config.php` . If this file does not exist, use the following artisan command `php artisan config:publish mcamara/laravel-localization`  in order to create it.
 
-This file have some interesting configuration settings (as the allowed languages or browser language detection, among others) feel free to play with it, all variables are self-explained.
+This file have some interesting configuration settings (as the allowed locales or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
+### 0.10
+- Standardizing function names and variables using locale
+-
+
 ### 0.9
 - Fixes issue #47
 - Fixes issue where getCleanRoute would only clean out the currently set locale.

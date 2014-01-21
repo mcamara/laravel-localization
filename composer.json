@@ -4,10 +4,10 @@
     "keywords": ["localization", "laravel", "php"],
     "homepage": "https://github.com/mcamara/laravel-localization",
     "license": "MIT",
-    "version": "0.9",
+    "version": "0.10",
     "authors": [
         {
-            "name": "LaravelLocalization",
+            "name": "Marc Cámara",
             "email": "mcamara88@gmail.com",
             "role": "Developer"
         }
