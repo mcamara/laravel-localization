@@ -236,7 +236,7 @@ class LaravelLocalization
         $parsed_url = parse_url($url);
         if (empty($parsed_url['path']))
         {
-            $parsed_url['path'] = "";
+            return $url."/".$locale;
         }
 
         return str_replace($parsed_url['path'], '/' . $locale . $parsed_url['path'], $url);
