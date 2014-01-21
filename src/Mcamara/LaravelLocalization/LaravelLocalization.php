@@ -3,6 +3,7 @@
 use Illuminate\Config\Repository;
 use Illuminate\View\Environment;
 use Illuminate\Translation\Translator;
+use Exception;
 use Request;
 use Session;
 use Cookie;
@@ -85,6 +86,7 @@ class LaravelLocalization
 
         // set default language
         $this->defaultLanguage = Config::get('app.locale');
+        $this->getSupportedLocales();
     }
 
     /**
@@ -181,7 +183,7 @@ class LaravelLocalization
      */
     public function getURLLanguage($localeCode, $route = null)
     {
-        return $this->getLocalizedURL($localeCode, $route = null);
+        return $this->getLocalizedURL($localeCode, $route);
     }
 
     /**
@@ -190,6 +192,8 @@ class LaravelLocalization
      * @param  string $localeCode Language to adapt
      * @param  string $route    URL to adapt, if false, current url would be taken
      *
+     * @throws UnsupportedLocaleException
+     *
      * @return string           URL translated
      */
     public function getLocalizedURL($localeCode, $route = null)
@@ -197,10 +201,10 @@ class LaravelLocalization
         $locales = $this->getSupportedLocales();
         if (empty($locales[$localeCode]))
         {
-            return false;
+            throw new UnsupportedLocaleException('Locale \'' . $localeCode . '\' is not in the list of supported locales.');
         }
 
-        if (!isset($route))
+        if (is_null($route) || !is_string($route))
         {
             if ($this->routeName)
             {
@@ -211,7 +215,20 @@ class LaravelLocalization
             }
             $route = Request::url();
         }
-        return str_replace(url(), url($localeCode), $this->getCleanRoute($route));
+        $route = $this->getCleanRoute($route);
+
+        if ($localeCode == $this->defaultLanguage && Config::get('laravel-localization::hideDefaultLanguageInRoute'))
+        {
+            return $route;
+        }
+
+        $parsed_route = parse_url($route);
+        if (empty($parsed_route['path']))
+        {
+            $parsed_route['path'] = "";
+        }
+
+        return str_replace($parsed_route['path'], '/' . $localeCode . $parsed_route['path'], $route);
     }
 
 
@@ -301,7 +318,7 @@ class LaravelLocalization
      */
     public function getCleanRoute($route = null)
     {
-        if (empty($route))
+        if (is_null($route) || !is_string($route))
         {
             $route = Request::url();
         }
@@ -314,8 +331,14 @@ class LaravelLocalization
         {
             $path = $parsed_route['path'];
         }
-        $new_path = preg_replace('%^/?'.$this->currentLanguage.'(/?)%', '$1', $path);
 
+        foreach ($this->getSupportedLocales() as $locale => $lang)
+        {
+            $new_path = preg_replace('%^/?'.$locale.'(/?)%', '$1', $path);
+            if ($new_path != $path) {
+                break;
+            }
+        }
         return str_replace($path, $new_path, $route);
     }
 
@@ -762,3 +785,8 @@ Route::filter('LaravelLocalizationRoutes', function()
     $app['laravellocalization']->setRouteName($routeName);
     return;
 });
+
+class UnsupportedLocaleException extends Exception
+{
+
+}

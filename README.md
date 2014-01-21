@@ -358,6 +358,11 @@ By default only english and spanish are allowed but it can be changed using conf
 This file have some interesting configuration settings (as the allowed languages or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
+### 0.9
+- Fixes issue #47
+- Fixes issue where getCleanRoute would only clean out the currently set locale.
+- getLocalizedURL now throws an UnsupportedLocaleException if the requested locale is not in the list of supported locales.
+
 ### 0.8
 - Changed getLanguageBar to just return view.  All other code has been moved to languagebar view.
 - Deprecated getPrintCurrentLanguage
