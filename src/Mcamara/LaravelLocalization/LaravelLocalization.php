@@ -144,7 +144,7 @@ class LaravelLocalization
             }
         }
         App::setLocale($this->currentLocale);
-        $this->configRepository->set('application.language',  $this->currentLocale);
+
         if ($this->configRepository->get('laravel-localization::useSessionLanguage'))
         {
             Session::put('language', $this->currentLocale);
