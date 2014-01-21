@@ -183,7 +183,7 @@ class LaravelLocalization
      */
     public function getURLLanguage($localeCode, $route = null)
     {
-        return $this->getLocalizedURL($localeCode, $route = null);
+        return $this->getLocalizedURL($localeCode, $route);
     }
 
     /**
