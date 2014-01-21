@@ -364,7 +364,13 @@ This file have some interesting configuration settings (as the allowed locales o
 ## Changelog
 ### 0.10
 - Standardizing function names and variables using locale
--
+- Deprecated getCleanRoute
+- Deprecated useBrowserLanguage
+- Changed config useBrowserLanguage to useAcceptLanguageHeader
+- Deprecated useSessionLanguage
+- Changed config useSessionLanguage to useSessionLocale
+- Deprecated useCookieLanguagee
+- Changed config useCookieLanguage to useCookieLocale
 
 ### 0.9
 - Fixes issue #47
