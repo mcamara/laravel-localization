@@ -365,11 +365,10 @@ This file have some interesting configuration settings (as the allowed locales o
 ### 0.10.1
 - Fixes to maintain compatibility with older config and languagebar.blade.php templates
 - Fixed backward compatibility of getLanguageBar
-- getLocalizedURL now returns URL paths in the same format as parameter inputted.
+- getLocalizedURL now returns URL paths in the same format as parameter inputted; trailing and leading slashes or lack of are respected.
+- getLocalizedURL now compatible with querystrings
 - merged getNonLocalizedURL and getLocalizedURL
 - getNonLocalizedURL($url = null) is now a wrapper for getLocalizedURL(false, $url = null)
-
-
 
 ### 0.10
 - Standardizing function names and variables using locale
@@ -412,7 +411,6 @@ This file have some interesting configuration settings (as the allowed locales o
 - Added 'LaravelLocalizationRedirectFilter' filter
 
 ### 0.2
-
 - Added `getURLLanguage` method.
 - Added `getLanguageBar` method.
 - Added `getURLLanguage` method.
@@ -421,7 +419,6 @@ This file have some interesting configuration settings (as the allowed locales o
 - Added README
 
 ### 0.1
-
  - Initial release.
 
 ## License
