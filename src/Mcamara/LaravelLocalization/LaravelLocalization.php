@@ -273,7 +273,6 @@ class LaravelLocalization
         {
             $parsed_url['path'] = $locale . '/' . ltrim($parsed_url['path'], '/');
         }
-
         //Make sure that the pass path is returned with a leading slash only if it come in with one.
         if (starts_with($path, '/') === true) {
             $parsed_url['path'] = '/' . $parsed_url['path'];
@@ -722,17 +721,31 @@ class LaravelLocalization
         return $this->configRepository->get('laravel-localization::hideDefaultLocaleInURL') || $this->configRepository->get('laravel-localization::hideDefaultLanguageInRoute');
     }
 
+    /**
+     * Build URL using array data from parse_url
+     *
+     * @param array $parsed_url     Array of data from parse_url function
+     *
+     * @return string               Returns URL as string.
+     */
     private function unparse_url($parsed_url) {
-        $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
-        $host     = isset($parsed_url['host']) ? $parsed_url['host'] : '';
-        $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
-        $user     = isset($parsed_url['user']) ? $parsed_url['user'] : '';
-        $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
-        $pass     = ($user || $pass) ? "$pass@" : '';
-        $path     = isset($parsed_url['path']) ? $parsed_url['path'] : '';
-        $query    = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
-        $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
-        return "$scheme$user$pass$host$port$path$query$fragment";
+        $url = "";
+        $url .= isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
+        $url .= isset($parsed_url['host']) ? $parsed_url['host'] : '';
+        $url .= isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
+        $user = isset($parsed_url['user']) ? $parsed_url['user'] : '';
+        $pass = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
+        $url .= $user . (($user || $pass) ? "$pass@" : '');
+        if (!empty($url)) {
+            $url .= isset($parsed_url['path']) ? '/' . ltrim($parsed_url['path'], '/') : '';
+        }
+        else
+        {
+            $url .= isset($parsed_url['path']) ? $parsed_url['path'] : '';
+        }
+        $url .= isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
+        $url .= isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
+        return $url;
     }
 
     /**
