@@ -24,7 +24,7 @@ Easy i18n localization for Laravel 4, an useful tool to combine with Laravel loc
 
 Add Laravel Localization to your `composer.json` file.
 
-    "mcamara/laravel-localization": "0.10.*"
+    "mcamara/laravel-localization": "0.11.*"
 
 Run `composer install` to get the latest version of the package.
 
@@ -379,7 +379,7 @@ By default only english and spanish are allowed but it can be changed using conf
 This file have some interesting configuration settings (as the allowed locales or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
-### 0.11
+### 0.11.0
 - Deprecated "getCurrentLanguageDirection", "getCurrentLanguageScript"
 - Added "getCurrentLocaleDirection", "getCurrentLocaleScript", "getCurrentLocaleName"
 
