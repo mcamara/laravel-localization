@@ -251,13 +251,13 @@ class LaravelLocalization
         }
 
         $parsed_url = parse_url($url);
-        $path = $parsed_url['path'];
         if (empty($parsed_url['path']))
         {
             $path = $parsed_url['path'] = "";
         }
         else
         {
+            $path = $parsed_url['path'];
             foreach ($this->getSupportedLocales() as $localeCode => $lang)
             {
                 $parsed_url['path'] = preg_replace('%^/?'.$localeCode.'(/?)%', '$1', $parsed_url['path']);
