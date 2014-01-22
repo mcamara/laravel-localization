@@ -31,12 +31,12 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-        $this->app['config']->package('mcamara/laravel-localization', __DIR__.'/../config');
+		$this->app['config']->package('mcamara/laravel-localization', __DIR__.'/../config');
 
 		$this->app['laravellocalization'] = $this->app->share(function($app)
-        {
-            return new LaravelLocalization($app['config'], $app['view'], $app['translator']);
-        });
+		{
+			return new LaravelLocalization($app['config'], $app['view'], $app['translator']);
+		});
 	}
 
 	/**
