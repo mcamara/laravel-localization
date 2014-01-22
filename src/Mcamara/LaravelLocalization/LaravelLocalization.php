@@ -518,6 +518,16 @@ class LaravelLocalization
     }
 
     /**
+     * Returns current locale name
+     *
+     * @return string current locale name
+     */
+    public function getCurrentLocaleName()
+    {
+    	return $this->supportedLocales[$this->getCurrentLocale()]['name'];
+    }
+
+    /**
      * Returns current language script
      *
      * @return string current language script
