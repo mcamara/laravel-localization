@@ -718,7 +718,7 @@ class LaravelLocalization
      *
      * @return boolean       Returns value of hideDefaultLocaleInURL in config.
      */
-    private function hideDefaultLocaleInURL()
+    public function hideDefaultLocaleInURL()
     {
         return $this->configRepository->get('laravel-localization::hideDefaultLocaleInURL') || $this->configRepository->get('laravel-localization::hideDefaultLanguageInRoute');
     }
@@ -846,12 +846,12 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 
         if (!empty($locales[$localeCode]))
         {
-            if ($localeCode === $defaultLocale && Config::get('laravel-localization::hideDefaultLocaleInURL'))
+            if ($localeCode === $defaultLocale && $app['laravellocalization']->hideDefaultLocaleInURL())
             {
                 return Redirect::to($app['laravellocalization']->getCleanRoute(), 302)->header('Vary','Accept-Language');
             }
         }
-        else if ($currentLocale !== $defaultLocale || !Config::get('laravel-localization::hideDefaultLocaleInURL'))
+        else if ($currentLocale !== $defaultLocale || !$app['laravellocalization']->hideDefaultLocaleInURL())
         {
             // If the current url does not contain any locale
             // The system redirect the user to the very same url "localized"
