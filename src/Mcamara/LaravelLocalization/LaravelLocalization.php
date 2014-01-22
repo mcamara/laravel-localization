@@ -98,7 +98,7 @@ class LaravelLocalization
      */
     public function setLanguage($language = null)
     {
-       return $this->setLocale($language);
+        return $this->setLocale($language);
     }
 
     /**
@@ -171,7 +171,30 @@ class LaravelLocalization
      */
     public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
     {
-        if (is_string($customView) && $this->view->exists($customView))
+        //START - Delete in v1.0
+        $languages = array();
+        $active = $this->currentLocale;
+        $urls = array();
+
+        foreach ($this->getSupportedLocales() as $lang => $properties)
+        {
+            $languages[$lang] = $abbr ? strtoupper($lang) : $properties['name'];
+
+            $langUrl = $this->getLocalizedURL($lang);
+
+            // check if the url is set for the language
+            if($langUrl)
+            {
+                $urls[$lang] = $langUrl;
+            }
+            else
+            {
+                // the url is not set for the language (check lang/$lang/routes.php)
+                unset($languages[$lang]);
+            }
+        }
+        //END - Delete in v1.0
+        if(is_string($customView) && $this->view->exists($customView))
         {
             $view = $customView;
         }
@@ -179,7 +202,7 @@ class LaravelLocalization
         {
             $view = 'laravel-localization::languagebar';
         }
-        return $this->view->make($view, compact('abbr'));
+        return $this->view->make($view, compact('abbr','languages','active','urls')); //Remove 'languages','active', and 'urls' in v1.0
     }
 
     /**
@@ -455,20 +478,16 @@ class LaravelLocalization
     {
         //Use deprecated languagesAllowed & languagesSupported to build supportedLocales.
         $allowed = $this->configRepository->get('laravel-localization::languagesAllowed');
-        if (empty($allowed))
-        {
-            return false;
-        }
-
         $supported = $this->configRepository->get('laravel-localization::supportedLanguages');
 
         $locales = array();
         foreach ($allowed as $localeCode)
         {
             $locales[$localeCode] = array(
-                'name' => $supported[$localeCode]
+                'name' => $supported[$localeCode]['name']
             );
         }
+        
         return $locales;
     }
 
@@ -484,8 +503,10 @@ class LaravelLocalization
             return $this->supportedLocales;
         }
 
-        $locales = $this->buildDeprecatedConfig();
-        if (empty($locales))
+        if ($this->configRepository->has('laravel-localization::languagesAllowed') && $this->configRepository->has('laravel-localization::supportedLanguages')) {
+            $locales = $this->buildDeprecatedConfig();
+        }
+        else
         {
             $locales = $this->configRepository->get('laravel-localization::supportedLocales');
         }
@@ -546,12 +567,12 @@ class LaravelLocalization
      *
      * @deprecated will be removed in v1.0
      */
-    public function getPrintCurrentLocale()
+    public function getPrintCurrentLanguage()
     {
-        $print = $this->configRepository->get('laravel-localization::printCurrentLocaleInBar');
+        $print = $this->configRepository->get('laravel-localization::printCurrentLanguageInBar');
         if (isset($print))
         {
-            return $this->configRepository->get('laravel-localization::printCurrentLocaleInBar');
+            return $print;
         }
         return true;
     }
@@ -699,7 +720,7 @@ class LaravelLocalization
      */
     private function hideDefaultLocaleInURL()
     {
-        return Config::get('laravel-localization::hideDefaultLocaleInURL') || Config::get('laravel-localization::hideDefaultLocaleInRoute');
+        return $this->configRepository->get('laravel-localization::hideDefaultLocaleInURL') || $this->configRepository->get('laravel-localization::hideDefaultLanguageInRoute');
     }
 
     /**
