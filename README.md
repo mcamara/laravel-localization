@@ -24,7 +24,7 @@ Easy i18n localization for Laravel 4, an useful tool to combine with Laravel loc
 
 Add Laravel Localization to your `composer.json` file.
 
-    "mcamara/laravel-localization": "0.10"
+    "mcamara/laravel-localization": "0.10.*"
 
 Run `composer install` to get the latest version of the package.
 
@@ -362,6 +362,14 @@ By default only english and spanish are allowed but it can be changed using conf
 This file have some interesting configuration settings (as the allowed locales or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
+### 0.10.1
+- Fixes to maintain compatibility with older config and languagebar.blade.php templates
+- Fixed backward compatibility of getLanguageBar
+- getLocalizedURL now returns URL paths in the same format as parameter inputted; trailing and leading slashes or lack of are respected.
+- getLocalizedURL now compatible with querystrings
+- merged getNonLocalizedURL and getLocalizedURL
+- getNonLocalizedURL($url = null) is now a wrapper for getLocalizedURL(false, $url = null)
+
 ### 0.10
 - Standardizing function names and variables using locale
 - Deprecated getCleanRoute
@@ -403,7 +411,6 @@ This file have some interesting configuration settings (as the allowed locales o
 - Added 'LaravelLocalizationRedirectFilter' filter
 
 ### 0.2
-
 - Added `getURLLanguage` method.
 - Added `getLanguageBar` method.
 - Added `getURLLanguage` method.
@@ -412,7 +419,6 @@ This file have some interesting configuration settings (as the allowed locales o
 - Added README
 
 ### 0.1
-
  - Initial release.
 
 ## License

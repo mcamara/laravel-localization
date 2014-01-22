@@ -1,6 +1,6 @@
 <ul class="language_bar_chooser">
     @foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
-        @if($localeCode == LaravelLocalization::getCurrentLanguage())
+        @if($localeCode == LaravelLocalization::getCurrentLocale())
             <li class="active">
             	{{{ !empty($abbr) ? $localeCode : $properties['native'] }}}
             </li>

@@ -98,7 +98,7 @@ class LaravelLocalization
      */
     public function setLanguage($language = null)
     {
-       return $this->setLocale($language);
+        return $this->setLocale($language);
     }
 
     /**
@@ -171,7 +171,30 @@ class LaravelLocalization
      */
     public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
     {
-        if (is_string($customView) && $this->view->exists($customView))
+        //START - Delete in v1.0
+        $languages = array();
+        $active = $this->currentLocale;
+        $urls = array();
+
+        foreach ($this->getSupportedLocales() as $lang => $properties)
+        {
+            $languages[$lang] = $abbr ? strtoupper($lang) : $properties['name'];
+
+            $langUrl = $this->getLocalizedURL($lang);
+
+            // check if the url is set for the language
+            if($langUrl)
+            {
+                $urls[$lang] = $langUrl;
+            }
+            else
+            {
+                // the url is not set for the language (check lang/$lang/routes.php)
+                unset($languages[$lang]);
+            }
+        }
+        //END - Delete in v1.0
+        if(is_string($customView) && $this->view->exists($customView))
         {
             $view = $customView;
         }
@@ -179,7 +202,7 @@ class LaravelLocalization
         {
             $view = 'laravel-localization::languagebar';
         }
-        return $this->view->make($view, compact('abbr'));
+        return $this->view->make($view, compact('abbr','languages','active','urls')); //Remove 'languages','active', and 'urls' in v1.0
     }
 
     /**
@@ -200,17 +223,17 @@ class LaravelLocalization
     /**
      * Returns an URL adapted to $locale
      *
-     * @param  string $locale       Locale to adapt
-     * @param  string $url          URL to adapt. If not passed, the current url would be taken.
+     * @param  string|boolean $locale       Locale to adapt, false to remove locale
+     * @param  string $url                  URL to adapt. If not passed, the current url would be taken.
      *
      * @throws UnsupportedLocaleException
      *
-     * @return string               URL translated
+     * @return string                       URL translated
      */
     public function getLocalizedURL($locale, $url = null)
     {
         $locales = $this->getSupportedLocales();
-        if (empty($locales[$locale]))
+        if (!empty($locale) && empty($locales[$locale]))
         {
             throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
         }
@@ -226,20 +249,39 @@ class LaravelLocalization
             }
             $url = Request::url();
         }
-        $url = $this->getNonLocalizedURL($url);
-
-        if ($locale == $this->defaultLocale && $this->hideDefaultLocaleInURL())
-        {
-            return $url;
-        }
 
         $parsed_url = parse_url($url);
         if (empty($parsed_url['path']))
         {
-            return $url."/".$locale;
+            $path = $parsed_url['path'] = "";
+        }
+        else
+        {
+            $path = $parsed_url['path'];
+            foreach ($this->getSupportedLocales() as $localeCode => $lang)
+            {
+                $parsed_url['path'] = preg_replace('%^/?'.$localeCode.'(/?)%', '$1', $parsed_url['path']);
+                if ($parsed_url['path'] != $path)
+                {
+                    break;
+                }
+            }
         }
 
-        return str_replace($parsed_url['path'], '/' . $locale . $parsed_url['path'], $url);
+        $parsed_url['path'] = ltrim($parsed_url['path'], '/');
+        if (!empty($locale) && ($locale != $this->defaultLocale || !$this->hideDefaultLocaleInURL()))
+        {
+            $parsed_url['path'] = $locale . '/' . ltrim($parsed_url['path'], '/');
+        }
+        //Make sure that the pass path is returned with a leading slash only if it come in with one.
+        if (starts_with($path, '/') === true) {
+            $parsed_url['path'] = '/' . $parsed_url['path'];
+        }
+        if (ends_with($path, '/') === false) {
+            $parsed_url['path'] = rtrim($parsed_url['path'], '/');
+        }
+
+        return $this->unparse_url($parsed_url);
     }
 
 
@@ -336,6 +378,7 @@ class LaravelLocalization
 
     /**
      * It returns an URL without locale (if it has it)
+     * Convenience function wrapping getLocalizedURL(false)
      *
      * @param  string $url      URL to clean, if false, current url would be taken
      *
@@ -343,29 +386,7 @@ class LaravelLocalization
      */
     public function getNonLocalizedURL($url = null)
     {
-        if (is_null($url) || !is_string($url))
-        {
-            $url = Request::url();
-        }
-        $parsed_route = parse_url($url);
-        if (empty($parsed_route['path']))
-        {
-            $path = "";
-        }
-        else
-        {
-            $path = $parsed_route['path'];
-        }
-
-        foreach ($this->getSupportedLocales() as $locale => $lang)
-        {
-            $new_path = preg_replace('%^/?'.$locale.'(/?)%', '$1', $path);
-            if ($new_path != $path)
-            {
-                break;
-            }
-        }
-        return str_replace($path, $new_path, $url);
+        return $this->getLocalizedURL(false, $url);
     }
 
     /**
@@ -455,20 +476,16 @@ class LaravelLocalization
     {
         //Use deprecated languagesAllowed & languagesSupported to build supportedLocales.
         $allowed = $this->configRepository->get('laravel-localization::languagesAllowed');
-        if (empty($allowed))
-        {
-            return false;
-        }
-
         $supported = $this->configRepository->get('laravel-localization::supportedLanguages');
 
         $locales = array();
         foreach ($allowed as $localeCode)
         {
             $locales[$localeCode] = array(
-                'name' => $supported[$localeCode]
+                'name' => $supported[$localeCode]['name']
             );
         }
+        
         return $locales;
     }
 
@@ -484,8 +501,10 @@ class LaravelLocalization
             return $this->supportedLocales;
         }
 
-        $locales = $this->buildDeprecatedConfig();
-        if (empty($locales))
+        if ($this->configRepository->has('laravel-localization::languagesAllowed') && $this->configRepository->has('laravel-localization::supportedLanguages')) {
+            $locales = $this->buildDeprecatedConfig();
+        }
+        else
         {
             $locales = $this->configRepository->get('laravel-localization::supportedLocales');
         }
@@ -546,12 +565,12 @@ class LaravelLocalization
      *
      * @deprecated will be removed in v1.0
      */
-    public function getPrintCurrentLocale()
+    public function getPrintCurrentLanguage()
     {
-        $print = $this->configRepository->get('laravel-localization::printCurrentLocaleInBar');
+        $print = $this->configRepository->get('laravel-localization::printCurrentLanguageInBar');
         if (isset($print))
         {
-            return $this->configRepository->get('laravel-localization::printCurrentLocaleInBar');
+            return $print;
         }
         return true;
     }
@@ -697,9 +716,36 @@ class LaravelLocalization
      *
      * @return boolean       Returns value of hideDefaultLocaleInURL in config.
      */
-    private function hideDefaultLocaleInURL()
+    public function hideDefaultLocaleInURL()
     {
-        return Config::get('laravel-localization::hideDefaultLocaleInURL') || Config::get('laravel-localization::hideDefaultLocaleInRoute');
+        return $this->configRepository->get('laravel-localization::hideDefaultLocaleInURL') || $this->configRepository->get('laravel-localization::hideDefaultLanguageInRoute');
+    }
+
+    /**
+     * Build URL using array data from parse_url
+     *
+     * @param array $parsed_url     Array of data from parse_url function
+     *
+     * @return string               Returns URL as string.
+     */
+    private function unparse_url($parsed_url) {
+        $url = "";
+        $url .= isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
+        $url .= isset($parsed_url['host']) ? $parsed_url['host'] : '';
+        $url .= isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
+        $user = isset($parsed_url['user']) ? $parsed_url['user'] : '';
+        $pass = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
+        $url .= $user . (($user || $pass) ? "$pass@" : '');
+        if (!empty($url)) {
+            $url .= isset($parsed_url['path']) ? '/' . ltrim($parsed_url['path'], '/') : '';
+        }
+        else
+        {
+            $url .= isset($parsed_url['path']) ? $parsed_url['path'] : '';
+        }
+        $url .= isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
+        $url .= isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
+        return $url;
     }
 
     /**
@@ -825,12 +871,12 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 
         if (!empty($locales[$localeCode]))
         {
-            if ($localeCode === $defaultLocale && Config::get('laravel-localization::hideDefaultLocaleInRoute'))
+            if ($localeCode === $defaultLocale && $app['laravellocalization']->hideDefaultLocaleInURL())
             {
                 return Redirect::to($app['laravellocalization']->getCleanRoute(), 302)->header('Vary','Accept-Language');
             }
         }
-        else if ($currentLocale !== $defaultLocale || !Config::get('laravel-localization::hideDefaultLocaleInRoute'))
+        else if ($currentLocale !== $defaultLocale || !$app['laravellocalization']->hideDefaultLocaleInURL())
         {
             // If the current url does not contain any locale
             // The system redirect the user to the very same url "localized"
