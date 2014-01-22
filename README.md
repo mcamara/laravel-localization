@@ -260,6 +260,23 @@ If the locale is not passed, the locale will be determined via a cookie (if stor
 The function have to be called in the prefix of any route that should be translated (see Filters sections for further information).
 
 
+### Get Current Locale Name
+
+```php
+	/**
+	 * Returns current locale name
+	 *
+	 * @return string current locale name
+	 */
+	public function getCurrentLocaleName()
+
+	//Should be called in a view like this:
+	{{ LaravelLocalization::getCurrentLocaleName() }}
+```
+
+This function will return current locale name as string (English/Spanish/Arabic/ ..etc).
+
+
 ### Get Current Locale Direction
 
 ```php
@@ -268,30 +285,30 @@ The function have to be called in the prefix of any route that should be transla
 	 *
 	 * @return string current locale direction
 	 */
-	public function getCurrentLanguageDirection()
+	public function getCurrentLocaleDirection()
 
 	//Should be called in a view like this:
-	{{ LaravelLocalization::getCurrentLanguageDirection() }}
+	{{ LaravelLocalization::getCurrentLocaleDirection() }}
 ```
 
-This function will return current language direction as string (ltr/rtl).
+This function will return current locale direction as string (ltr/rtl).
 
 
-### Get Current Language Script
+### Get Current Locale Script
 
 ```php
 	/**
-	 * Returns current language script
+	 * Returns current locale script
 	 *
-	 * @return string current language script
+	 * @return string current locale script
 	 */
-	public function getCurrentLanguageScript()
+	public function getCurrentLocaleScript()
 
 	//Should be called in a view like this:
-	{{ LaravelLocalization::getCurrentLanguageScript() }}
+	{{ LaravelLocalization::getCurrentLocaleScript() }}
 ```
 
-This function will return current language script as string (Latin/Cyrillic/Arabic/ ..etc).
+This function will return current locale script as string (Latin/Cyrillic/Arabic/ ..etc).
 
 
 ## View
@@ -362,6 +379,10 @@ By default only english and spanish are allowed but it can be changed using conf
 This file have some interesting configuration settings (as the allowed locales or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
+### 0.11
+- Deprecated "getCurrentLanguageDirection", "getCurrentLanguageScript"
+- Added "getCurrentLocaleDirection", "getCurrentLocaleScript", "getCurrentLocaleName"
+
 ### 0.10.1
 - Fixes to maintain compatibility with older config and languagebar.blade.php templates
 - Fixed backward compatibility of getLanguageBar
