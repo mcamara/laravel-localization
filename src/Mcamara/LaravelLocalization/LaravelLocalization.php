@@ -499,18 +499,42 @@ class LaravelLocalization
      * Returns current language direction
      *
      * @return string current language direction
+     *
+     * @deprecated will be removed in v1.0
      */
     public function getCurrentLanguageDirection()
     {
-        return $this->supportedLocales[$this->getCurrentLocale()]['dir'];
+        return $this->getCurrentLocaleDirection();
+    }
+
+    /**
+     * Returns current locale direction
+     *
+     * @return string current locale direction
+     */
+    public function getCurrentLocaleDirection()
+    {
+    	return $this->supportedLocales[$this->getCurrentLocale()]['dir'];
     }
 
     /**
      * Returns current language script
      *
      * @return string current language script
+     *
+     * @deprecated will be removed in v1.0
      */
     public function getCurrentLanguageScript()
+    {
+        return $this->getCurrentLocaleScript();
+    }
+
+    /**
+     * Returns current locale script
+     *
+     * @return string current locale script
+     */
+    public function getCurrentLocaleScript()
     {
         return $this->supportedLocales[$this->getCurrentLocale()]['script'];
     }
