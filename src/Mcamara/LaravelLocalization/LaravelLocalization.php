@@ -247,7 +247,7 @@ class LaravelLocalization
 				// the system would return the translated one
 				return $this->getURLFromRouteNameTranslated($locale);
 			}
-			$url = Request::url();
+			$url = Request::fullUrl();
 		}
 
 		$parsed_url = parse_url($url);
