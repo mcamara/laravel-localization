@@ -240,14 +240,22 @@ class LaravelLocalization
 
 		if (is_null($url) || !is_string($url))
 		{
+			$url = Request::fullUrl();
 			if ($this->routeName)
 			{
 				// if the system is going to translate the current url
 				// and it is a translated route
 				// the system would return the translated one
-				return $this->getURLFromRouteNameTranslated($locale);
+				$urlTranslated = $this->getURLFromRouteNameTranslated($locale);
+				if(!$urlTranslated)
+				{
+					return false;
+				}
+				$url = parse_url($url);
+				$urlTranslated = parse_url($urlTranslated);
+				$urlTranslated = array_merge($url,$urlTranslated);
+				return $this->unparse_url($urlTranslated);
 			}
-			$url = Request::fullUrl();
 		}
 
 		$parsed_url = parse_url($url);
@@ -302,7 +310,7 @@ class LaravelLocalization
 			return false;
 		}
 
-		if (!isset($transKeyName))
+		if (empty($transKeyName))
 		{
 			// if translation key name is not given
 			// the system would try to get the current one...
