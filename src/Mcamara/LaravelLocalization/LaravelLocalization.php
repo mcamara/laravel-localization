@@ -230,13 +230,22 @@ class LaravelLocalization
 	 *
 	 * @return string					   URL translated
 	 */
-	public function getLocalizedURL($locale, $url = null)
+	public function getLocalizedURL($locale = null, $url = null)
 	{
-		$locales = $this->getSupportedLocales();
-		if (!empty($locale) && empty($locales[$locale]))
-		{
-			throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
-		}
+		if ($locale !== false)
+        {   if (is_null($locale))
+            {
+                $locale = $this->currentLocale();
+            }
+            else
+            {
+                $locales = $this->getSupportedLocales();
+                if (empty($locales[$locale]))
+                {
+                    throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
+                }
+            }
+        }
 
 		if (is_null($url) || !is_string($url))
 		{
@@ -915,7 +924,7 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 		{
 			if ($localeCode === $defaultLocale && $app['laravellocalization']->hideDefaultLocaleInURL())
 			{
-				return Redirect::to($app['laravellocalization']->getCleanRoute(), 302)->header('Vary','Accept-Language');
+				return Redirect::to($app['laravellocalization']->getNonLocalizedURL(), 302)->header('Vary','Accept-Language');
 			}
 		}
 		else if ($currentLocale !== $defaultLocale || !$app['laravellocalization']->hideDefaultLocaleInURL())
@@ -923,7 +932,7 @@ Route::filter('LaravelLocalizationRedirectFilter', function()
 			// If the current url does not contain any locale
 			// The system redirect the user to the very same url "localized"
 			// we use the current locale to redirect him
-			return Redirect::to($currentLocale.'/'.Request::path(), 302)->header('Vary','Accept-Language');
+			return Redirect::to($app['laravellocalization']->getLocalizedURL(), 302)->header('Vary','Accept-Language');
 		}
 	}
 });
