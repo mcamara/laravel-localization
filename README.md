@@ -26,7 +26,7 @@ Easy i18n localization for Laravel 4, an useful tool to combine with Laravel loc
 
 Add Laravel Localization to your `composer.json` file.
 
-    "mcamara/laravel-localization": "0.11.*"
+    "mcamara/laravel-localization": "0.12.*"
 
 Run `composer install` to get the latest version of the package.
 
@@ -183,7 +183,7 @@ You can also define which view you want to use to show the language bar. If you 
 
 It returns a URL clean of any localization.
 
-### Get URL for an specific locale
+### Get URL for an specific locale, there are two options here
 
 ```php
     /**
@@ -200,6 +200,22 @@ It returns a URL clean of any localization.
 
 	//Should be called in a view like this:
 	{{ LaravelLocalization::getLocalizedURL(string $locale, optional string $url) }}
+```
+
+or
+
+```php
+    /**
+     * Returns an URL adapted to $locale or current locale
+     *
+     * @param  string $url				   URL to adapt. If not passed, the current url would be taken.
+     * @param  string|boolean $locale	   Locale to adapt, false to remove locale
+     *
+     * @throws UnsupportedLocaleException
+     *
+     * @return string					   URL translated
+     */
+    public function localizeURL($url, $locale = null)
 ```
 
 It returns a URL localized to the desired locale.
@@ -381,6 +397,10 @@ By default only english and spanish are allowed but it can be changed using conf
 This file have some interesting configuration settings (as the allowed locales or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
+### 0.12.0
+- Changes 302 redirect in to 307 to prevent POST values from being consumed.
+- Added localizeURL function
+
 ### 0.11.0
 - Deprecated "getCurrentLanguageDirection", "getCurrentLanguageScript"
 - Added "getCurrentLocaleDirection", "getCurrentLocaleScript", "getCurrentLocaleName"
