@@ -220,6 +220,22 @@ class LaravelLocalization
 		return $this->getLocalizedURL($language, $route);
 	}
 
+    /**
+     * Returns an URL adapted to $locale or current locale
+     *
+     * @param  string $url				   URL to adapt. If not passed, the current url would be taken.
+     * @param  string|boolean $locale	   Locale to adapt, false to remove locale
+     *
+     * @throws UnsupportedLocaleException
+     *
+     * @return string					   URL translated
+     */
+    public function localizeURL($url, $locale = null)
+    {
+        return $this->getLocalizedURL($locale, $url);
+    }
+
+
 	/**
 	 * Returns an URL adapted to $locale
 	 *
@@ -235,7 +251,7 @@ class LaravelLocalization
 		if ($locale !== false)
         {   if (is_null($locale))
             {
-                $locale = $this->currentLocale();
+                $locale = $this->getCurrentLocale();
             }
             else
             {
