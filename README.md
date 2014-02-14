@@ -397,6 +397,9 @@ By default only english and spanish are allowed but it can be changed using conf
 This file have some interesting configuration settings (as the allowed locales or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
+### 0.12.1
+- Throws exception if Larvel's default locale is not in the array of supported locales.
+
 ### 0.12.0
 - Changes 302 redirect in to 307 to prevent POST values from being consumed.
 - Added localizeURL function
