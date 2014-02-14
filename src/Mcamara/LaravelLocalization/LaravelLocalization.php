@@ -86,7 +86,10 @@ class LaravelLocalization
 
 		// set default locale
 		$this->defaultLocale = Config::get('app.locale');
-		$this->getSupportedLocales();
+        $supportedLocales = $this->getSupportedLocales();
+        if (empty($supportedLocales[$this->defaultLocale])) {
+            throw new UnsupportedLocaleException("Laravel's default locale is not in the supportedLocales array.");
+        }
 	}
 
 	/**
