@@ -73,6 +73,8 @@ class LaravelLocalization
 
 	/**
 	 * Creates new instance.
+     *
+     * @throws UnsupportedLocaleException
 	 *
 	 * @param \Illuminate\Config\Repository $configRepository
 	 * @param \Illuminate\View\Environment $view
