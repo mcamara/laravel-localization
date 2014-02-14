@@ -133,38 +133,6 @@ If you want to hide the default locale but always show other locales in the url,
 
 This package comes with some useful functions, like:
 
-### Get Language Bar
-
-```php
-	/**
-     * Returns html with language selector
-     *
-     * @param  boolean $abbr 		    Should languages be abbreviate to their locale codes?
-     * @param  string $customView 	    Which template should the language bar have?
-     *
-     * @return string 				    Returns an html view with a language bar
-     */
-    public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
-
-	//Should be called in a view like this:
-	{{ LaravelLocalization::getLanguageBar(optional boolean $abbr, optional string $customView) }}
-```
-
-It returns an html string with links to the current URL localized to all other supportedLocales.
-For example, if currently viewing the site in English and Catalan and Spanish are allowed as locales, and the current URL is http://url-to-laravel/test or http://url-to-laravel/en/test this function would return...
-
-```html
-	<ul class="laravel_language_chooser">
-		<li class="active">English</li>
-		<li><a rel="alternate" hreflang="ca" href="http://url-to-laravel/ca/test">Catalan</a></li>
-		<li><a rel="alternate" hreflang="es" href="http://url-to-laravel/es/test">Español</a></li>
-	</ul>
-```
-
-If you are using translation routes, be sure that all keys exist for all locales. Otherwise, the language bar would not show the untranslated routes but it would show all the other links.
-
-You can also define which view you want to use to show the language bar. If you want to create your own language bar from the example given in the package, you should publish it using the command `php artisan view:publish mcamara/laravel-localization`, it would create a language bar template (take a look at view section). If you rename the view, you should pass the new name as the $customView variable when the languageBar function is called, this function will look at this custom view within the app/view folder. In case this file does not exist, the language bar function would show the default bar.
-
 ### Get Clean routes
 
 ```php
@@ -329,11 +297,22 @@ This function will return current locale direction as string (ltr/rtl).
 This function will return current locale script as string (Latin/Cyrillic/Arabic/ ..etc).
 
 
-## View
+## Creating a language selector
 
-You can edit the default view for the language bar executing `php artisan view:publish mcamara/laravel-localization`.
+If you're supporting multiple locales in your project your going to want to provide the users with a way to change language.  Below is a simple example of blade template code you can use to create your own language selector.
 
-This command will create a blade view in your app/views folder containing the default code for the language bar, edit it to style and edit your language bar that suits you the best.
+```
+<ul class="language_bar_chooser">
+	@foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+        <li>
+            <a rel="alternate" hreflang="{{$localeCode}}" href="{{$url}}">
+                {{{ $properties['native'] }}}
+            </a>
+        </li>
+	@endforeach
+</ul>
+```
+
 
 ## Translated Routes
 _**New in version 0.5**_
