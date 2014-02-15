@@ -4,7 +4,7 @@
     "keywords": ["localization", "laravel", "php"],
     "homepage": "https://github.com/mcamara/laravel-localization",
     "license": "MIT",
-    "version": "0.12.0",
+    "version": "0.12.1",
     "authors": [
         {
             "name": "Marc Cámara",
