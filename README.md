@@ -326,7 +326,7 @@ This function will return current locale direction as string (ltr/rtl).
 	{{ LaravelLocalization::getCurrentLocaleScript() }}
 ```
 
-This function will return current locale script as string (Latin/Cyrillic/Arabic/ ..etc).
+This function will return the [ISO 15924](http://www.unicode.org/iso15924) code for the current locale script as a string; "Latn", "Cyrl", "Arab", etc.
 
 
 ## View
