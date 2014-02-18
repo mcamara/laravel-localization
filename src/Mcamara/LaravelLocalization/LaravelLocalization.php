@@ -320,9 +320,7 @@ class LaravelLocalization
 		if (starts_with($path, '/') === true) {
 			$parsed_url['path'] = '/' . $parsed_url['path'];
 		}
-		if (ends_with($path, '/') === false) {
-			$parsed_url['path'] = rtrim($parsed_url['path'], '/');
-		}
+		$parsed_url['path'] = rtrim($parsed_url['path'], '/');
 
 		return $this->unparse_url($parsed_url);
 	}
