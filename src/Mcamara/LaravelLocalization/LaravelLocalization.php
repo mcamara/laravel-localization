@@ -237,7 +237,7 @@ class LaravelLocalization
      *
      * @return string					   URL translated
      */
-    public function localizeURL($url, $locale = null)
+    public function localizeURL($url = null, $locale = null)
     {
         return $this->getLocalizedURL($locale, $url);
     }
