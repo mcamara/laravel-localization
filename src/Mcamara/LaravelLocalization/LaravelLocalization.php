@@ -174,7 +174,7 @@ class LaravelLocalization
 	 *
 	 * @return string 					Returns an html view with a language bar
      *
-     * @deprecated will be removed in v1.0 please see updated readme for details on making your own language bar tempalte.
+     * @deprecated will be removed in v1.0 please see updated readme for details on making your own language bar template.
 	 */
 	public function getLanguageBar($abbr = false, $customView = 'mcamara/laravel-localization/languagebar')
 	{
@@ -828,8 +828,8 @@ class LaravelLocalization
 	 * HTTP header or the user's host address.  Language codes are generally in
 	 * the form "ll" for a language spoken in only one country, or "ll-CC" for a
 	 * language spoken in a particular country.  For example, U.S. English is
-	 * "en-US", while British English is "en-UK".  Portugese as spoken in
-	 * Portugal is "pt-PT", while Brazilian Portugese is "pt-BR".
+	 * "en-US", while British English is "en-UK".  Portuguese as spoken in
+	 * Portugal is "pt-PT", while Brazilian Portuguese is "pt-BR".
 	 *
 	 * This function is based on negotiateLanguage from Pear HTTP2
 	 * http://pear.php.net/package/HTTP2/
