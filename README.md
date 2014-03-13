@@ -378,6 +378,9 @@ By default only english and spanish are allowed but it can be changed using conf
 This file have some interesting configuration settings (as the allowed locales or browser language detection, among others) feel free to play with it, all variables are self-explained.
 
 ## Changelog
+### 0.13.4
+- Fixes issue localizing a url when segment starts with a locale
+
 ### 0.13.3
 - Allow no url to be passed in localizeURL
 
