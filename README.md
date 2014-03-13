@@ -129,6 +129,8 @@ In order to active it, you just have to attach this filter to the routes you wan
 
 If you want to hide the default locale but always show other locales in the url, switch the 'hideDefaultLocaleInURL' config value to true. Once it's true, if the default locale is en (english) all URLs containing /en/ would be redirected to the same url without this fragment '/' but maintaining the locale as en (English).
 
+**IMPORTANT** - When hideDefaultLocaleInURL is set to true, the unlocalized root is treated as the applications default locale ```app.locale```.  Because of this language negotiation using the Accept-Language header will **NEVER** occur when hideDefaultLocaleInURL is true.
+
 ## Helpers
 
 This package comes with some useful functions, like:
@@ -305,7 +307,7 @@ If you're supporting multiple locales in your project your going to want to prov
 <ul class="language_bar_chooser">
 	@foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
         <li>
-            <a rel="alternate" hreflang="{{$localeCode}}" href="{{ LaravelLocalization::getLocalizedURL($localeCode) }}">
+            <a rel="alternate" hreflang="{{$localeCode}}" href="{{LaravelLocalization::getLocalizedURL($localeCode) }}">
                 {{{ $properties['native'] }}}
             </a>
         </li>
