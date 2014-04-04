@@ -65,11 +65,10 @@ class LaravelLocalization
 	protected $translatedRoutes = array();
 
 	/**
-	 * Name of the translation key of the current route, it is used for url translations
+	 * An array that contains all the name of the translation keys of the current route, it is used for url translations
 	 *
-	 * @var string
+	 * @var array
 	 */
-	protected $routeName = false;
 	protected $routesNames = array();
 
 	/**
