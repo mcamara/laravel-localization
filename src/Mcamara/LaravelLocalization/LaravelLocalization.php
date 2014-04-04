@@ -256,19 +256,20 @@ class LaravelLocalization
 	public function getLocalizedURL($locale = null, $url = null)
 	{
 		if ($locale !== false)
-        {   if (is_null($locale))
-            {
-                $locale = $this->getCurrentLocale();
-            }
-            else
-            {
-                $locales = $this->getSupportedLocales();
-                if (empty($locales[$locale]))
-                {
-                    throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
-                }
-            }
-        }
+    {   
+    	if (is_null($locale))
+      {
+          $locale = $this->getCurrentLocale();
+      }
+      else
+      {
+          $locales = $this->getSupportedLocales();
+          if (empty($locales[$locale]))
+          {
+              throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
+          }
+      }
+    }
 
 		if (is_null($url) || !is_string($url))
 		{
@@ -393,16 +394,7 @@ class LaravelLocalization
 			if ($this->translator->has($transKeyName,$locale))
 			{
 				$translation = $this->translator->trans($transKeyName,array(),array(),$locale);
-
-				// If hideDefaultLocaleInURL is true, make sure not to include the default locale in the transalted url
-				if ($locale === $this->defaultLocale && $this->hideDefaultLocaleInURL())
-				{
-					$route = $route."/".$translation;
-				}
-				else
-				{
-					$route = $route."/".$translation;
-				}
+				$route = $route."/".$translation;
 
 				if (is_array($attributes))
 				{
@@ -775,13 +767,17 @@ class LaravelLocalization
 		$path = explode("/",$path);
 		$routesNames = array();
 
-		foreach ($this->translatedRoutes as $route)
+		foreach ($path as $routes)
 		{
-			if (in_array($this->translator->trans($route), $path))
+			foreach ($this->translatedRoutes as $route)
 			{
-				$routesNames[] = $route;
+				if ($this->translator->trans($route) == $path)
+				{
+					$routesNames[] = $route;
+				}
 			}
 		}
+
 		return $routesNames;
 	}
 
