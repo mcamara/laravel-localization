@@ -70,6 +70,7 @@ class LaravelLocalization
 	 * @var string
 	 */
 	protected $routeName = false;
+	protected $routesNames = array();
 
 	/**
 	 * Creates new instance.
@@ -273,7 +274,7 @@ class LaravelLocalization
 		if (is_null($url) || !is_string($url))
 		{
 			$url = Request::fullUrl();
-			if ($this->routeName)
+			if (!empty($this->routesNames))
 			{
 				// if the system is going to translate the current url
 				// and it is a translated route
@@ -343,7 +344,7 @@ class LaravelLocalization
 	 *
 	 * @return string|boolean 			URL translated
 	 */
-	public function getURLFromRouteNameTranslated($locale, $transKeyName = null, $attributes = array())
+	public function getURLFromRouteNameTranslated($locale, $transKeysNames = array(), $attributes = array())
 	{
 		if (!in_array($locale, array_keys($this->configRepository->get('laravel-localization::supportedLocales'))))
 		{
@@ -355,12 +356,12 @@ class LaravelLocalization
 		{
 			// if translation key name is not given
 			// the system would try to get the current one...
-			if (!$this->routeName)
+			if (empty($this->routesNames))
 			{
 				// ... if it is false, the route is impossible to translate
 				return false;
 			}
-			$transKeyName = $this->routeName;
+			$transKeysNames = $this->routesNames;
 			if (sizeof($attributes) === 0)
 			{
 				// if there are no attributes and the current url has some
@@ -380,32 +381,43 @@ class LaravelLocalization
 			}
 		}
 
-		if ($this->translator->has($transKeyName,$locale))
+		$route = "";
+		if (!($locale === $this->defaultLocale && $this->hideDefaultLocaleInURL()))
 		{
-			$translation = $this->translator->trans($transKeyName,array(),array(),$locale);
-
-			// If hideDefaultLocaleInURL is true, make sure not to include the default locale in the transalted url
-			if ($locale === $this->defaultLocale && $this->hideDefaultLocaleInURL())
-			{
-				$route = url($translation);
-			}
-			else
-			{
-				$route = url($locale."/".$translation);
-			}
-
-			if (is_array($attributes))
-			{
-				foreach ($attributes as $key => $value)
-				{
-					$route = str_replace("{".$key."}", $value, $route);
-					$route = str_replace("{".$key."?}", $value, $route);
-				}
-			}
-			// delete empty optional arguments
-			$route = preg_replace('/\/{[^)]+\?}/','',$route);
-			return rtrim($route, '/');
+			$route = url($locale);
 		}
+
+		foreach ($transKeysNames as $transKeyName)
+		{
+			if ($this->translator->has($transKeyName,$locale))
+			{
+				$translation = $this->translator->trans($transKeyName,array(),array(),$locale);
+
+				// If hideDefaultLocaleInURL is true, make sure not to include the default locale in the transalted url
+				if ($locale === $this->defaultLocale && $this->hideDefaultLocaleInURL())
+				{
+					$route = url($route."/".$translation);
+				}
+				else
+				{
+					$route = url($route."/".$translation);
+				}
+
+				if (is_array($attributes))
+				{
+					foreach ($attributes as $key => $value)
+					{
+						$route = str_replace("{".$key."}", $value, $route);
+						$route = str_replace("{".$key."?}", $value, $route);
+					}
+				}
+				// delete empty optional arguments
+				$route = preg_replace('/\/{[^)]+\?}/','',$route);
+			}
+		}
+
+		if (!empty($route)) return rtrim($route, '/');
+		
 		// This locale does not have any key for this route name
 		return false;
 
@@ -718,9 +730,16 @@ class LaravelLocalization
 	 * Set current route name
 	 * @param string $name  current route name
 	 */
-	public function setRouteName($name)
+	public function setRouteName($name, $add = false)
 	{
-		$this->routeName = $name;
+		if ($add)
+		{
+			$this->routesNames[] = $name;
+		}
+		else
+		{
+			$this->routesNames = $name;
+		}
 	}
 
 	/**
@@ -752,15 +771,17 @@ class LaravelLocalization
 		}
 		$path = str_replace('/' . $this->currentLocale . '/', '', $path);
 		$path = trim($path,"/");
+		$path = explode("/",$path);
+		$routesNames = array();
 
 		foreach ($this->translatedRoutes as $route)
 		{
-			if ($this->translator->trans($route) === $path)
+			if (in_array($this->translator->trans($route), $path))
 			{
-				return $route;
+				$routesNames[] = $route;
 			}
 		}
-		return false;
+		return $routesNames;
 	}
 
 
@@ -986,6 +1007,7 @@ Route::filter('LaravelLocalizationRoutes', function()
 		// Laravel 4.0
 		$routeName = $app['laravellocalization']->getRouteNameFromAPath($router->getCurrentRoute()->getPath());
 	}
+
 	$app['laravellocalization']->setRouteName($routeName);
 	return;
 });
