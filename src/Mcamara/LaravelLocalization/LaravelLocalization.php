@@ -65,7 +65,7 @@ class LaravelLocalization
 	protected $translatedRoutes = array();
 
 	/**
-	 * An array that contains all the name of the translation keys of the current route, it is used for url translations
+	 * Name of the translation key of the current route, it is used for url translations
 	 *
 	 * @var array
 	 */
@@ -283,9 +283,11 @@ class LaravelLocalization
 				{
 					return false;
 				}
+				
 				$url = parse_url($url);
 				$urlTranslated = parse_url($urlTranslated);
 				$urlTranslated = array_merge($url,$urlTranslated);
+				
 				return $this->unparse_url($urlTranslated);
 			}
 		}
@@ -383,9 +385,9 @@ class LaravelLocalization
 		$route = "";
 		if (!($locale === $this->defaultLocale && $this->hideDefaultLocaleInURL()))
 		{
-			$route = url($locale);
+			$route = $locale;
 		}
-
+		
 		foreach ($transKeysNames as $transKeyName)
 		{
 			if ($this->translator->has($transKeyName,$locale))
@@ -395,11 +397,11 @@ class LaravelLocalization
 				// If hideDefaultLocaleInURL is true, make sure not to include the default locale in the transalted url
 				if ($locale === $this->defaultLocale && $this->hideDefaultLocaleInURL())
 				{
-					$route = url($route."/".$translation);
+					$route = $route."/".$translation;
 				}
 				else
 				{
-					$route = url($route."/".$translation);
+					$route = $route."/".$translation;
 				}
 
 				if (is_array($attributes))
