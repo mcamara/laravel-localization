@@ -744,7 +744,10 @@ class LaravelLocalization
 	 */
 	public function transRoute($routeName)
 	{
-		$this->translatedRoutes[] = $routeName;
+		if (!in_array($routeName, $this->translatedRoutes))
+		{
+			$this->translatedRoutes[] = $routeName;
+		}
 		return $this->translator->trans($routeName);
 	}
 
@@ -767,11 +770,11 @@ class LaravelLocalization
 		$path = explode("/",$path);
 		$routesNames = array();
 
-		foreach ($path as $routes)
+		foreach ($path as $path_route)
 		{
 			foreach ($this->translatedRoutes as $route)
 			{
-				if ($this->translator->trans($route) == $path)
+				if ($this->translator->trans($route) == $path_route)
 				{
 					$routesNames[] = $route;
 				}
