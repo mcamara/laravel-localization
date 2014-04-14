@@ -1,3 +1,6 @@
+### 0.13.5
+- Fixes issue with grouped routes
+
 ### 0.13.4
 - Fixes issue localizing a url when segment starts with a locale
 
