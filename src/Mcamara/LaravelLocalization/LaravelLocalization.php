@@ -354,7 +354,7 @@ class LaravelLocalization
 			return false;
 		}
 
-		if (empty($transKeyName))
+		if (empty($transKeyNames))
 		{
 			// if translation key name is not given
 			// the system would try to get the current one...
