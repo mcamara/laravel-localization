@@ -93,6 +93,34 @@ class LaravelLocalization
             throw new UnsupportedLocaleException("Laravel's default locale is not in the supportedLocales array.");
         }
 	}
+	
+	/**
+	 * Sets the defaultLocale protected property
+	 * @param {string} $locale The locale string to set, e.g. en-gb
+	 */
+	public function setDefaultLocale($locale)
+	{
+		$this->defaultLocale = $locale;
+	}
+
+	/**
+	 * Sets the currentLocale protected property
+	 * @param {string} $locale The locale string to set, e.g. en-gb
+	 */
+	public function setCurrentLocale($locale)
+	{
+		$this->currentLocale = $locale;
+	}
+
+	/**
+	 * Sets the supportedLocales protected property and the config setting
+	 * @param {array} $locales The locales to support
+	 */
+	public function setSupportedLocales($locales)
+	{
+		$this->supportedLocales = $locales;
+		$this->configRepository->set('laravel-localization::supportedLocales', $locales);
+	}
 
 	/**
 	 * Set and return current language
