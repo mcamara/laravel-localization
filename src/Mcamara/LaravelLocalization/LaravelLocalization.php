@@ -374,11 +374,17 @@ class LaravelLocalization
 				{
 					// Laravel 4.1
 					$attributes = $router->current()->parameters();
+                    $response = \Event::fire('routes.translation', ['locale' => $locale, 'attributes' => $attributes]);
+                    if(!empty($response)) $response = array_shift($response);
+                    if(is_array($response)) $attributes = array_merge($attributes, $response);
 				}
 				else
 				{
 					// Laravel 4.0
 					$attributes = $router->getCurrentRoute()->getParameters();
+                    $response = \Event::fire('routes.translation', ['locale' => $locale, 'attributes' => $attributes]);
+                    if(!empty($response)) $response = array_shift($response);
+                    if(is_array($response)) $attributes = array_merge($attributes, $response);
 				}
 			}
 		}
