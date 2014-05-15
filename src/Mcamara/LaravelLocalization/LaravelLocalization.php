@@ -386,7 +386,7 @@ class LaravelLocalization
 		$route = "";
 		if (!($locale === $this->defaultLocale && $this->hideDefaultLocaleInURL()))
 		{
-			$route = $locale;
+			$route = '/'.$locale;
 		}
 		
 		foreach ($transKeysNames as $transKeyName)
