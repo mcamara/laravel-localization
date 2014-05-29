@@ -197,15 +197,15 @@ It returns a URL localized to the desired locale.
      * Returns an URL adapted to the route name and the locale given
      *
      * @param  string $locale 		    Locale to adapt
-     * @param  string $transKeyName  	Translation key name of the url to adapt
+     * @param  array $transKeyNames  	Array containing the Translation key name of the url to adapt
      * @param  array $attributes  		Attributes for the route (only needed if transKeyName needs them)
      *
      * @return string|boolean  	        URL translated
      */
-    public function getURLFromRouteNameTranslated($locale, $transKeyName = null, $attributes = array())
+    public function getURLFromRouteNameTranslated($locale, $transKeyNames = array(), $attributes = array())
 
 	//Should be called in a view like this:
-	{{ LaravelLocalization::getURLFromRouteNameTranslated(string $locale, optional string $transKeyName, optional array $attributes) }}
+	{{ LaravelLocalization::getURLFromRouteNameTranslated(string $locale, optional array $transKeyNames, optional array $attributes) }}
 ```
 
 It returns a route, localized to the desired locale using the locale passed. If the translation key does not exist in the locale given, this function will return false.
