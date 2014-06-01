@@ -73,14 +73,16 @@ class LaravelLocalization
 
 	/**
 	 * Creates new instance.
-     *
-     * @throws UnsupportedLocaleException
 	 *
-	 * @param \Illuminate\Config\Repository $configRepository
-	 * @param \Illuminate\View\Environment $view
-	 * @param \Illuminate\Translation\Translator $translator
+	 *
+	 * @param \Illuminate\Config\Repository                         $configRepository
+	 * @param \Illuminate\View\Environment|\Illuminate\View\Factory $view
+	 * @param \Illuminate\Translation\Translator                    $translator
+	 *
+	 * @throws UnsupportedLocaleException
 	 */
-	public function __construct(Repository $configRepository, Environment $view, Translator $translator)
+	public function __construct(Repository $configRepository, Factory $view, Translator $translator)
+	
 	{
 		$this->configRepository = $configRepository;
 		$this->view = $view;
