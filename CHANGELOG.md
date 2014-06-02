@@ -1,3 +1,7 @@
+### 0.14.0
+- Laravel 4.2 compatibility
+- Removed Laravel 4.0 compatibility
+
 ### 0.13.5
 - Fixes issue with grouped routes
 
