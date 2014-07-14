@@ -377,10 +377,10 @@ class LaravelLocalization
 			}
 		}
 
-		$route = "";
+		$route = Request::getBaseUrl();
 		if (!($locale === $this->defaultLocale && $this->hideDefaultLocaleInURL()))
 		{
-			$route = '/'.$locale;
+			$route = Request::getBaseUrl().'/'.$locale;
 		}
 		
 		foreach ($transKeysNames as $transKeyName)
