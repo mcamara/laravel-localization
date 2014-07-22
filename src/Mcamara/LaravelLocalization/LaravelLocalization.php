@@ -10,8 +10,6 @@ use Cookie;
 use App;
 use View;
 use Config;
-use Redirect;
-use Route;
 
 class LaravelLocalization
 {
@@ -952,47 +950,6 @@ class LaravelLocalization
 	}
 
 }
-
-Route::filter('LaravelLocalizationRedirectFilter', function()
-{
-	global $app;
-	$currentLocale = $app['laravellocalization']->getCurrentLocale();
-	$defaultLocale = $app['laravellocalization']->getDefault();
-	$params = explode('/', Request::path());
-	if (count($params) > 0)
-	{
-		$localeCode = $params[0];
-		$locales = $app['laravellocalization']->getSupportedLocales();
-
-		if (!empty($locales[$localeCode]))
-		{
-			if ($localeCode === $defaultLocale && $app['laravellocalization']->hideDefaultLocaleInURL())
-			{
-				return Redirect::to($app['laravellocalization']->getNonLocalizedURL(), 307)->header('Vary','Accept-Language');
-			}
-		}
-		else if ($currentLocale !== $defaultLocale || !$app['laravellocalization']->hideDefaultLocaleInURL())
-		{
-			// If the current url does not contain any locale
-			// The system redirect the user to the very same url "localized"
-			// we use the current locale to redirect him
-			return Redirect::to($app['laravellocalization']->getLocalizedURL(), 307)->header('Vary','Accept-Language');
-		}
-	}
-});
-
-/**
- * 	This filter would set the translated route name
- */
-Route::filter('LaravelLocalizationRoutes', function()
-{
-	global $app;
-	$router = $app['router'];
-	$routeName = $app['laravellocalization']->getRouteNameFromAPath($router->current()->uri());
-
-	$app['laravellocalization']->setRouteName($routeName);
-	return;
-});
 
 class UnsupportedLocaleException extends Exception
 {
