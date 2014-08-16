@@ -133,10 +133,10 @@ class LaravelLocalization
 		{
 			$this->currentLocale = $locale;
 		}
-        elseif (!empty($this->allLocales[$locale]))
-        {
-            $this->currentLocale = $this->defaultLocale;
-        }
+        	elseif (!empty($this->allLocales[$locale]) && $this->allowUnsupported())
+        	{
+            		$this->currentLocale = $this->defaultLocale;
+        	}
 		else
 		{
 			// if the first segment/locale passed is not valid
