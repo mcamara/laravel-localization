@@ -39,6 +39,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
             $currentLocale = $app['laravellocalization']->getCurrentLocale();
             $defaultLocale = $app['laravellocalization']->getDefault();
             $params = explode('/', Request::path());
+
             if (count($params) > 0)
             {
                 $localeCode = $params[0];

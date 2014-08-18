@@ -48,7 +48,14 @@ class LaravelLocalization
 	 */
 	protected $supportedLocales;
 
-	/**
+    /**
+         * All Locales
+         *
+         * @var array
+         */
+    protected $allLocales;
+
+    /**
 	 * Current locale
 	 *
 	 * @var string
@@ -86,6 +93,8 @@ class LaravelLocalization
 
 		// set default locale
 		$this->defaultLocale = Config::get('app.locale');
+        // Load all locales array from config
+        $this->getAllLocales();
         $supportedLocales = $this->getSupportedLocales();
         if (empty($supportedLocales[$this->defaultLocale])) {
             throw new UnsupportedLocaleException("Laravel's default locale is not in the supportedLocales array.");
@@ -124,6 +133,10 @@ class LaravelLocalization
 		{
 			$this->currentLocale = $locale;
 		}
+        	elseif (!empty($this->allLocales[$locale]) && $this->allowUnsupported())
+        	{
+            		$this->currentLocale = $this->defaultLocale;
+        	}
 		else
 		{
 			// if the first segment/locale passed is not valid
@@ -161,6 +174,7 @@ class LaravelLocalization
 		{
 			Cookie::forget('language');
 		}
+
 		return $locale;
 	}
 
@@ -254,7 +268,7 @@ class LaravelLocalization
 	public function getLocalizedURL($locale = null, $url = null)
 	{
 		if ($locale !== false)
-    {   
+    {
     	if (is_null($locale))
       {
           $locale = $this->getCurrentLocale();
@@ -282,11 +296,11 @@ class LaravelLocalization
 				{
 					return false;
 				}
-				
+
 				$url = parse_url($url);
 				$urlTranslated = parse_url($urlTranslated);
 				$urlTranslated = array_merge($url,$urlTranslated);
-				
+
 				return $this->unparse_url($urlTranslated);
 			}
 		}
@@ -301,7 +315,17 @@ class LaravelLocalization
 		{
             $parsed_url['path'] = str_replace($base_path, '', '/'.ltrim($parsed_url['path'], '/'));
 			$path = $parsed_url['path'];
-			foreach ($this->getSupportedLocales() as $localeCode => $lang)
+
+            // These are the strings we will rewrite
+            $localesToMatchAgainst = $this->getSupportedLocales();
+
+            // If user wants all locales supported, we need to get all locales to rewrite
+            if ($this->allowUnsupported())
+            {
+                $localesToMatchAgainst = $this->getAllLocales();
+            }
+
+			foreach ($localesToMatchAgainst as $localeCode => $lang)
 			{
 				$parsed_url['path'] = preg_replace('%^/?'.$localeCode.'/%', '$1', $parsed_url['path']);
 				if ($parsed_url['path'] != $path)
@@ -380,7 +404,7 @@ class LaravelLocalization
 		{
 			$route = Request::getBaseUrl().'/'.$locale;
 		}
-		
+
 		foreach ($transKeysNames as $transKeyName)
 		{
 			if ($this->translator->has($transKeyName,$locale))
@@ -402,7 +426,7 @@ class LaravelLocalization
 		}
 
 		if (!empty($route)) return rtrim($route, '/');
-		
+
 		// This locale does not have any key for this route name
 		return false;
 
@@ -559,6 +583,25 @@ class LaravelLocalization
 
 		return $locales;
 	}
+
+    /**
+         * Return an array of all Locales
+         *
+         * @return array
+         */
+    public function getAllLocales()
+    {
+        if (!empty($this->allLocales))
+        {
+            return $this->allLocales;
+        }
+
+        $locales = $this->configRepository->get('laravel-localization::allLocales');
+
+        $this->allLocales = $locales;
+
+        return $locales;
+    }
 
 	/**
 	 * Returns current locale name
@@ -784,14 +827,24 @@ class LaravelLocalization
 		return $this->configRepository->get('laravel-localization::useSessionLocale') || $this->configRepository->get('laravel-localization::useSessionLanguage');
 	}
 
+    /**
+         * Returns the translation key for a given path
+         *
+         * @return boolean	   Returns value of useCookieLocale in config.
+         */
+    private function useCookieLocale()
+    {
+        return $this->configRepository->get('laravel-localization::useCookieLocale') || $this->configRepository->get('laravel-localization::useCookieLanguage');
+    }
+
 	/**
 	 * Returns the translation key for a given path
 	 *
-	 * @return boolean	   Returns value of useCookieLocale in config.
+	 * @return boolean	   Returns value of allowUnsupported in config.
 	 */
-	private function useCookieLocale()
+	private function allowUnsupported()
 	{
-		return $this->configRepository->get('laravel-localization::useCookieLocale') || $this->configRepository->get('laravel-localization::useCookieLanguage');
+		return $this->configRepository->get('laravel-localization::allowUnsupported');
 	}
 
 	/**
