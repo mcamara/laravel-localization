@@ -4,6 +4,7 @@ use Illuminate\Support\ServiceProvider;
 use Route;
 use Request;
 use Redirect;
+use Session;
 
 class LaravelLocalizationServiceProvider extends ServiceProvider {
 
