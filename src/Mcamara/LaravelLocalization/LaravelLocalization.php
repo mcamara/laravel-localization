@@ -65,7 +65,7 @@ class LaravelLocalization
 	/**
 	 * Name of the translation key of the current route, it is used for url translations
 	 *
-	 * @var array
+	 * @var array|string
 	 */
 	protected $routesNames = array();
 
@@ -254,20 +254,24 @@ class LaravelLocalization
 	public function getLocalizedURL($locale = null, $url = null)
 	{
 		if ($locale !== false)
-    {   
-    	if (is_null($locale))
-      {
-          $locale = $this->getCurrentLocale();
-      }
-      else
-      {
-          $locales = $this->getSupportedLocales();
-          if (empty($locales[$locale]))
-          {
-              throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
-          }
-      }
-    }
+		{   
+			if (is_null($locale))
+			{
+				$locale = $this->getCurrentLocale();
+			}
+			else
+			{
+				$locales = $this->getSupportedLocales();
+				if (empty($locales[$locale]))
+				{
+					throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
+				}
+			}
+		}
+		else
+		{
+			$locale = $this->defaultLocale;
+		}
 
 		if (is_null($url) || !is_string($url))
 		{
@@ -280,12 +284,12 @@ class LaravelLocalization
 				$urlTranslated = $this->getURLFromRouteNameTranslated($locale);
 				if(!$urlTranslated)
 				{
-					return false;
+					return False;
 				}
 				
 				$url = parse_url($url);
 				$urlTranslated = parse_url($urlTranslated);
-				$urlTranslated = array_merge($url,$urlTranslated);
+				$urlTranslated = array_merge($url, $urlTranslated);
 				
 				return $this->unparse_url($urlTranslated);
 			}
@@ -293,7 +297,8 @@ class LaravelLocalization
 
         $base_path = Request::getBaseUrl();
 		$parsed_url = parse_url($url);
-		if (empty($parsed_url['path']))
+
+		if ( !$parsed_url || empty($parsed_url['path']) )
 		{
 			$path = $parsed_url['path'] = "";
 		}
@@ -385,7 +390,7 @@ class LaravelLocalization
 		{
 			if ($this->translator->has($transKeyName,$locale))
 			{
-				$translation = $this->translator->trans($transKeyName,array(),array(),$locale);
+				$translation = $this->translator->trans($transKeyName, [], "", $locale);
 				$route = $route."/".$translation;
 
 				if (is_array($attributes))
@@ -746,9 +751,9 @@ class LaravelLocalization
 	/**
 	 * Returns the translation key for a given path
 	 *
-	 * @param  string $path [description]
+	 * @param  string $path 	Path to get the key translated
 	 *
-	 * @return string	   [description]
+	 * @return string|boolean 	Key for translation
 	 */
 	public function getRouteNameFromAPath($path)
 	{
@@ -759,18 +764,18 @@ class LaravelLocalization
 		}
 		$path = str_replace('/' . $this->currentLocale . '/', '', $path);
 		$path = trim($path,"/");
-		$routesNames = array();
+		$routesNames = [];
 
 
         foreach ($this->translatedRoutes as $route)
         {
             if ($this->translator->trans($route) == $path)
             {
-                $routesNames[] = $route;
+                return $route;
             }
         }
 
-		return $routesNames;
+		return False;
 	}
 
 
