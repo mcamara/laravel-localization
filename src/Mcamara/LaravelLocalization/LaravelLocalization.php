@@ -8,7 +8,6 @@ use Request;
 use Session;
 use Cookie;
 use App;
-use View;
 use Config;
 
 class LaravelLocalization
@@ -65,7 +64,7 @@ class LaravelLocalization
 	/**
 	 * Name of the translation key of the current route, it is used for url translations
 	 *
-	 * @var array|string
+	 * @var array
 	 */
 	protected $routesNames = array();
 
@@ -170,7 +169,7 @@ class LaravelLocalization
 	 * @param  boolean $abbr 			Should languages be abbreviate to their locale codes?
 	 * @param  string $customView 		Which template should the language bar have?
 	 *
-	 * @return string 					Returns an html view with a language bar
+	 * @return \Illuminate\View\View 	Returns an html view with a language bar
      *
      * @deprecated will be removed in v1.0 please see updated readme for details on making your own language bar template.
 	 */
@@ -344,10 +343,10 @@ class LaravelLocalization
 	 * Returns an URL adapted to the route name and the locale given
 	 *
 	 * @param  string $locale 			Locale to adapt
-	 * @param  string $transKeyName  	Translation key name of the url to adapt
+	 * @param  string $transKeysNames  	Translation key name of the url to adapt
 	 * @param  array $attributes  		Attributes for the route (only needed if transKeyName needs them)
 	 *
-	 * @return string|boolean 			URL translated
+	 * @return string|false 			URL translated
 	 */
 	public function getURLFromRouteNameTranslated($locale, $transKeysNames = array(), $attributes = array())
 	{
@@ -718,17 +717,32 @@ class LaravelLocalization
 
 	/**
 	 * Set current route name
-	 * @param string $name  current route name
+	 * @param string|array $routeNames  current route name
 	 */
-	public function setRouteName($name, $add = false)
+	public function setRouteName($routeNames, $add = false)
 	{
 		if ($add)
 		{
-			$this->routesNames[] = $name;
+			if(is_string($routeNames))
+			{
+				$this->routesNames[] = $routeNames;
+			}
+			else
+			{
+				$this->routesNames = array_merge($this->routesNames, $routeNames);
+			}
 		}
 		else
 		{
-			$this->routesNames = $name;
+			if(is_string($routeNames))
+			{
+				$this->routesNames = [];
+				$this->routesNames[] = $routeNames;
+			}
+			else
+			{
+				$this->routesNames = $routeNames;
+			}
 		}
 	}
 
@@ -753,7 +767,7 @@ class LaravelLocalization
 	 *
 	 * @param  string $path 	Path to get the key translated
 	 *
-	 * @return string|boolean 	Key for translation
+	 * @return arrays 			Keys for translation
 	 */
 	public function getRouteNameFromAPath($path)
 	{
@@ -766,16 +780,15 @@ class LaravelLocalization
 		$path = trim($path,"/");
 		$routesNames = [];
 
-
         foreach ($this->translatedRoutes as $route)
         {
             if ($this->translator->trans($route) == $path)
             {
-                return $route;
+                $routesNames[] = $route;
             }
         }
 
-		return False;
+		return $routesNames;
 	}
 
 
@@ -953,10 +966,5 @@ class LaravelLocalization
 
 		return $default;
 	}
-
-}
-
-class UnsupportedLocaleException extends Exception
-{
 
 }
