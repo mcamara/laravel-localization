@@ -3,7 +3,6 @@
 use Illuminate\Config\Repository;
 use Illuminate\View\Factory;
 use Illuminate\Translation\Translator;
-use Exception;
 use Request;
 use Session;
 use Cookie;
@@ -243,12 +242,12 @@ class LaravelLocalization
 	/**
 	 * Returns an URL adapted to $locale
 	 *
-	 * @param  string|boolean $locale	   Locale to adapt, false to remove locale
-	 * @param  string $url				  URL to adapt. If not passed, the current url would be taken.
+	 * @param  string|boolean 	$locale	   	Locale to adapt, false to remove locale
+	 * @param  string 			$url		URL to adapt. If not passed, the current url would be taken.
 	 *
 	 * @throws UnsupportedLocaleException
 	 *
-	 * @return string					   URL translated
+	 * @return string|false				URL translated, False if url does not exist
 	 */
 	public function getLocalizedURL($locale = null, $url = null)
 	{
@@ -290,7 +289,7 @@ class LaravelLocalization
 				$urlTranslated = parse_url($urlTranslated);
 				$urlTranslated = array_merge($url, $urlTranslated);
 				
-				return $this->unparse_url($urlTranslated);
+				return $this->unparseUrl($urlTranslated);
 			}
 		}
 
@@ -335,16 +334,16 @@ class LaravelLocalization
 		}
 		$parsed_url['path'] = rtrim($parsed_url['path'], '/');
 
-		return $this->unparse_url($parsed_url);
+		return $this->unparseUrl($parsed_url);
 	}
 
 
 	/**
 	 * Returns an URL adapted to the route name and the locale given
 	 *
-	 * @param  string $locale 			Locale to adapt
-	 * @param  string $transKeysNames  	Translation key name of the url to adapt
-	 * @param  array $attributes  		Attributes for the route (only needed if transKeyName needs them)
+	 * @param  string|boolean 	$locale 			Locale to adapt
+	 * @param  string 			$transKeysNames  	Translation key name of the url to adapt
+	 * @param  array 			$attributes  		Attributes for the route (only needed if transKeyName needs them)
 	 *
 	 * @return string|false 			URL translated
 	 */
@@ -518,7 +517,7 @@ class LaravelLocalization
 	/**
 	 * Build the new supported Locales array using deprecated config options
 	 *
-	 * @return array|boolean
+	 * @return array
 	 *
 	 * @deprecated will be removed in v1.0
 	 */
@@ -721,28 +720,18 @@ class LaravelLocalization
 	 */
 	public function setRouteName($routeNames, $add = false)
 	{
-		if ($add)
+		if(!$add)
 		{
-			if(is_string($routeNames))
-			{
-				$this->routesNames[] = $routeNames;
-			}
-			else
-			{
-				$this->routesNames = array_merge($this->routesNames, $routeNames);
-			}
+			$this->routesNames = [];
+		}
+
+		if(is_string($routeNames))
+		{
+			$this->routesNames[] = $routeNames;
 		}
 		else
 		{
-			if(is_string($routeNames))
-			{
-				$this->routesNames = [];
-				$this->routesNames[] = $routeNames;
-			}
-			else
-			{
-				$this->routesNames = $routeNames;
-			}
+			$this->routesNames = array_merge($this->routesNames, $routeNames);
 		}
 	}
 
@@ -839,7 +828,7 @@ class LaravelLocalization
 	 *
 	 * @return string			   Returns URL as string.
 	 */
-	private function unparse_url($parsed_url) {
+	private function unparseUrl($parsed_url) {
 		$url = "";
 		$url .= isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
 		$url .= isset($parsed_url['host']) ? $parsed_url['host'] : '';
@@ -957,7 +946,7 @@ class LaravelLocalization
 
 		if (Request::server('REMOTE_HOST'))
 		{
-			$lang = strtolower(end($h = explode('.', Request::server('REMOTE_HOST'))));
+			$lang = strtolower( end( explode('.', Request::server('REMOTE_HOST') ) ) );
 			if (isset($supported[$lang]))
 			{
 				return $supported[$lang];

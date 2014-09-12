@@ -43,23 +43,29 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
             {
                 $localeCode = $params[0];
                 $locales = $app['laravellocalization']->getSupportedLocales();
-
-                // Save any flashed data for redirect
-                Session::reflash();
+                $hideDefaultLocale = $app['laravellocalization']->hideDefaultLocaleInURL();
+                $redirection = false;
                 
                 if (!empty($locales[$localeCode]))
                 {
-                    if ($localeCode === $defaultLocale && $app['laravellocalization']->hideDefaultLocaleInURL())
+                    if ($localeCode === $defaultLocale && $hideDefaultLocale)
                     {
-                        return Redirect::to($app['laravellocalization']->getNonLocalizedURL(), 307)->header('Vary','Accept-Language');
+                        $redirection = $app['laravellocalization']->getNonLocalizedURL();
                     }
                 }
-                else if ($currentLocale !== $defaultLocale || !$app['laravellocalization']->hideDefaultLocaleInURL())
+                else if ($currentLocale !== $defaultLocale || !$hideDefaultLocale)
                 {
                     // If the current url does not contain any locale
                     // The system redirect the user to the very same url "localized"
                     // we use the current locale to redirect him
-                    return Redirect::to($app['laravellocalization']->getLocalizedURL(), 307)->header('Vary','Accept-Language');
+                    $redirection = $app['laravellocalization']->getLocalizedURL();
+                }
+                    
+                if($redirection)
+                {
+                    // Save any flashed data for redirect
+                    Session::reflash();
+                    return Redirect::to($redirection, 307)->header('Vary','Accept-Language');
                 }
             }
         });
