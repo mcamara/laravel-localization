@@ -952,8 +952,7 @@ class LaravelLocalization
 
                 	if (in_array($http_accept_language, $supported))
                     		return $http_accept_language;
-	            	}
-
+	            }
 	        }		
 
 		if (Request::server('REMOTE_HOST'))
