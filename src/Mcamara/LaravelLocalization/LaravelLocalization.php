@@ -948,7 +948,7 @@ class LaravelLocalization
 	        {
 	            if ($_SERVER['HTTP_ACCEPT_LANGUAGE'] != '')
 	            {
-                	$http_accept_language = locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+                	$http_accept_language = \locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']);
                 	if (in_array($http_accept_language, $supported))
                 	{
                     		return $http_accept_language;
