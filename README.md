@@ -399,3 +399,4 @@ View changelog here -> [changelog](CHANGELOG.md)
 ## License
 
 Laravel Localization is an open-sourced laravel package licensed under the MIT license
+
