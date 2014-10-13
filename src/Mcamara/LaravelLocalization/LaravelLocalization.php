@@ -103,6 +103,18 @@ class LaravelLocalization
 	}
 
 	/**
+	 * Set and return supported locales
+	 *
+	 * @param  array $locales 			Locales that the App supports
+	 *
+	 * @return string 					Returns supported locales
+	 */
+	public function setSupportedLocales($locales)
+	{
+		return $this->supportedLocales = $locales;
+	}
+
+	/**
 	 * Set and return current locale
 	 *
 	 * @param  string $locale			Locale to set the App to (optional)
