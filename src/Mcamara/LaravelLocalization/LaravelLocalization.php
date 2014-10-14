@@ -604,7 +604,7 @@ class LaravelLocalization
 	 */
 	public function getCurrentLocaleDirection()
 	{
-		return $this->supportedLocales[$this->getCurrentLocale()]['dir'];
+		return self::getDirectionFromScript($this->getCurrentLocaleScript());
 	}
 
 	/**
@@ -781,15 +781,41 @@ class LaravelLocalization
 		$path = trim($path,"/");
 		$routesNames = [];
 
-        foreach ($this->translatedRoutes as $route)
-        {
-            if ($this->translator->trans($route) == $path)
-            {
-                $routesNames[] = $route;
-            }
-        }
+		foreach ($this->translatedRoutes as $route)
+		{
+			if ($this->translator->trans($route) == $path)
+			{
+				$routesNames[] = $route;
+			}
+		}
 
 		return $routesNames;
+	}
+
+	/**
+	 * Returns the left-to-right/right-to-left property for a given script
+	 *
+	 * RTL scripts have ISO15924 numeric codes in the range 100-199
+	 * See http://www.unicode.org/iso15924/iso15924-num.html
+	 *
+	 * @param  string $script ISO15924 script code
+	 *
+	 * @return string         'ltr' or 'rtl'
+	 */
+	public static function getDirectionFromScript($script)
+	{
+		switch ($script)
+		{
+			// Other (historic) RTL scripts exist, but this list contains the only ones in current use.
+			case 'Arab':
+			case 'Hebr':
+			case 'Mong':
+			case 'Tfng':
+			case 'Thaa':
+				return 'rtl';
+			default:
+				return 'ltr';
+		}
 	}
 
 
