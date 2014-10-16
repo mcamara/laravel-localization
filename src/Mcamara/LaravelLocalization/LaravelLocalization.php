@@ -3,6 +3,7 @@
 use Illuminate\Config\Repository;
 use Illuminate\View\Factory;
 use Illuminate\Translation\Translator;
+use Illuminate\Routing\Router;
 use Request;
 use Session;
 use Cookie;
@@ -31,6 +32,13 @@ class LaravelLocalization
 	 * @var \Illuminate\Translation\Translator
 	 */
 	protected $translator;
+
+	/**
+	 * Illuminate router class.
+	 *
+	 * @var \Illuminate\Routing\Router
+	 */
+	protected $router;
 
 	/**
 	 * Default locale
@@ -76,11 +84,12 @@ class LaravelLocalization
 	 * @param \Illuminate\View\Factory $view
 	 * @param \Illuminate\Translation\Translator $translator
 	 */
-	public function __construct(Repository $configRepository, Factory $view, Translator $translator)
+	public function __construct(Repository $configRepository, Factory $view, Translator $translator, Router $router)
 	{
 		$this->configRepository = $configRepository;
 		$this->view = $view;
 		$this->translator = $translator;
+		$this->router = $router;
 
 		// set default locale
 		$this->defaultLocale = Config::get('app.locale');
@@ -381,9 +390,7 @@ class LaravelLocalization
 			{
 				// if there are no attributes and the current url has some
 				// the system will take the same
-				global $app;
-				$router = $app['router'];
-				$attributes = $router->current()->parameters();
+				$attributes = $this->router->current()->parameters();
                 $response = \Event::fire('routes.translation', array('locale' => $locale, 'attributes' => $attributes));
                 if(!empty($response)) $response = array_shift($response);
                 if(is_array($response)) $attributes = array_merge($attributes, $response);
