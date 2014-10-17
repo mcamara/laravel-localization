@@ -32,10 +32,10 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+        $app = $this->app;
 
-        Route::filter('LaravelLocalizationRedirectFilter', function()
+        Route::filter('LaravelLocalizationRedirectFilter', function() use($app)
         {
-            global $app;
             $currentLocale = $app['laravellocalization']->getCurrentLocale();
             $defaultLocale = $app['laravellocalization']->getDefault();
             $params = explode('/', Request::path());
@@ -73,9 +73,8 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
         /**
          * 	This filter would set the translated route name
          */
-        Route::filter('LaravelLocalizationRoutes', function()
+        Route::filter('LaravelLocalizationRoutes', function() use($app)
         {
-            global $app;
             $router = $app['router'];
             $routeName = $app['laravellocalization']->getRouteNameFromAPath($router->current()->uri());
 
@@ -87,7 +86,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
 
 		$this->app['laravellocalization'] = $this->app->share(function($app)
 		{
-			return new LaravelLocalization($app['config'], $app['view'], $app['translator']);
+			return new LaravelLocalization($app['config'], $app['view'], $app['translator'], $app['router']);
 		});
 	}
 
