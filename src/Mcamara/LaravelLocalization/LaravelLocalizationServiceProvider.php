@@ -32,10 +32,9 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-
-        Route::filter('LaravelLocalizationRedirectFilter', function()
+        $app = $this->app;
+        Route::filter('LaravelLocalizationRedirectFilter', function() use($app)
         {
-            global $app;
             $currentLocale = $app['laravellocalization']->getCurrentLocale();
             $defaultLocale = $app['laravellocalization']->getDefault();
             $params = explode('/', Request::path());
@@ -75,20 +74,21 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
          */
         Route::filter('LaravelLocalizationRoutes', function()
         {
-            global $app;
-            $router = $app['router'];
-            $routeName = $app['laravellocalization']->getRouteNameFromAPath($router->current()->uri());
+            $app = $this->app;
+            $routeName = $app['laravellocalization']->getRouteNameFromAPath($app['router']->current()->uri());
 
             $app['laravellocalization']->setRouteName($routeName);
             return;
         });
 
-		$this->app['config']->package('mcamara/laravel-localization', __DIR__.'/../config');
+		$app['config']->package('mcamara/laravel-localization', __DIR__.'/../config');
 
-		$this->app['laravellocalization'] = $this->app->share(function($app)
-		{
-			return new LaravelLocalization($app['config'], $app['view'], $app['translator']);
-		});
+		$app['laravellocalization'] = $app->share(
+            function() use($app)
+    		{
+    			return new LaravelLocalization($app['config'], $app['view'], $app['translator'], $app['router'], $app['request'], $app);
+    		}
+        );
 	}
 
 	/**
