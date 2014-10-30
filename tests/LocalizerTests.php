@@ -60,11 +60,11 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
                 return LaravelLocalization::getLocalizedURL('es') ?: "Not url available";
             });
 
-            $app['router']->get(LaravelLocalization::transRoute('LaravelLocalization::routes.view'), function ($id) {
+            $app['router']->get(LaravelLocalization::transRoute('LaravelLocalization::routes.view'), function () {
                 return LaravelLocalization::getLocalizedURL('es') ?: "Not url available";
             });
 
-            $app['router']->get(LaravelLocalization::transRoute('LaravelLocalization::routes.view_project'), function ($id) {
+            $app['router']->get(LaravelLocalization::transRoute('LaravelLocalization::routes.view_project'), function () {
                 return LaravelLocalization::getLocalizedURL('es') ?: "Not url available";
             });
         });
@@ -544,7 +544,7 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
         );
     }
 
-    public function testGgetSupportedLanguagesKeys()
+    public function testGetSupportedLanguagesKeys()
     {
         $this->assertEquals(
             ['en' , 'es'],
@@ -552,6 +552,29 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
         );
     }
 
+    public function testGetConfigRepository()
+    {
+        $this->assertEquals(
+            $this->app['config'],
+            LaravelLocalization::getConfigRepository('/view/1')
+        );
+    }
+
+    public function testCreateUrlFromUri()
+    {
+        $this->assertEquals(
+            'http://localhost/view/1' ,
+            LaravelLocalization::createUrlFromUri('/view/1')
+        );
+
+        LaravelLocalization::setLocale('es');
+        $this->refreshApplication('es');
+
+        $this->assertEquals(
+            'http://localhost/ver/1' ,
+            LaravelLocalization::createUrlFromUri('/ver/1')
+        );
+    }
 
 
 }

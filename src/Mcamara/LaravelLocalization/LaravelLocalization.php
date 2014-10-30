@@ -55,6 +55,13 @@ class LaravelLocalization
 	/**
 	 * Illuminate request class.
 	 *
+	 * @var Illuminate\Foundation\Application
+	 */
+	protected $app;
+
+	/**
+	 * Illuminate request class.
+	 *
 	 * @var string
 	 */
 	protected $baseUrl;
@@ -103,13 +110,13 @@ class LaravelLocalization
 	 * @param \Illuminate\View\Factory $view
 	 * @param \Illuminate\Translation\Translator $translator
 	 */
-	public function __construct(Repository $configRepository, Factory $view, Translator $translator, Router $router, Request $request, Application $app)
+	public function __construct(Repository $configRepository, Factory $view, Translator $translator, Router $router, Application $app)
 	{
 		$this->configRepository = $configRepository;
 		$this->view = $view;
 		$this->translator = $translator;
 		$this->router = $router;
-		$this->request = $request;
+		$this->request = $app['request'];
 		$this->app = $app;
 
 		// set default locale
@@ -346,7 +353,7 @@ class LaravelLocalization
 			$route = '/' . $locale;
 		}
 		
-		if ($this->translator->has($transKeyName, $locale))
+		if (is_string($locale) && $this->translator->has($transKeyName, $locale))
 		{
 			$translation = $this->translator->trans($transKeyName, [], "", $locale);
 			$route .= "/" . $translation;
@@ -362,6 +369,7 @@ class LaravelLocalization
 			// delete empty optional arguments
 			$route = preg_replace('/\/{[^)]+\?}/','',$route);
 		}
+
 		if (!empty($route))
 		{
 			return rtrim($this->createUrlFromUri($route));
@@ -416,9 +424,12 @@ class LaravelLocalization
 			$locales = $this->configRepository->get('laravel-localization::supportedLocales');
 		}
 
-		$this->supportedLocales = $locales;
-
-		return $locales;
+		if(is_array($locales))
+		{
+			$this->supportedLocales = $locales;
+			return $locales;
+		}
+		return [];
 	}
 
 	/**
@@ -619,7 +630,6 @@ class LaravelLocalization
 		return $this->configRepository->get('laravel-localization::hideDefaultLocaleInURL') || $this->configRepository->get('laravel-localization::hideDefaultLanguageInRoute');
 	}
 
-
 	/**
 	 * Create an url from the uri
 	 * @param 	string 	$uri 	Uri 
@@ -737,8 +747,10 @@ class LaravelLocalization
 		}
 		else
 		{
-			if(empty($this->router->current()))
+			if(!$this->router->current())
+			{
 				return [];
+			}
 
 			$attributes = $this->router->current()->parameters();
 			$response = \Event::fire('routes.translation', ['attributes' => $attributes ]);
@@ -1020,7 +1032,7 @@ class LaravelLocalization
 	 *
 	 * @deprecated will be removed in v1.0 use getSupportedLocales instead.
 	 */
-	public function getAllowedLanguages($abbr = true)
+	public function getAllowedLanguages()
 	{
 		trigger_error("This function will be removed in the master release, you should use the getSupportedLocales function instead" ,E_USER_DEPRECATED);
 		return $this->getSupportedLocales();
