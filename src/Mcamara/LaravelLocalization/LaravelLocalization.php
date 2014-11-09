@@ -7,10 +7,9 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\Route;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
-use Symfony\Component\HttpKernel\Client;
 use Session;
 use Cookie;
-use App;
+use \App;
 use \URL;
 use Config;
 
@@ -384,7 +383,7 @@ class LaravelLocalization
 	 * It returns an URL without locale (if it has it)
 	 * Convenience function wrapping getLocalizedURL(false)
 	 *
-	 * @param  string $url	  URL to clean, if false, current url would be taken
+	 * @param  string|false 	$url	  URL to clean, if false, current url would be taken
 	 *
 	 * @return string		   URL with no locale in path
 	 */
@@ -582,7 +581,7 @@ class LaravelLocalization
 	/**
 	 * Returns the config repository for this instance
 	 * 
-	 * @return Illuminate\Config\Repository 	Configuration repository
+	 * @return Repository 	Configuration repository
 	 * 
 	 */ 
 	public function getConfigRepository()
@@ -771,11 +770,16 @@ class LaravelLocalization
 	/**
 	 * Build URL using array data from parse_url
 	 *
-	 * @param array $parsed_url	 Array of data from parse_url function
+	 * @param array|false 	$parsed_url	 Array of data from parse_url function
 	 *
 	 * @return string			   Returns URL as string.
 	 */
 	protected function unparseUrl($parsed_url) {
+		if($parsed_url === false)
+		{
+			return "";
+		}
+
 		$url = "";
 		$url .= isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
 		$url .= isset($parsed_url['host']) ? $parsed_url['host'] : '';
@@ -908,7 +912,8 @@ class LaravelLocalization
 
 		if ($this->request->server('REMOTE_HOST'))
 		{
-			$lang = strtolower( end( explode('.', $this->request->server('REMOTE_HOST') ) ) );
+			$remote_host = explode('.', $this->request->server('REMOTE_HOST') );
+			$lang = strtolower( end( $remote_host ) );
 			if (isset($supported[$lang]))
 			{
 				return $supported[$lang];
@@ -1025,8 +1030,6 @@ class LaravelLocalization
 
 	/**
 	 * Returns all allowed languages
-	 *
-	 * @param  boolean $abbr should the languages be abbreviated?
 	 *
 	 * @return array Array with all allowed languages
 	 *

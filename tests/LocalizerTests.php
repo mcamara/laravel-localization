@@ -493,13 +493,16 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
 
     public function testGetCurrentLocaleScript()
     {
+        LaravelLocalization::setLocale('es');
+        $this->refreshApplication('es');
+
         $this->assertEquals(
             'Latin',
             LaravelLocalization::getCurrentLocaleScript()
         );
 
-        LaravelLocalization::setLocale('es');
-        $this->refreshApplication('es');
+        LaravelLocalization::setLocale('en');
+        $this->refreshApplication('en');
         
         $this->assertEquals(
             'Latin' ,
