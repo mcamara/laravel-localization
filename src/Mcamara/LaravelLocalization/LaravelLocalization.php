@@ -216,7 +216,7 @@ class LaravelLocalization
 	 * Returns an URL adapted to $locale
 	 *
 	 * @param  string|boolean 	$locale	   	Locale to adapt, false to remove locale
-	 * @param  string 			$url		URL to adapt in the current language. If not passed, the current url would be taken.
+	 * @param  string|false		$url		URL to adapt in the current language. If not passed, the current url would be taken.
 	 * @param  array 			$attributes	Attributes to add to the route, if empty, the system would try to extract them from the url.
 	 *
 	 * @throws UnsupportedLocaleException
@@ -298,13 +298,9 @@ class LaravelLocalization
 
 		$parsed_url['path'] = ltrim($parsed_url['path'], '/');
 
-		// check if this url is a translated url
-		foreach($this->translatedRoutes as $translatedRoute)
+		if($translatedRoute = $this->findTranslatedRoute($parsed_url['path'], $url_locale))
 		{
-			if($this->translator->trans($translatedRoute, [], "", $url_locale) == $parsed_url['path'])
-			{
-				return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
-			}
+			return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
 		}
 
 		if (!empty($locale) && ($locale != $this->defaultLocale || !$this->hideDefaultLocaleInURL()))
@@ -573,6 +569,28 @@ class LaravelLocalization
 		    {
 		        return $route;
 		    }
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns the translated route for the path and the url given
+	 *
+	 * @param  string 		$path 			Path to check if it is a translated route
+	 * @param  string 		$url_locale 	Language to check if the path exists
+	 *
+	 * @return string|false 			Key for translation, false if not exist
+	 */
+	protected function findTranslatedRoute($path, $url_locale)
+	{
+		// check if this url is a translated url
+		foreach($this->translatedRoutes as $translatedRoute)
+		{
+			if($this->translator->trans($translatedRoute, [], "", $url_locale) == $path)
+			{
+				return $translatedRoute;
+			}
 		}
 
 		return false;
