@@ -86,7 +86,13 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
 		$app['laravellocalization'] = $app->share(
             function() use($app)
     		{
-    			return new LaravelLocalization($app['config'], $app['view'], $app['translator'], $app['router'], $app);
+    			return new LaravelLocalization(
+                    $app['config'], 
+                    $app['view'], 
+                    $app['translator'], 
+                    $app['router'], 
+                    $app
+                );
     		}
         );
 	}

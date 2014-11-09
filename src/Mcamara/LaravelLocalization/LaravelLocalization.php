@@ -6,12 +6,10 @@ use Illuminate\Translation\Translator;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\Route;
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Application as Application;
+use Illuminate\Routing\UrlGenerator as URL;
 use Session;
 use Cookie;
-use \App;
-use \URL;
-use Config;
 
 
 class LaravelLocalization
@@ -115,8 +113,9 @@ class LaravelLocalization
 		$this->view = $view;
 		$this->translator = $translator;
 		$this->router = $router;
-		$this->request = $app['request'];
+
 		$this->app = $app;
+		$this->request = $this->app['request'];
 
 		// set default locale
 		$this->defaultLocale = $this->configRepository->get('app.locale');
@@ -168,7 +167,7 @@ class LaravelLocalization
 				$this->currentLocale = $this->getCurrentLocale();
 			}
 		}
-		App::setLocale($this->currentLocale);
+		$this->app->setLocale($this->currentLocale);
 
 		if ($this->useSessionLocale())
 		{
@@ -254,14 +253,9 @@ class LaravelLocalization
 				return $this->getURLFromRouteNameTranslated($locale, $this->routeName, $attributes);
 			}
 		}
-		else if($locale && $url && !empty($this->translatedRoutes))
+		else if($locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale))
 		{
-			foreach ($this->translatedRoutes as $translatedRoutes) 
-			{
-				$routeName = $this->getURLFromRouteNameTranslated($this->currentLocale, $translatedRoutes, $attributes);
-				if($this->getNonLocalizedURL($routeName) == $this->getNonLocalizedURL($url))
-					return $this->getURLFromRouteNameTranslated($locale, $translatedRoutes, $attributes);
-			}
+			return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
 		}
 
         $base_path = $this->request->getBaseUrl();
@@ -298,7 +292,7 @@ class LaravelLocalization
 
 		$parsed_url['path'] = ltrim($parsed_url['path'], '/');
 
-		if($translatedRoute = $this->findTranslatedRoute($parsed_url['path'], $url_locale))
+		if($translatedRoute = $this->findTranslatedRouteByPath($parsed_url['path'], $url_locale))
 		{
 			return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
 		}
@@ -308,6 +302,7 @@ class LaravelLocalization
 			$parsed_url['path'] = $locale . '/' . ltrim($parsed_url['path'], '/');
 		}
         $parsed_url['path'] = ltrim(ltrim($base_path, '/') . '/' . $parsed_url['path'], '/');
+
 		//Make sure that the pass path is returned with a leading slash only if it come in with one.
 		if (starts_with($path, '/') === true) 
 		{
@@ -315,10 +310,13 @@ class LaravelLocalization
 		}
 		$parsed_url['path'] = rtrim($parsed_url['path'], '/');
 
-		if(filter_var($url = $this->unparseUrl($parsed_url), FILTER_VALIDATE_URL))
+		$url = $this->unparseUrl($parsed_url);
+
+		if($this->checkUrl($url))
 		{
 			return $url;
 		}
+
 		return $this->createUrlFromUri($url);
 	}
 
@@ -582,7 +580,7 @@ class LaravelLocalization
 	 *
 	 * @return string|false 			Key for translation, false if not exist
 	 */
-	protected function findTranslatedRoute($path, $url_locale)
+	protected function findTranslatedRouteByPath($path, $url_locale)
 	{
 		// check if this url is a translated url
 		foreach($this->translatedRoutes as $translatedRoute)
@@ -595,6 +593,46 @@ class LaravelLocalization
 
 		return false;
 	}
+
+	/**
+	 * Returns the translated route for an url and the attributes given and a locale
+	 *
+	 * @param  string 		$url 			Url to check if it is a translated route
+	 * @param  array 		$attributes 	Attributes to check if the url exists in the translated routes array
+	 * @param  string 		$locale 		Language to check if the url exists
+	 *
+	 * @return string|false 				Key for translation, false if not exist
+	 */
+	protected function findTranslatedRouteByUrl($url, $attributes, $locale)
+	{
+		// check if this url is a translated url
+
+		foreach ($this->translatedRoutes as $translatedRoute) 
+		{
+			$routeName = $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
+
+			if($this->getNonLocalizedURL($routeName) == $this->getNonLocalizedURL($url))
+			{
+				return $translatedRoute;
+			}
+
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns true if the string given is a valid url
+	 *
+	 * @param  string 		$url 			String to check if it is a valid url
+	 *
+	 * @return boolean		Is the string given a valid url?
+	 */
+	protected function checkUrl($url)
+	{
+		return filter_var($url, FILTER_VALIDATE_URL);
+	}
+
 
 	/**
 	 * Returns the config repository for this instance
@@ -679,14 +717,14 @@ class LaravelLocalization
 	/**
 	 * Extract attributes for current url
 	 * 
-	 * @param  string 	$url 		to extract attributes, if not present, the system will look for attributes in the current call
+	 * @param  string|null|false 	$url 	to extract attributes, if not present, the system will look for attributes in the current call
 	 * 
 	 * @return array 	Array with attributes
 	 * 
 	 */ 
 	protected function extractAttributes($url = false)
 	{
-		if($url)
+		if(!empty($url))
 		{
 			$attributes = [];
 			$parse = parse_url($url);
@@ -793,7 +831,7 @@ class LaravelLocalization
 	 * @return string			   Returns URL as string.
 	 */
 	protected function unparseUrl($parsed_url) {
-		if($parsed_url === false)
+		if(empty($parsed_url))
 		{
 			return "";
 		}
@@ -805,6 +843,7 @@ class LaravelLocalization
 		$user = isset($parsed_url['user']) ? $parsed_url['user'] : '';
 		$pass = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
 		$url .= $user . (($user || $pass) ? "$pass@" : '');
+
 		if (!empty($url)) {
 			$url .= isset($parsed_url['path']) ? '/' . ltrim($parsed_url['path'], '/') : '';
 		}
@@ -812,8 +851,10 @@ class LaravelLocalization
 		{
 			$url .= isset($parsed_url['path']) ? $parsed_url['path'] : '';
 		}
+
 		$url .= isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
 		$url .= isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
+
 		return $url;
 	}
 
