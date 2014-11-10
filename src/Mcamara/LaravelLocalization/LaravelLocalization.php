@@ -6,7 +6,7 @@ use Illuminate\Translation\Translator;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\Route;
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Application as Application;
+use Illuminate\Foundation\Application;
 use Illuminate\Routing\UrlGenerator as URL;
 use Session;
 use Cookie;
@@ -100,12 +100,15 @@ class LaravelLocalization
 
 	/**
 	 * Creates new instance.
-     *
-     * @throws UnsupportedLocaleException
 	 *
-	 * @param \Illuminate\Config\Repository $configRepository
-	 * @param \Illuminate\View\Factory $view
-	 * @param \Illuminate\Translation\Translator $translator
+	 * @param Illuminate\Config\Repository 		$configRepository
+	 * @param Illuminate\View\Factory 			$view
+	 * @param Illuminate\Translation\Translator $translator
+	 * @param Illuminate\Routing\Route 			$router
+	 * @param Illuminate\Foundation\Application $app
+	 *
+     * @throws UnsupportedLocaleException
+     *
 	 */
 	public function __construct(Repository $configRepository, Factory $view, Translator $translator, Router $router, Application $app)
 	{
@@ -120,7 +123,9 @@ class LaravelLocalization
 		// set default locale
 		$this->defaultLocale = $this->configRepository->get('app.locale');
         $supportedLocales = $this->getSupportedLocales();
-        if (empty($supportedLocales[$this->defaultLocale])) {
+        
+        if (empty($supportedLocales[$this->defaultLocale])) 
+        {
             throw new UnsupportedLocaleException("Laravel's default locale is not in the supportedLocales array.");
         }
 	}
