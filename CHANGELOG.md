@@ -1,3 +1,9 @@
+### 0.15.0
+- Added tests from scratch
+- Refactored multiple functions
+- getLocalizedURL now accepts attributes for the url (if needed)
+- $routeName is always a string, no need to be an array if it just have the translation key for the current url
+
 ### 0.14.0
 - Laravel 4.2 compatibility
 - Removed Laravel 4.0 compatibility

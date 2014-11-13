@@ -26,11 +26,11 @@ Easy i18n localization for Laravel 4, an useful tool to combine with Laravel loc
 
 Add Laravel Localization to your `composer.json` file.
 
-    "mcamara/laravel-localization": "0.14.*"
+    "mcamara/laravel-localization": "0.15.*"
 
 Run `composer install` to get the latest version of the package.
 
-If you are using a laravel version lower than 4.2, you should use 0.13.* version.
+If you are using a laravel version lower than 4.2, you should use 0.13.* version. Moreover, 0.15 version will be the last one with support for Laravel 4.2. A new version compatible with Laravel 5 is in development and would be available soon after the final version of Laravel is released, labeled as version 1.x .
 
 ### Manually
 
@@ -137,17 +137,40 @@ If you want to hide the default locale but always show other locales in the url,
 
 This package comes with some useful functions, like:
 
+### Get URL for an specific locale
+
+```php
+	/**
+	 * Returns an URL adapted to $locale
+	 *
+	 * @param  string|boolean 	$locale	   	Locale to adapt, false to remove locale
+	 * @param  string|false		$url		URL to adapt in the current language. If not passed, the current url would be taken.
+	 * @param  array 			$attributes	Attributes to add to the route, if empty, the system would try to extract them from the url.
+	 *
+	 * @throws UnsupportedLocaleException
+	 *
+	 * @return string|false				URL translated, False if url does not exist
+	 */
+	public function getLocalizedURL($locale = null, $url = null, $attributes = array())
+
+	//Should be called in a view like this:
+	{{ LaravelLocalization::getLocalizedURL(optional string $locale, optional string $url, optional array $attributes) }}
+```
+
+It returns a URL localized to the desired locale.
+
 ### Get Clean routes
 
 ```php
 	/**
-     * It returns an URL without locale (if it has it)
-     *
-     * @param  string $url      URL to clean, if false, current url would be taken
-     *
-     * @return string           URL with no locale in path
-     */
-    public function getNonLocalizedURL($url = null)
+	 * It returns an URL without locale (if it has it)
+	 * Convenience function wrapping getLocalizedURL(false)
+	 *
+	 * @param  string|false 	$url	  URL to clean, if false, current url would be taken
+	 *
+	 * @return string		   URL with no locale in path
+	 */
+	public function getNonLocalizedURL($url = null)
 
 	//Should be called in a view like this:
 	{{ LaravelLocalization::getNonLocalizedURL(optional string $url) }}
@@ -155,56 +178,22 @@ This package comes with some useful functions, like:
 
 It returns a URL clean of any localization.
 
-### Get URL for an specific locale, there are two options here
-
-```php
-    /**
-     * Returns an URL adapted to $locale
-     *
-     * @param  string $locale       Locale to adapt
-     * @param  string $url          URL to adapt. If not passed, the current url would be taken
-     *
-     * @throws UnsupportedLocaleException
-     *
-     * @return string               URL translated
-     */
-    public function getLocalizedURL($locale, $url = null)
-
-	//Should be called in a view like this:
-	{{ LaravelLocalization::getLocalizedURL(string $locale, optional string $url) }}
-```
-
-or
-
-```php
-    /**
-     * Returns an URL adapted to $locale or current locale
-     *
-     * @param  string $url				   URL to adapt. If not passed, the current url would be taken.
-     * @param  string|boolean $locale	   Locale to adapt, false to remove locale
-     *
-     * @throws UnsupportedLocaleException
-     *
-     * @return string					   URL translated
-     */
-    public function localizeURL($url, $locale = null)
-```
-
-It returns a URL localized to the desired locale.
 
 ### Get URL for an specific translation key
 
 ```php
 	/**
-     * Returns an URL adapted to the route name and the locale given
+	 * Returns an URL adapted to the route name and the locale given
+	 *
+     * @throws UnsupportedLocaleException
      *
-     * @param  string $locale 		    Locale to adapt
-     * @param  array $transKeyNames  	Array containing the Translation key name of the url to adapt
-     * @param  array $attributes  		Attributes for the route (only needed if transKeyName needs them)
-     *
-     * @return string|boolean  	        URL translated
-     */
-    public function getURLFromRouteNameTranslated($locale, $transKeyNames = array(), $attributes = array())
+	 * @param  string|boolean 	$locale 			Locale to adapt
+	 * @param  string 			$transKeyName  		Translation key name of the url to adapt
+	 * @param  array 			$attributes  		Attributes for the route (only needed if transKeyName needs them)
+	 *
+	 * @return string|false 	URL translated
+	 */
+	public function getURLFromRouteNameTranslated($locale, $transKeyName, $attributes = array())
 
 	//Should be called in a view like this:
 	{{ LaravelLocalization::getURLFromRouteNameTranslated(string $locale, optional array $transKeyNames, optional array $attributes) }}
@@ -227,6 +216,22 @@ It returns a route, localized to the desired locale using the locale passed. If 
 ```
 
 This function will return all supported locales and their properties as an array.
+
+### Get Supported Locales Keys
+
+```php
+	/**
+	 * Returns supported languages language key
+	 * 
+	 * @return array 	keys of supported languages
+	 */ 
+	public function getSupportedLanguagesKeys()
+
+	//Should be called like this:
+	{{ LaravelLocalization::getSupportedLanguagesKeys() }}
+```
+
+This function will return an array with all the keys for the supported locales.
 
 ### Set Locale
 
