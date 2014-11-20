@@ -7,7 +7,8 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\Route;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
-use Illuminate\Routing\UrlGenerator as URL;
+use Illuminate\Support\Facades\URL;
+
 use Session;
 use Cookie;
 
