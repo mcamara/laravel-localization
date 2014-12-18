@@ -14,7 +14,6 @@ Easy i18n localization for Laravel 4, an useful tool to combine with Laravel loc
 - <a href="#usage">Usage</a>
     - <a href="#filters">Filters</a>
 - <a href="#helpers">Helpers</a>
-- <a href="#view">View</a>
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#config">Config</a>
 - <a href="#changelog">Changelog</a>

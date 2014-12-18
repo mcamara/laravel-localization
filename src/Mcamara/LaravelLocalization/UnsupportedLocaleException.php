@@ -2,7 +2,6 @@
 
 use Exception;
 
-class UnsupportedLocaleException extends Exception
-{
+class UnsupportedLocaleException extends Exception {
 
 }
