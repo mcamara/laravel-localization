@@ -180,6 +180,7 @@ class LaravelLocalization {
                 $this->currentLocale = $this->getCurrentLocale();
             }
         }
+
         $this->app->setLocale($this->currentLocale);
 
         $this->storeSession($this->currentLocale);
@@ -472,18 +473,14 @@ class LaravelLocalization {
             return $this->currentLocale;
         }
 
-        $locales = $this->getSupportedLocales();
         // get session language...
-        if ( $this->useSessionLocale() && Session::has($this->cookieSessionName) )
+        if ( $locale = $this->getSessionLocale() )
         {
-            return Session::get($this->cookieSessionName);
+            return $locale;
         }
 
         // or get cookie language...
-        if ( $this->useCookieLocale() &&
-            Cookie::get($this->cookieSessionName) != null &&
-            !empty( $locales[ Cookie::get($this->cookieSessionName) ] )
-        )
+        if ( $locale = $this->getCookieLocale() )
         {
             return Cookie::get($this->cookieSessionName);
         }
@@ -510,6 +507,21 @@ class LaravelLocalization {
 
 
     /**
+     * Returns the locale stored on the session (if available)
+     *
+     * @return string|false Locale stored in session - False if it doesn't exist
+     */
+    protected function getSessionLocale()
+    {
+        if ( $this->useSessionLocale() && Session::has($this->cookieSessionName) )
+        {
+            return Session::get($this->cookieSessionName);
+        }
+
+        return false;
+    }
+
+    /**
      * Store the locale on a session variable
      * @param $locale Locale to save on session variable
      */
@@ -521,6 +533,20 @@ class LaravelLocalization {
         }
     }
 
+    /**
+     * Returns the locale stored on the cookies (if available)
+     *
+     * @return string|false Locale stored in cookies - False if it doesn't exist
+     */
+    protected function getCookieLocale()
+    {
+        if ( $this->useCookieLocale() && Cookie::has($this->cookieSessionName) )
+        {
+            return Cookie::get($this->cookieSessionName);
+        }
+
+        return false;
+    }
 
     /**
      * Store the locale on a cookie variable
