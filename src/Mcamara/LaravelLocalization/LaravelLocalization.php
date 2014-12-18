@@ -219,11 +219,13 @@ class LaravelLocalization {
     /**
      * Returns an URL adapted to $locale
      *
+     * @throws SupportedLocalesNotDefined
+     * @throws UnsupportedLocaleException
+     *
      * @param  string|boolean $locale Locale to adapt, false to remove locale
      * @param  string|false $url URL to adapt in the current language. If not passed, the current url would be taken.
      * @param  array $attributes Attributes to add to the route, if empty, the system would try to extract them from the url.
      *
-     * @throws UnsupportedLocaleException
      *
      * @return string|false                URL translated, False if url does not exist
      */
@@ -320,6 +322,7 @@ class LaravelLocalization {
     /**
      * Returns an URL adapted to the route name and the locale given
      *
+     * @throws SupportedLocalesNotDefined
      * @throws UnsupportedLocaleException
      *
      * @param  string|boolean $locale Locale to adapt
@@ -330,10 +333,7 @@ class LaravelLocalization {
      */
     public function getURLFromRouteNameTranslated( $locale, $transKeyName, $attributes = array() )
     {
-        if ( $locale !== false && !in_array($locale, array_keys($this->configRepository->get('laravel-localization::supportedLocales'))) )
-        {
-            throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
-        }
+        $this->checkLocaleInSupportedLocales($locale);
 
         $route = "";
 
@@ -347,25 +347,18 @@ class LaravelLocalization {
             $translation = $this->translator->trans($transKeyName, [ ], "", $locale);
             $route .= "/" . $translation;
 
-            if ( is_array($attributes) )
-            {
-                foreach ( $attributes as $key => $value )
-                {
-                    $route = str_replace("{" . $key . "}", $value, $route);
-                    $route = str_replace("{" . $key . "?}", $value, $route);
-                }
-            }
-            // delete empty optional arguments
-            $route = preg_replace('/\/{[^)]+\?}/', '', $route);
+            $route = $this->substituteAttributesInRoute($attributes, $route);
+
         }
 
-        if ( !empty( $route ) )
+        if ( empty( $route ) )
         {
-            return rtrim($this->createUrlFromUri($route));
+            // This locale does not have any key for this route name
+            return false;
         }
 
-        // This locale does not have any key for this route name
-        return false;
+        return rtrim($this->createUrlFromUri($route));
+
 
     }
 
@@ -574,6 +567,27 @@ class LaravelLocalization {
     }
 
     /**
+     * Change route attributes for the ones in the $attributes array
+     *
+     * @param $attributes array Array of attributes
+     * @param $route string route to substitute
+     * @return string route with attributes changed
+     */
+    protected function substituteAttributesInRoute( $attributes, $route )
+    {
+        foreach ( $attributes as $key => $value )
+        {
+            $route = str_replace("{" . $key . "}", $value, $route);
+            $route = str_replace("{" . $key . "?}", $value, $route);
+        }
+
+        // delete empty optional arguments that are not in the $attributes array
+        $route = preg_replace('/\/{[^)]+\?}/', '', $route);
+
+        return $route;
+    }
+
+    /**
      * Returns translated routes
      *
      * @return array translated routes
@@ -661,6 +675,9 @@ class LaravelLocalization {
 
     /**
      * Returns the translated route for an url and the attributes given and a locale
+     *
+     * @throws SupportedLocalesNotDefined
+     * @throws UnsupportedLocaleException
      *
      * @param  string|false|null $url Url to check if it is a translated route
      * @param  array $attributes Attributes to check if the url exists in the translated routes array
