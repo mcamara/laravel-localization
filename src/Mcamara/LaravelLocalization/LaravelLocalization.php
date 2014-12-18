@@ -99,6 +99,14 @@ class LaravelLocalization {
      */
     protected $routeName;
 
+
+    /**
+     * Name of the locale variable for the session and cookie storages
+     *
+     * @var string
+     */
+    protected $cookieSessionName = 'locale';
+
     /**
      * Creates new instance.
      *
@@ -174,18 +182,9 @@ class LaravelLocalization {
         }
         $this->app->setLocale($this->currentLocale);
 
-        if ( $this->useSessionLocale() )
-        {
-            Session::put('language', $this->currentLocale);
-        }
-        if ( $this->useCookieLocale() )
-        {
-            Cookie::queue(Cookie::forever('language', $this->currentLocale));
-        } //Forget the language cookie if it's disabled and exists
-        else if ( Cookie::get('language') != null )
-        {
-            Cookie::forget('language');
-        }
+        $this->storeSession($this->currentLocale);
+
+        $this->storeCookie($this->currentLocale);
 
         return $locale;
     }
@@ -472,20 +471,25 @@ class LaravelLocalization {
         {
             return $this->currentLocale;
         }
+
         $locales = $this->getSupportedLocales();
         // get session language...
-        if ( $this->useSessionLocale() && Session::has('language') )
+        if ( $this->useSessionLocale() && Session::has($this->cookieSessionName) )
         {
-            return Session::get('language');
-        } // or get cookie language...
-        else if ( $this->useCookieLocale() &&
-            Cookie::get('language') != null &&
-            !empty( $locales[ Cookie::get('language') ] )
+            return Session::get($this->cookieSessionName);
+        }
+
+        // or get cookie language...
+        if ( $this->useCookieLocale() &&
+            Cookie::get($this->cookieSessionName) != null &&
+            !empty( $locales[ Cookie::get($this->cookieSessionName) ] )
         )
         {
-            return Cookie::get('language');
-        } // or get browser language...
-        else if ( $this->useAcceptLanguageHeader() )
+            return Cookie::get($this->cookieSessionName);
+        }
+
+        // or get browser language...
+        if ( $this->useAcceptLanguageHeader() )
         {
             return $this->negotiateLanguage();
         }
@@ -502,6 +506,33 @@ class LaravelLocalization {
     public function getSupportedLanguagesKeys()
     {
         return array_keys($this->supportedLocales);
+    }
+
+
+    /**
+     * Store the locale on a session variable
+     * @param $locale Locale to save on session variable
+     */
+    protected function storeSession( $locale )
+    {
+        if ( $this->useSessionLocale() )
+        {
+            Session::put($this->cookieSessionName, $locale);
+        }
+    }
+
+
+    /**
+     * Store the locale on a cookie variable
+     * @param $locale Locale to store on Cookie variable
+     */
+    protected function storeCookie( $locale )
+    {
+        Cookie::forget($this->cookieSessionName);
+        if ( $this->useCookieLocale() )
+        {
+            Cookie::queue(Cookie::forever($this->cookieSessionName, $locale));
+        }
     }
 
     /**
@@ -648,7 +679,7 @@ class LaravelLocalization {
      */
     protected function useSessionLocale()
     {
-        return $this->configRepository->get('laravel-localization::useSessionLocale') || $this->configRepository->get('laravel-localization::useSessionLanguage');
+        return $this->configRepository->get('laravel-localization::useSessionLocale');
     }
 
     /**
@@ -658,7 +689,7 @@ class LaravelLocalization {
      */
     protected function useCookieLocale()
     {
-        return $this->configRepository->get('laravel-localization::useCookieLocale') || $this->configRepository->get('laravel-localization::useCookieLanguage');
+        return $this->configRepository->get('laravel-localization::useCookieLocale');
     }
 
     /**
@@ -668,7 +699,7 @@ class LaravelLocalization {
      */
     protected function useAcceptLanguageHeader()
     {
-        return $this->configRepository->get('laravel-localization::useAcceptLanguageHeader') || $this->configRepository->get('laravel-localization::useBrowserLanguage');
+        return $this->configRepository->get('laravel-localization::useAcceptLanguageHeader');
     }
 
     /**
@@ -678,7 +709,7 @@ class LaravelLocalization {
      */
     public function hideDefaultLocaleInURL()
     {
-        return $this->configRepository->get('laravel-localization::hideDefaultLocaleInURL') || $this->configRepository->get('laravel-localization::hideDefaultLanguageInRoute');
+        return $this->configRepository->get('laravel-localization::hideDefaultLocaleInURL');
     }
 
     /**
