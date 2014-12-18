@@ -232,32 +232,29 @@ class LaravelLocalization {
         if ( is_null($locale) )
         {
             $locale = $this->getCurrentLocale();
-        } elseif ( $locale !== false )
-        {
-            $locales = $this->getSupportedLocales();
-            if ( empty( $locales[ $locale ] ) )
-            {
-                throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
-            }
         }
+
+        $this->checkLocaleInSupportedLocales($locale);
 
         if ( empty( $attributes ) )
         {
             $attributes = $this->extractAttributes($url);
         }
 
+        if ( $locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale) )
+        {
+            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
+        }
+
         if ( empty( $url ) )
         {
-            if ( empty( $this->routeName ) )
-            {
-                $url = $this->request->fullUrl();
-            } else
+            if ( !empty( $this->routeName ) )
             {
                 return $this->getURLFromRouteNameTranslated($locale, $this->routeName, $attributes);
             }
-        } else if ( $locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale) )
-        {
-            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
+
+            $url = $this->request->fullUrl();
+
         }
 
         $base_path = $this->request->getBaseUrl();
@@ -274,18 +271,17 @@ class LaravelLocalization {
             foreach ( $this->getSupportedLocales() as $localeCode => $lang )
             {
                 $parsed_url[ 'path' ] = preg_replace('%^/?' . $localeCode . '/%', '$1', $parsed_url[ 'path' ]);
-                if ( $parsed_url[ 'path' ] != $path )
+                if ( $parsed_url[ 'path' ] !== $path )
                 {
                     $url_locale = $localeCode;
                     break;
-                } else
+                }
+
+                $parsed_url[ 'path' ] = preg_replace('%^/?' . $localeCode . '$%', '$1', $parsed_url[ 'path' ]);
+                if ( $parsed_url[ 'path' ] !== $path )
                 {
-                    $parsed_url[ 'path' ] = preg_replace('%^/?' . $localeCode . '$%', '$1', $parsed_url[ 'path' ]);
-                    if ( $parsed_url[ 'path' ] != $path )
-                    {
-                        $url_locale = $localeCode;
-                        break;
-                    }
+                    $url_locale = $localeCode;
+                    break;
                 }
             }
         }
@@ -523,7 +519,7 @@ class LaravelLocalization {
 
     /**
      * Store the locale on a session variable
-     * @param $locale Locale to save on session variable
+     * @param $locale string Locale to save on session variable
      */
     protected function storeSession( $locale )
     {
@@ -550,7 +546,7 @@ class LaravelLocalization {
 
     /**
      * Store the locale on a cookie variable
-     * @param $locale Locale to store on Cookie variable
+     * @param $locale String Locale to store on Cookie variable
      */
     protected function storeCookie( $locale )
     {
@@ -558,6 +554,22 @@ class LaravelLocalization {
         if ( $this->useCookieLocale() )
         {
             Cookie::queue(Cookie::forever($this->cookieSessionName, $locale));
+        }
+    }
+
+    /**
+     * Check if Locale exists on the supported locales array
+     *
+     * @param $locale string|bool Locale to be checked
+     * @throws SupportedLocalesNotDefined
+     * @throws UnsupportedLocaleException
+     */
+    public function checkLocaleInSupportedLocales( $locale )
+    {
+        $locales = $this->getSupportedLocales();
+        if ( $locale !== false && empty( $locales[ $locale ] ) )
+        {
+            throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
         }
     }
 
@@ -650,7 +662,7 @@ class LaravelLocalization {
     /**
      * Returns the translated route for an url and the attributes given and a locale
      *
-     * @param  string $url Url to check if it is a translated route
+     * @param  string|bool $url Url to check if it is a translated route
      * @param  array $attributes Attributes to check if the url exists in the translated routes array
      * @param  string $locale Language to check if the url exists
      *
@@ -658,8 +670,12 @@ class LaravelLocalization {
      */
     protected function findTranslatedRouteByUrl( $url, $attributes, $locale )
     {
-        // check if this url is a translated url
+        if ( empty( $url ) )
+        {
+            return false;
+        }
 
+        // check if this url is a translated url
         foreach ( $this->translatedRoutes as $translatedRoute )
         {
             $routeName = $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
