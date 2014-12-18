@@ -411,7 +411,7 @@ class LaravelLocalization {
 
         $locales = $this->configRepository->get('laravel-localization::supportedLocales');
 
-        if ( empty($locales) )
+        if ( empty( $locales ) || !is_array($locales) )
         {
             throw new SupportedLocalesNotDefined();
         }
@@ -947,18 +947,12 @@ class LaravelLocalization {
             }
         }
 
-        if ( class_exists('Locale') )
+        if ( class_exists('Locale') && !empty( $_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ] ) )
         {
-            if ( isset( $_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ] ) )
+            $http_accept_language = \Locale::acceptFromHttp($_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ]);
+            if ( in_array($http_accept_language, $supported) )
             {
-                if ( $_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ] != '' )
-                {
-                    $http_accept_language = \Locale::acceptFromHttp($_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ]);
-                    if ( in_array($http_accept_language, $supported) )
-                    {
-                        return $http_accept_language;
-                    }
-                }
+                return $http_accept_language;
             }
         }
 
