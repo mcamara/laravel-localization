@@ -482,7 +482,7 @@ class LaravelLocalization {
         // or get cookie language...
         if ( $locale = $this->getCookieLocale() )
         {
-            return Cookie::get($this->cookieSessionName);
+            return $locale;
         }
 
         // or get browser language...
