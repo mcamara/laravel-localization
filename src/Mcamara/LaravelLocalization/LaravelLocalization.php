@@ -399,6 +399,7 @@ class LaravelLocalization {
     /**
      * Return an array of all supported Locales
      *
+     * @throws SupportedLocalesNotDefined
      * @return array
      */
     public function getSupportedLocales()
@@ -408,22 +409,16 @@ class LaravelLocalization {
             return $this->supportedLocales;
         }
 
-        if ( $this->configRepository->has('laravel-localization::languagesAllowed') && $this->configRepository->has('laravel-localization::supportedLanguages') )
+        $locales = $this->configRepository->get('laravel-localization::supportedLocales');
+
+        if ( empty($locales) )
         {
-            $locales = $this->buildDeprecatedConfig();
-        } else
-        {
-            $locales = $this->configRepository->get('laravel-localization::supportedLocales');
+            throw new SupportedLocalesNotDefined();
         }
 
-        if ( is_array($locales) )
-        {
-            $this->supportedLocales = $locales;
+        $this->supportedLocales = $locales;
 
-            return $locales;
-        }
-
-        return [ ];
+        return $locales;
     }
 
     /**

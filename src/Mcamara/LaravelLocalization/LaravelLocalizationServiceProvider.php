@@ -36,7 +36,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
         Route::filter('LaravelLocalizationRedirectFilter', function () use ( $app )
         {
             $currentLocale = $app[ 'laravellocalization' ]->getCurrentLocale();
-            $defaultLocale = $app[ 'laravellocalization' ]->getDefault();
+            $defaultLocale = $app[ 'laravellocalization' ]->getDefaultLocale();
             $params = explode('/', Request::path());
             if ( count($params) > 0 )
             {
