@@ -662,7 +662,7 @@ class LaravelLocalization {
     /**
      * Returns the translated route for an url and the attributes given and a locale
      *
-     * @param  string|bool $url Url to check if it is a translated route
+     * @param  string|false|null $url Url to check if it is a translated route
      * @param  array $attributes Attributes to check if the url exists in the translated routes array
      * @param  string $locale Language to check if the url exists
      *
