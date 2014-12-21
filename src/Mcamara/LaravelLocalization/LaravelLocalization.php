@@ -236,7 +236,10 @@ class LaravelLocalization {
             $locale = $this->getCurrentLocale();
         }
 
-        $this->checkLocaleInSupportedLocales($locale);
+        if( ! $this->checkLocaleInSupportedLocales($locale))
+        {
+            throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
+        }
 
         if ( empty( $attributes ) )
         {
@@ -333,7 +336,10 @@ class LaravelLocalization {
      */
     public function getURLFromRouteNameTranslated( $locale, $transKeyName, $attributes = array() )
     {
-        $this->checkLocaleInSupportedLocales($locale);
+        if( ! $this->checkLocaleInSupportedLocales($locale))
+        {
+            throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
+        }
 
         $route = "";
 
@@ -555,15 +561,16 @@ class LaravelLocalization {
      *
      * @param string|boolean $locale string|bool Locale to be checked
      * @throws SupportedLocalesNotDefined
-     * @throws UnsupportedLocaleException
+     * @return boolean is the locale supported?
      */
     public function checkLocaleInSupportedLocales( $locale )
     {
         $locales = $this->getSupportedLocales();
         if ( $locale !== false && empty( $locales[ $locale ] ) )
         {
-            throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
+            return false;
         }
+        return true;
     }
 
     /**
@@ -962,25 +969,16 @@ class LaravelLocalization {
     public function negotiateLanguage()
     {
         $default = $this->configRepository->get('app.locale');
-        $supported = array();
-        foreach ( $this->configRepository->get('laravel-localization::supportedLocales') as $lang => $language )
-        {
-            $supported[ $lang ] = $lang;
-        }
 
-        if ( !count($supported) )
+        if ( $acceptLanguages = $this->request->header('Accept-Language') )
         {
-            return $default;
-        }
+            $acceptLanguages = explode(',', $acceptLanguages);
 
-        if ( $this->request->header('Accept-Language') )
-        {
-            $matches = array();
-            $generic_matches = array();
-            foreach ( explode(',', $this->request->header('Accept-Language')) as $option )
+            $matches = [ ];
+            $generic_matches = [ ];
+            foreach ( $acceptLanguages as $option )
             {
                 $option = array_map('trim', explode(';', $option));
-
                 $l = $option[ 0 ];
                 if ( isset( $option[ 1 ] ) )
                 {
@@ -1025,14 +1023,15 @@ class LaravelLocalization {
 
             foreach ( $matches as $key => $q )
             {
-                if ( isset( $supported[ $key ] ) )
+                if($this->checkLocaleInSupportedLocales($key))
                 {
-                    return $supported[ $key ];
+                    return $key;
                 }
             }
             // If any (i.e. "*") is acceptable, return the first supported format
             if ( isset( $matches[ '*' ] ) )
             {
+                $supported = $this->getSupportedLocales();
                 return array_shift($supported);
             }
         }
@@ -1040,7 +1039,8 @@ class LaravelLocalization {
         if ( class_exists('Locale') && !empty( $_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ] ) )
         {
             $http_accept_language = \Locale::acceptFromHttp($_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ]);
-            if ( in_array($http_accept_language, $supported) )
+
+            if($this->checkLocaleInSupportedLocales($http_accept_language))
             {
                 return $http_accept_language;
             }
@@ -1050,9 +1050,10 @@ class LaravelLocalization {
         {
             $remote_host = explode('.', $this->request->server('REMOTE_HOST'));
             $lang = strtolower(end($remote_host));
-            if ( isset( $supported[ $lang ] ) )
+
+            if($this->checkLocaleInSupportedLocales($lang))
             {
-                return $supported[ $lang ];
+                return $lang;
             }
         }
 
