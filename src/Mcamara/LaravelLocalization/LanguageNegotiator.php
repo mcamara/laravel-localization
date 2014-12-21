@@ -25,8 +25,8 @@ class LanguageNegotiator {
 
 
     /**
-     * @param $defaultLocale
-     * @param $supportedLanguages
+     * @param string $defaultLocale
+     * @param array $supportedLanguages
      * @param Request $request
      */
     function __construct( $defaultLocale, $supportedLanguages, Request $request )
