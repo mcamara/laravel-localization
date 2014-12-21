@@ -4,7 +4,7 @@ namespace Mcamara\LaravelLocalization;
 
 
 use Locale;
-use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Http\Request;
 
 class LanguageNegotiator {
 
@@ -24,8 +24,14 @@ class LanguageNegotiator {
     private $request;
 
 
+    /**
+     * @param $defaultLocale
+     * @param $supportedLanguages
+     * @param Request $request
+     */
     function __construct( $defaultLocale, $supportedLanguages, Request $request )
     {
+        dd($request);
         $this->defaultLocale = $defaultLocale;
         $this->supportedLanguages = $supportedLanguages;
         $this->request = $request;
