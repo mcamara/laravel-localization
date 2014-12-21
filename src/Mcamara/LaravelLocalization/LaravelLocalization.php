@@ -236,7 +236,7 @@ class LaravelLocalization {
             $locale = $this->getCurrentLocale();
         }
 
-        if( ! $this->checkLocaleInSupportedLocales($locale))
+        if ( !$this->checkLocaleInSupportedLocales($locale) )
         {
             throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
         }
@@ -336,7 +336,7 @@ class LaravelLocalization {
      */
     public function getURLFromRouteNameTranslated( $locale, $transKeyName, $attributes = array() )
     {
-        if( ! $this->checkLocaleInSupportedLocales($locale))
+        if ( !$this->checkLocaleInSupportedLocales($locale) )
         {
             throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
         }
@@ -570,6 +570,7 @@ class LaravelLocalization {
         {
             return false;
         }
+
         return true;
     }
 
@@ -969,12 +970,59 @@ class LaravelLocalization {
     public function negotiateLanguage()
     {
         $default = $this->configRepository->get('app.locale');
+        $matches = $this->getMatchesFromAcceptedLanguages();
+
+        foreach ( $matches as $key => $q )
+        {
+            if ( $this->checkLocaleInSupportedLocales($key) )
+            {
+                return $key;
+            }
+        }
+        // If any (i.e. "*") is acceptable, return the first supported format
+        if ( isset( $matches[ '*' ] ) )
+        {
+            $supported = $this->getSupportedLocales();
+
+            return array_shift($supported);
+        }
+
+        if ( class_exists('Locale') && !empty( $_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ] ) )
+        {
+            $http_accept_language = \Locale::acceptFromHttp($_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ]);
+
+            if ( $this->checkLocaleInSupportedLocales($http_accept_language) )
+            {
+                return $http_accept_language;
+            }
+        }
+
+        if ( $this->request->server('REMOTE_HOST') )
+        {
+            $remote_host = explode('.', $this->request->server('REMOTE_HOST'));
+            $lang = strtolower(end($remote_host));
+
+            if ( $this->checkLocaleInSupportedLocales($lang) )
+            {
+                return $lang;
+            }
+        }
+
+        return $default;
+    }
+
+    /**
+     * Return all the accepted languages from the browser
+     * @return array Matches from the header field Accept-Languages
+     */
+    private function getMatchesFromAcceptedLanguages()
+    {
+        $matches = [ ];
 
         if ( $acceptLanguages = $this->request->header('Accept-Language') )
         {
             $acceptLanguages = explode(',', $acceptLanguages);
 
-            $matches = [ ];
             $generic_matches = [ ];
             foreach ( $acceptLanguages as $option )
             {
@@ -1021,43 +1069,9 @@ class LaravelLocalization {
 
             arsort($matches, SORT_NUMERIC);
 
-            foreach ( $matches as $key => $q )
-            {
-                if($this->checkLocaleInSupportedLocales($key))
-                {
-                    return $key;
-                }
-            }
-            // If any (i.e. "*") is acceptable, return the first supported format
-            if ( isset( $matches[ '*' ] ) )
-            {
-                $supported = $this->getSupportedLocales();
-                return array_shift($supported);
-            }
         }
 
-        if ( class_exists('Locale') && !empty( $_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ] ) )
-        {
-            $http_accept_language = \Locale::acceptFromHttp($_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ]);
-
-            if($this->checkLocaleInSupportedLocales($http_accept_language))
-            {
-                return $http_accept_language;
-            }
-        }
-
-        if ( $this->request->server('REMOTE_HOST') )
-        {
-            $remote_host = explode('.', $this->request->server('REMOTE_HOST'));
-            $lang = strtolower(end($remote_host));
-
-            if($this->checkLocaleInSupportedLocales($lang))
-            {
-                return $lang;
-            }
-        }
-
-        return $default;
+        return $matches;
     }
 
 }
