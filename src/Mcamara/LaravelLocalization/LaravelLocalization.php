@@ -4,11 +4,9 @@ use Illuminate\Config\Repository;
 use Illuminate\View\Factory;
 use Illuminate\Translation\Translator;
 use Illuminate\Routing\Router;
-use Illuminate\Routing\Route;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\URL;
-
 use Session;
 use Cookie;
 
@@ -110,11 +108,11 @@ class LaravelLocalization {
     /**
      * Creates new instance.
      *
-     * @param Illuminate\Config\Repository $configRepository
-     * @param Illuminate\View\Factory $view
-     * @param Illuminate\Translation\Translator $translator
-     * @param Illuminate\Routing\Route $router
-     * @param Illuminate\Foundation\Application $app
+     * @param Repository $configRepository
+     * @param Factory $view
+     * @param Translator $translator
+     * @param Router $router
+     * @param Application $app
      *
      * @throws UnsupportedLocaleException
      *
@@ -553,7 +551,7 @@ class LaravelLocalization {
     /**
      * Check if Locale exists on the supported locales array
      *
-     * @param $locale string|bool Locale to be checked
+     * @param string|boolean $locale string|bool Locale to be checked
      * @throws SupportedLocalesNotDefined
      * @throws UnsupportedLocaleException
      */
@@ -570,7 +568,7 @@ class LaravelLocalization {
      * Change route attributes for the ones in the $attributes array
      *
      * @param $attributes array Array of attributes
-     * @param $route string route to substitute
+     * @param string $route string route to substitute
      * @return string route with attributes changed
      */
     protected function substituteAttributesInRoute( $attributes, $route )
