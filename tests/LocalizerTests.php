@@ -38,8 +38,8 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
 
     /**
      * Set routes for testing
-     * 
-     */ 
+     * @param bool|string $locale
+     */
     protected function setRoutes($locale = false)
     {
         $app = $this->app;
