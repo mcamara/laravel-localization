@@ -31,7 +31,6 @@ class LanguageNegotiator {
      */
     function __construct( $defaultLocale, $supportedLanguages, Request $request )
     {
-        dd($request);
         $this->defaultLocale = $defaultLocale;
         $this->supportedLanguages = $supportedLanguages;
         $this->request = $request;
