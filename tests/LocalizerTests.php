@@ -75,7 +75,8 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
 
     /**
      * Refresh routes and refresh application
-     */ 
+     * @param bool|string $locale
+     */
     protected function refreshApplication( $locale = false )
     {
         parent::refreshApplication();
