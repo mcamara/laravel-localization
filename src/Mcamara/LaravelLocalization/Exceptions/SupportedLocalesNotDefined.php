@@ -1,11 +1,11 @@
 <?php
 
-namespace Mcamara\LaravelLocalization;
+namespace Mcamara\LaravelLocalization\Exceptions;
 
 
 use Exception;
 
-class SupportedLocalesNotDefined extends Exception{
+class SupportedLocalesNotDefined extends Exception {
 
 
     function __construct()

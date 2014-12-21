@@ -1,4 +1,4 @@
-<?php namespace Mcamara\LaravelLocalization;
+<?php namespace Mcamara\LaravelLocalization\Exceptions;
 
 use Exception;
 

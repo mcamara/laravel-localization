@@ -1,5 +1,8 @@
 <?php namespace Mcamara\LaravelLocalization;
 
+use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
+use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
+
 use Illuminate\Config\Repository;
 use Illuminate\View\Factory;
 use Illuminate\Translation\Translator;
