@@ -414,7 +414,8 @@ class LaravelLocalization
 			return $this->supportedLocales;
 		}
 
-		if ($this->configRepository->has('laravel-localization::languagesAllowed') && $this->configRepository->has('laravel-localization::supportedLanguages')) 
+		if ($this->configRepository->has('laravel-localization::languagesAllowed')
+			&& $this->configRepository->has('laravel-localization::supportedLanguages'))
 		{
 			$locales = $this->buildDeprecatedConfig();
 		}
@@ -652,43 +653,39 @@ class LaravelLocalization
 	}
 
 	/**
-	 * Returns the translation key for a given path
-	 *
 	 * @return boolean	   Returns value of useSessionLocale in config.
 	 */
 	protected function useSessionLocale()
 	{
-		return $this->configRepository->get('laravel-localization::useSessionLocale') || $this->configRepository->get('laravel-localization::useSessionLanguage');
+		return $this->configRepository->get('laravel-localization::useSessionLocale')
+			|| $this->configRepository->get('laravel-localization::useSessionLanguage');
 	}
 
 	/**
-	 * Returns the translation key for a given path
-	 *
 	 * @return boolean	   Returns value of useCookieLocale in config.
 	 */
 	protected function useCookieLocale()
 	{
-		return $this->configRepository->get('laravel-localization::useCookieLocale') || $this->configRepository->get('laravel-localization::useCookieLanguage');
+		return $this->configRepository->get('laravel-localization::useCookieLocale')
+			|| $this->configRepository->get('laravel-localization::useCookieLanguage');
 	}
 
 	/**
-	 * Returns the translation key for a given path
-	 *
 	 * @return boolean	   Returns value of useAcceptLanguageHeader in config.
 	 */
 	protected function useAcceptLanguageHeader()
 	{
-		return $this->configRepository->get('laravel-localization::useAcceptLanguageHeader') || $this->configRepository->get('laravel-localization::useBrowserLanguage');
+		return $this->configRepository->get('laravel-localization::useAcceptLanguageHeader')
+			|| $this->configRepository->get('laravel-localization::useBrowserLanguage');
 	}
 
 	/**
-	 * Returns the translation key for a given path
-	 *
 	 * @return boolean	   Returns value of hideDefaultLocaleInURL in config.
 	 */
 	public function hideDefaultLocaleInURL()
 	{
-		return $this->configRepository->get('laravel-localization::hideDefaultLocaleInURL') || $this->configRepository->get('laravel-localization::hideDefaultLanguageInRoute');
+		return $this->configRepository->get('laravel-localization::hideDefaultLocaleInURL')
+			|| $this->configRepository->get('laravel-localization::hideDefaultLanguageInRoute');
 	}
 
 	/**
