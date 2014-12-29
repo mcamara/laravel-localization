@@ -48,35 +48,39 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
             $currentLocale = $this->getLocalization()->getCurrentLocale();
             $defaultLocale = $this->getLocalization()->getDefaultLocale();
             $params = explode('/', Request::path());
-            if (count($params) > 0)
+
+            if ( ! isset($params[0])) {
+                return null;
+            }
+
+            $localeCode = $params[0];
+            $locales = $this->getLocalization()->getSupportedLocales();
+            $hideDefaultLocale = $this->getLocalization()->hideDefaultLocaleInURL();
+            $redirection = false;
+
+            if ( ! empty($locales[$localeCode]))
             {
-                $localeCode = $params[0];
-                $locales = $this->getLocalization()->getSupportedLocales();
-                $hideDefaultLocale = $this->getLocalization()->hideDefaultLocaleInURL();
-                $redirection = false;
-
-                if ( ! empty($locales[$localeCode]))
+                if ($localeCode === $defaultLocale && $hideDefaultLocale)
                 {
-                    if ($localeCode === $defaultLocale && $hideDefaultLocale)
-                    {
-                        $redirection = $this->getLocalization()->getNonLocalizedURL();
-                    }
-                }
-                else if ($currentLocale !== $defaultLocale || !$hideDefaultLocale)
-                {
-                    // If the current url does not contain any locale
-                    // The system redirect the user to the very same url "localized"
-                    // we use the current locale to redirect him
-                    $redirection = $this->getLocalization()->getLocalizedURL();
-                }
-
-                if ($redirection)
-                {
-                    // Save any flashed data for redirect
-                    Session::reflash();
-                    return Redirect::to($redirection, 307)->header('Vary','Accept-Language');
+                    $redirection = $this->getLocalization()->getNonLocalizedURL();
                 }
             }
+            else if ($currentLocale !== $defaultLocale || !$hideDefaultLocale)
+            {
+                // If the current url does not contain any locale
+                // The system redirect the user to the very same url "localized"
+                // we use the current locale to redirect him
+                $redirection = $this->getLocalization()->getLocalizedURL();
+            }
+
+            if ($redirection)
+            {
+                // Save any flashed data for redirect
+                Session::reflash();
+                return Redirect::to($redirection, 307)->header('Vary','Accept-Language');
+            }
+
+            return null;
         });
 
         /**
