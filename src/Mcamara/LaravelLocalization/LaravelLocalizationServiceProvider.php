@@ -49,11 +49,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
             $defaultLocale = $this->getLocalization()->getDefaultLocale();
             $params = explode('/', Request::path());
 
-            if ( ! isset($params[0])) {
-                return null;
-            }
-
-            $urlLocale = $params[0];
+            $urlLocale = isset($params[0]) ? $params[0] : '';
             $supportedLocales = $this->getLocalization()->getSupportedLocales();
             $hideDefaultLocale = $this->getLocalization()->hideDefaultLocaleInURL();
             $redirection = false;
