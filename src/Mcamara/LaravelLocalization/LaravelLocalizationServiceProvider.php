@@ -1,6 +1,8 @@
 <?php namespace Mcamara\LaravelLocalization;
 
+use App;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Config\Repository as Config;
 use Route;
 use Request;
 use Redirect;
@@ -32,24 +34,23 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-        $app = $this->app;
-        Route::filter('LaravelLocalizationRedirectFilter', function() use($app)
+        Route::filter('LaravelLocalizationRedirectFilter', function()
         {
-            $currentLocale = $app['laravellocalization']->getCurrentLocale();
-            $defaultLocale = $app['laravellocalization']->getDefault();
+            $currentLocale = $this->getLocalization()->getCurrentLocale();
+            $defaultLocale = $this->getLocalization()->getDefaultLocale();
             $params = explode('/', Request::path());
             if (count($params) > 0)
             {
                 $localeCode = $params[0];
-                $locales = $app['laravellocalization']->getSupportedLocales();
-                $hideDefaultLocale = $app['laravellocalization']->hideDefaultLocaleInURL();
+                $locales = $this->getLocalization()->getSupportedLocales();
+                $hideDefaultLocale = $this->getLocalization()->hideDefaultLocaleInURL();
                 $redirection = false;
                 
-                if (!empty($locales[$localeCode]))
+                if ( ! empty($locales[$localeCode]))
                 {
                     if ($localeCode === $defaultLocale && $hideDefaultLocale)
                     {
-                        $redirection = $app['laravellocalization']->getNonLocalizedURL();
+                        $redirection = $this->getLocalization()->getNonLocalizedURL();
                     }
                 }
                 else if ($currentLocale !== $defaultLocale || !$hideDefaultLocale)
@@ -57,10 +58,10 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
                     // If the current url does not contain any locale
                     // The system redirect the user to the very same url "localized"
                     // we use the current locale to redirect him
-                    $redirection = $app['laravellocalization']->getLocalizedURL();
+                    $redirection = $this->getLocalization()->getLocalizedURL();
                 }
                     
-                if($redirection)
+                if ($redirection)
                 {
                     // Save any flashed data for redirect
                     Session::reflash();
@@ -74,27 +75,16 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
          */
         Route::filter('LaravelLocalizationRoutes', function()
         {
-            $app = $this->app;
-            $routeName = $app['laravellocalization']->getRouteNameFromAPath($app['router']->current()->uri());
+            $routeName = $this->getLocalization()->getRouteNameFromAPath(App::make('router')->current()->uri());
 
-            $app['laravellocalization']->setRouteName($routeName);
+            $this->getLocalization()->setRouteName($routeName);
             return;
         });
 
-		$app['config']->package('mcamara/laravel-localization', __DIR__.'/../config');
+        $this->getConfig()->package('mcamara/laravel-localization', __DIR__.'/../config');
 
-		$app['laravellocalization'] = $app->share(
-            function() use($app)
-    		{
-    			return new LaravelLocalization(
-                    $app['config'], 
-                    $app['view'], 
-                    $app['translator'], 
-                    $app['router'], 
-                    $app
-                );
-    		}
-        );
+		App::singleton('laravellocalization', 'Mcamara\LaravelLocalization\LaravelLocalization');
+
 	}
 
 	/**
@@ -104,7 +94,22 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array();
+		return [];
 	}
 
+    /**
+     * @return LaravelLocalization
+     */
+    private function getLocalization()
+    {
+        return App::make('laravellocalization');
+    }
+
+    /**
+     * @return Config
+     */
+    private function getConfig()
+    {
+        return App::make('config');
+    }
 }
