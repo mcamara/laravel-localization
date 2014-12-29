@@ -53,23 +53,24 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
                 return null;
             }
 
-            $localeCode = $params[0];
-            $locales = $this->getLocalization()->getSupportedLocales();
+            $urlLocale = $params[0];
+            $supportedLocales = $this->getLocalization()->getSupportedLocales();
             $hideDefaultLocale = $this->getLocalization()->hideDefaultLocaleInURL();
             $redirection = false;
 
-            if ( ! empty($locales[$localeCode]))
+            if (isset($supportedLocales[$urlLocale]))
             {
-                if ($localeCode === $defaultLocale && $hideDefaultLocale)
+                if ($urlLocale === $defaultLocale && $hideDefaultLocale)
                 {
                     $redirection = $this->getLocalization()->getNonLocalizedURL();
                 }
             }
-            else if ($currentLocale !== $defaultLocale || !$hideDefaultLocale)
+
+            // If the current url does not contain any locale
+            else if ($currentLocale !== $defaultLocale || ! $hideDefaultLocale)
             {
-                // If the current url does not contain any locale
-                // The system redirect the user to the very same url "localized"
-                // we use the current locale to redirect him
+                // We redirect the user to the very same url "localized"
+                // and we use as locale the current locale
                 $redirection = $this->getLocalization()->getLocalizedURL();
             }
 
