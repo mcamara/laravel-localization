@@ -47,15 +47,12 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
         {
             $currentLocale = $this->getLocalization()->getCurrentLocale();
             $defaultLocale = $this->getLocalization()->getDefaultLocale();
-            $params = explode('/', Request::path());
-
-            $urlLocale = isset($params[0]) ? $params[0] : '';
             $hideDefaultLocale = $this->getLocalization()->hideDefaultLocaleInURL();
             $redirection = false;
 
-            if ($this->isSupportedLocale($urlLocale))
+            if ($this->urlContainsSupportedLocale())
             {
-                if ($urlLocale === $defaultLocale && $hideDefaultLocale)
+                if ($this->getLocaleInUrl() === $defaultLocale && $hideDefaultLocale)
                 {
                     $redirection = $this->getLocalization()->getNonLocalizedURL();
                 }
@@ -116,6 +113,23 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
     private function getConfig()
     {
         return App::make('config');
+    }
+
+    /**
+     * @return bool
+     */
+    private function urlContainsSupportedLocale()
+    {
+        return $this->isSupportedLocale($this->getLocaleInUrl());
+    }
+
+    /**
+     * @return string
+     */
+    private function getLocaleInUrl()
+    {
+        $params = explode('/', Request::path());
+        return isset($params[0]) ? $params[0] : '';
     }
 
     /**
