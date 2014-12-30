@@ -1,10 +1,6 @@
 <?php
 
-use \Route;
-
 class LocalizerTests extends \Orchestra\Testbench\TestCase {
-
-    protected $app;
 
     protected $test_url = 'http://localhost/';
 
@@ -42,35 +38,31 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
      */ 
     protected function setRoutes($locale = false)
     {
-        $app = $this->app;
-
-        $app['router']->group([
+        Route::group([
             'prefix' => LaravelLocalization::setLocale($locale),
             'before' => 'LaravelLocalizationRoutes|LaravelLocalizationTestFilter' // Route translate filter
-        ], function() use($app) {
-            $app['router']->get('/', function () use($app) {
-                return $app['translator']->get('LaravelLocalization::routes.hello');
+        ], function() {
+            Route::get('/', function () {
+                return Lang::get('LaravelLocalization::routes.hello');
             });
 
-            $app['router']->get('test', function () use($app) {
-                return $app['translator']->get('LaravelLocalization::routes.test_text');
+            Route::get('test', function () {
+                return Lang::get('LaravelLocalization::routes.test_text');
             });
 
-            $app['router']->get(LaravelLocalization::transRoute('LaravelLocalization::routes.about'), function () {
+            Route::get(LaravelLocalization::transRoute('LaravelLocalization::routes.about'), function () {
                 return LaravelLocalization::getLocalizedURL('es') ?: "Not url available";
             });
 
-            $app['router']->get(LaravelLocalization::transRoute('LaravelLocalization::routes.view'), function () {
+            Route::get(LaravelLocalization::transRoute('LaravelLocalization::routes.view'), function () {
                 return LaravelLocalization::getLocalizedURL('es') ?: "Not url available";
             });
 
-            $app['router']->get(LaravelLocalization::transRoute('LaravelLocalization::routes.view_project'), function () {
+            Route::get(LaravelLocalization::transRoute('LaravelLocalization::routes.view_project'), function () {
                 return LaravelLocalization::getLocalizedURL('es') ?: "Not url available";
             });
         });
-        $app['router']->enableFilters();
-
-        $this->app = $app;
+        Route::enableFilters();
     }
 
     /**
@@ -94,33 +86,31 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.url', $this->test_url );
+        Config::set('app.url', $this->test_url );
 
-        $app['config']->set('app.locale', $this->defaultLocale );
+        Config::set('app.locale', $this->defaultLocale );
 
-        $app['config']->package('mcamara/laravel-localization', __DIR__.'/../config');
+        Config::package('mcamara/laravel-localization', __DIR__.'/../config');
 
-        $app['config']->set('laravel-localization::supportedLocales', $this->supportedLocales );
+        Config::set('laravel-localization::supportedLocales', $this->supportedLocales );
 
-        $app['config']->set('laravel-localization::useAcceptLanguageHeader', true);
+        Config::set('laravel-localization::useAcceptLanguageHeader', true);
 
-        $app['config']->set('laravel-localization::useSessionLocale', true);
+        Config::set('laravel-localization::useSessionLocale', true);
 
-        $app['config']->set('laravel-localization::useCookieLocale', true);
+        Config::set('laravel-localization::useCookieLocale', true);
 
-        $app['config']->set('laravel-localization::hideDefaultLocaleInURL', false);
+        Config::set('laravel-localization::hideDefaultLocaleInURL', false);
 
-        $app['translator']->getLoader()->addNamespace('LaravelLocalization', realpath(dirname(__FILE__)) . "/lang");
+        Lang::getLoader()->addNamespace('LaravelLocalization', realpath(dirname(__FILE__)) . "/lang");
 
-        $app['translator']->load( 'LaravelLocalization' , 'routes' , 'es' );
-        $app['translator']->load( 'LaravelLocalization' , 'routes' , 'en' );
+        Lang::load( 'LaravelLocalization' , 'routes' , 'es' );
+        Lang::load( 'LaravelLocalization' , 'routes' , 'en' );
 
         LaravelLocalization::setBaseUrl($this->test_url);
         LaravelLocalization::getCurrentLocale($this->supportedLocales);
 
-        $this->app = $app;
         $this->setRoutes();
-
     }
 
     public function testSetLocale()
