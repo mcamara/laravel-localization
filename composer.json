@@ -1,10 +1,10 @@
 {
     "name": "mcamara/laravel-localization",
-    "description": "Easy localization for Laravel 4",
+    "description": "Easy localization for Laravel",
     "keywords": ["localization", "laravel", "php"],
     "homepage": "https://github.com/mcamara/laravel-localization",
     "license": "MIT",
-    "version": "0.15.1",
+    "version": "1.0",
     "authors": [
         {
             "name": "Marc Cámara",
@@ -14,10 +14,10 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "laravel/framework": "4.2.*"
+        "laravel/framework": "5.0.*"
     },
     "require-dev": {
-        "orchestra/testbench": "2.2.*"
+        "orchestra/testbench": "3.0.*"
     },
     "autoload": {
         "classmap": [
