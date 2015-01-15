@@ -341,6 +341,11 @@ class LaravelLocalization {
             throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
         }
 
+        if ( !is_string($locale) )
+        {
+            $locale = $this->getDefaultLocale();
+        }
+
         $route = "";
 
         if ( !( $locale === $this->defaultLocale && $this->hideDefaultLocaleInURL() ) )

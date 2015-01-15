@@ -294,6 +294,7 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
             $this->test_url . "es/acerca" ,
             $crawler->getContent()
         );
+
         $this->refreshApplication();
 
         $this->app['config']->set('laravel-localization.hideDefaultLocaleInURL', true);
