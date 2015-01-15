@@ -433,7 +433,25 @@ class LaravelLocalization {
      */
     public function getCurrentLocaleDirection()
     {
-        return $this->supportedLocales[ $this->getCurrentLocale() ][ 'dir' ];
+
+        if ( !empty( $this->supportedLocales[ $this->getCurrentLocale() ][ 'dir' ] ) )
+        {
+            return $this->supportedLocales[ $this->getCurrentLocale() ][ 'dir' ];
+        }
+
+        switch ( $this->getCurrentLocaleScript() )
+        {
+            // Other (historic) RTL scripts exist, but this list contains the only ones in current use.
+            case 'Arab':
+            case 'Hebr':
+            case 'Mong':
+            case 'Tfng':
+            case 'Thaa':
+                return 'rtl';
+            default:
+                return 'ltr';
+        }
+
     }
 
     /**
@@ -484,6 +502,7 @@ class LaravelLocalization {
         if ( $this->useAcceptLanguageHeader() )
         {
             $negotiator = new LanguageNegotiator($this->defaultLocale, $this->getSupportedLocales(), $this->request);
+
             return $negotiator->negotiateLanguage();
         }
 

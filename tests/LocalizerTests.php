@@ -9,8 +9,8 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
     protected $test_url = 'http://localhost/';
 
     protected $supportedLocales = [
-        "en"    =>  [   "name" => "English",  "script" => "Latin",  "dir" => "ltr", "native" => "English"  ],
-        "es"    =>  [   "name" => "Spanish",  "script" => "Latin",  "dir" => "ltr", "native" => "español"  ]
+        "en"    =>  [   "name" => "English",  "script" => "Latn",  "dir" => "ltr", "native" => "English"  ],
+        "es"    =>  [   "name" => "Spanish",  "script" => "Latn",  "dir" => "ltr", "native" => "español"  ]
     ];
 
     protected $defaultLocale = "en";
@@ -498,7 +498,7 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
         $this->refreshApplication('es');
 
         $this->assertEquals(
-            'Latin',
+            'Latn',
             LaravelLocalization::getCurrentLocaleScript()
         );
 
@@ -506,7 +506,7 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
         $this->refreshApplication('en');
 
         $this->assertEquals(
-            'Latin' ,
+            'Latn' ,
             LaravelLocalization::getCurrentLocaleScript()
         );
     }
