@@ -1,9 +1,10 @@
 <?php namespace Mcamara\LaravelLocalization\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Http\Request;
 
-class LaravelLocalizationRoutes {
+class LaravelLocalizationRoutes implements Middleware {
 
     /**
      * Handle an incoming request.
@@ -12,7 +13,7 @@ class LaravelLocalizationRoutes {
      * @param  \Closure $next
      * @return mixed
      */
-    public function handle( Request $request, Closure $next )
+    public function handle( $request, Closure $next )
     {
         $app = app();
 

@@ -41,12 +41,14 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
     protected function registerResources()
     {
         $userConfigFile    = app()->configPath().'/laravel-localization/config.php';
-        $packageConfigFile = __DIR__.'/../../config/config.php';
+        $packageConfigFile = __DIR__ . '/../../config/config.php';
         $config            = $this->app['files']->getRequire($packageConfigFile);
+
         if (file_exists($userConfigFile)) {
             $userConfig = $this->app['files']->getRequire($userConfigFile);
             $config     = array_replace_recursive($config, $userConfig);
         }
+
         $this->app['config']->set('laravel-localization', $config);
     }
 
@@ -60,20 +62,10 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
     {
         $this->registerResources();
 
-        $app = $this->app;
-
-//        $app[ 'config' ]->package('mcamara/laravel-localization', __DIR__ . '/../config');
-
-        $app[ 'laravellocalization' ] = $app->share(
-            function () use ( $app )
+        $this->app[ 'laravellocalization' ] = $this->app->share(
+            function ()
             {
-                return new LaravelLocalization(
-                    $app[ 'config' ],
-                    $app[ 'view' ],
-                    $app[ 'translator' ],
-                    $app[ 'router' ],
-                    $app
-                );
+                return new LaravelLocalization();
             }
         );
     }

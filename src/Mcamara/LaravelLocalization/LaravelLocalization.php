@@ -99,7 +99,6 @@ class LaravelLocalization {
      */
     protected $routeName;
 
-
     /**
      * Name of the locale variable for the session and cookie storages
      *
@@ -109,24 +108,16 @@ class LaravelLocalization {
 
     /**
      * Creates new instance.
-     *
-     * @param Repository $configRepository
-     * @param Factory $view
-     * @param Translator $translator
-     * @param Router $router
-     * @param Application $app
-     *
      * @throws UnsupportedLocaleException
-     *
      */
-    public function __construct( Repository $configRepository, Factory $view, Translator $translator, Router $router, Application $app )
+    public function __construct()
     {
-        $this->configRepository = $configRepository;
-        $this->view = $view;
-        $this->translator = $translator;
-        $this->router = $router;
+        $this->app = app();
 
-        $this->app = $app;
+        $this->configRepository = $this->app['config'];
+        $this->view = $this->app['view'];
+        $this->translator = $this->app['translator'];
+        $this->router = $this->app['router'];
         $this->request = $this->app[ 'request' ];
 
         // set default locale
@@ -135,7 +126,7 @@ class LaravelLocalization {
 
         if ( empty( $supportedLocales[ $this->defaultLocale ] ) )
         {
-            throw new UnsupportedLocaleException("Laravel's default locale is not in the supportedLocales array.");
+            throw new UnsupportedLocaleException("Laravel default locale is not in the supportedLocales array.");
         }
     }
 
@@ -560,9 +551,9 @@ class LaravelLocalization {
      */
     protected function getCookieLocale()
     {
-        if ( $this->useCookieLocale() && Cookie::has($this->cookieSessionName) )
+        if ( $this->useCookieLocale() )
         {
-            return Cookie::get($this->cookieSessionName);
+            return cookie($this->cookieSessionName)->getValue();
         }
 
         return false;
@@ -574,10 +565,9 @@ class LaravelLocalization {
      */
     protected function storeCookie( $locale )
     {
-        Cookie::forget($this->cookieSessionName);
         if ( $this->useCookieLocale() )
         {
-            Cookie::queue(Cookie::forever($this->cookieSessionName, $locale));
+            cookie($this->cookieSessionName, $locale);
         }
     }
 
@@ -652,7 +642,6 @@ class LaravelLocalization {
         {
             $this->translatedRoutes[ ] = $routeName;
         }
-
         return $this->translator->trans($routeName);
     }
 

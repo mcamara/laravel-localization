@@ -1,31 +1,27 @@
 <?php
 
-use \Route;
+use Illuminate\Routing\Route;
+use Illuminate\Routing\RouteCollection;
 
 class LocalizerTests extends \Orchestra\Testbench\TestCase {
 
-    protected $app;
-
     protected $test_url = 'http://localhost/';
 
-    protected $supportedLocales = [
-        "en"    =>  [   "name" => "English",  "script" => "Latn",  "dir" => "ltr", "native" => "English"  ],
-        "es"    =>  [   "name" => "Spanish",  "script" => "Latn",  "dir" => "ltr", "native" => "español"  ]
-    ];
+    protected $supportedLocales = [ ];
 
     protected $defaultLocale = "en";
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders( $app )
     {
         return [
             'Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider'
         ];
     }
 
-    protected function getPackageAliases($app)
+    protected function getPackageAliases( $app )
     {
         return [
-            'LaravelLocalization'   => 'Mcamara\LaravelLocalization\Facades\LaravelLocalization'
+            'LaravelLocalization' => 'Mcamara\LaravelLocalization\Facades\LaravelLocalization'
         ];
     }
 
@@ -38,37 +34,46 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
      * Set routes for testing
      * @param bool|string $locale
      */
-    protected function setRoutes($locale = false)
+    protected function setRoutes( $locale = false )
     {
-        $app = $this->app;
+        if ( $locale )
+        {
+            app('laravellocalization')->setLocale($locale);
+        }
 
-        $app['router']->group([
-            'prefix' => LaravelLocalization::setLocale($locale),
-            'before' => 'LaravelLocalizationRoutes|LaravelLocalizationTestFilter' // Route translate filter
-        ], function() use($app) {
-            $app['router']->get('/', function () use($app) {
-                return $app['translator']->get('LaravelLocalization::routes.hello');
-            });
+        app('router')->group([
+            'prefix'     => app('laravellocalization')->setLocale(),
+            'middleware' => [
+                'Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes',
+                'Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter'
+            ]
+        ], function ()
+        {
+            app('router')->get('/', [ 'as'=>'index', function ()
+            {
+                return app('translator')->get('LaravelLocalization::routes.hello');
+            }]);
 
-            $app['router']->get('test', function () use($app) {
-                return $app['translator']->get('LaravelLocalization::routes.test_text');
-            });
+            app('router')->get('test', [ 'as'=>'test', function ()
+            {
+                return app('translator')->get('LaravelLocalization::routes.test_text');
+            }]);
 
-            $app['router']->get(LaravelLocalization::transRoute('LaravelLocalization::routes.about'), function () {
-                return LaravelLocalization::getLocalizedURL('es') ?: "Not url available";
-            });
+            app('router')->get(app('laravellocalization')->transRoute('LaravelLocalization::routes.about'), [ 'as'=>'about', function ()
+            {
+                return app('laravellocalization')->getLocalizedURL('es') ? : "Not url available";
+            }]);
 
-            $app['router']->get(LaravelLocalization::transRoute('LaravelLocalization::routes.view'), function () {
-                return LaravelLocalization::getLocalizedURL('es') ?: "Not url available";
-            });
+            app('router')->get(app('laravellocalization')->transRoute('LaravelLocalization::routes.view'), [ 'as'=>'view', function ()
+            {
+                return app('laravellocalization')->getLocalizedURL('es') ? : "Not url available";
+            }]);
 
-            $app['router']->get(LaravelLocalization::transRoute('LaravelLocalization::routes.view_project'), function () {
-                return LaravelLocalization::getLocalizedURL('es') ?: "Not url available";
-            });
+            app('router')->get(app('laravellocalization')->transRoute('LaravelLocalization::routes.view_project'), [ 'as'=>'view_project', function ()
+            {
+                return app('laravellocalization')->getLocalizedURL('es') ? : "Not url available";
+            }]);
         });
-//        $app['router']->enableFilters();
-
-        $this->app = $app;
     }
 
     /**
@@ -78,11 +83,7 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
     protected function refreshApplication( $locale = false )
     {
         parent::refreshApplication();
-
-        if(!empty($this->app))
-        {
-            $this->setRoutes($locale);
-        }
+        $this->setRoutes($locale);
     }
 
     /**
@@ -91,112 +92,97 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
      * @param Illuminate\Foundation\Application $app
      * @return void
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp( $app )
     {
-        $app['config']->set('app.url', $this->test_url );
+        app('config')->set('app.url', $this->test_url);
 
-        $app['config']->set('app.locale', $this->defaultLocale );
+        app('config')->set('app.locale', $this->defaultLocale);
 
-//        $app['config']->package('mcamara/laravel-localization', __DIR__.'/../config');
+        $packageConfigFile = __DIR__ . '/../src/config/config.php';
+        $config = app('files')->getRequire($packageConfigFile);
 
-        $app['config']->set('laravel-localization.supportedLocales', $this->supportedLocales );
+        app('config')->set('laravel-localization', $config);
 
-        $app['config']->set('laravel-localization.useAcceptLanguageHeader', true);
+        $this->supportedLocales = app('config')->get('laravel-localization.supportedLocales');
 
-        $app['config']->set('laravel-localization.useSessionLocale', true);
+        app('translator')->getLoader()->addNamespace('LaravelLocalization', realpath(dirname(__FILE__)) . "/lang");
 
-        $app['config']->set('laravel-localization.useCookieLocale', true);
+        app('translator')->load('LaravelLocalization', 'routes', 'es');
+        app('translator')->load('LaravelLocalization', 'routes', 'en');
 
-        $app['config']->set('laravel-localization.hideDefaultLocaleInURL', false);
+        app('laravellocalization')->setBaseUrl($this->test_url);
 
-        $app['translator']->getLoader()->addNamespace('LaravelLocalization', realpath(dirname(__FILE__)) . "/lang");
-
-        $app['translator']->load( 'LaravelLocalization' , 'routes' , 'es' );
-        $app['translator']->load( 'LaravelLocalization' , 'routes' , 'en' );
-
-        LaravelLocalization::setBaseUrl($this->test_url);
-        LaravelLocalization::getCurrentLocale($this->supportedLocales);
-
-        $this->app = $app;
         $this->setRoutes();
 
     }
 
     public function testSetLocale()
     {
-        $this->assertEquals('es', LaravelLocalization::setLocale('es'));
-        $this->assertEquals('es', LaravelLocalization::getCurrentLocale());
+        $this->assertEquals(route('about'), "http://localhost/about");
 
-        $crawler = $this->call('GET', '/', [], [], [], [ "HTTP_ACCEPT_LANGUAGE"  =>   "en,es" ]);
+        $this->refreshApplication('es');
+        $this->assertEquals('es', app('laravellocalization')->setLocale('es'));
+        $this->assertEquals('es', app('laravellocalization')->getCurrentLocale());
+        $this->assertEquals(route('about'), "http://localhost/acerca");
 
-        $this->assertResponseOk();
-        $this->assertEquals('Hola mundo', $crawler->getContent());
         $this->refreshApplication();
 
+        $this->assertEquals('en', app('laravellocalization')->setLocale('en'));
 
-        $this->assertEquals('en', LaravelLocalization::setLocale('en'));
-        $this->assertNotEquals('es', LaravelLocalization::getCurrentLocale());
-        $this->assertEquals('en', LaravelLocalization::getCurrentLocale());
+        $this->assertEquals(route('about'), "http://localhost/about");
 
-
-        $crawler = $this->call('GET', '/', [], [], [], [ "HTTP_ACCEPT_LANGUAGE"  =>   "en,es" ]);
-
-        $this->assertResponseOk();
-        $this->assertEquals('Hello world', $crawler->getContent());
-        $this->refreshApplication();
-
-        $this->assertNull(LaravelLocalization::setLocale('de'));
-        $this->assertEquals('en', LaravelLocalization::getCurrentLocale());
+        $this->assertNull(app('laravellocalization')->setLocale('de'));
+        $this->assertEquals('en', app('laravellocalization')->getCurrentLocale());
 
     }
 
     public function testLocalizeURL()
     {
         $this->assertEquals(
-            $this->test_url . LaravelLocalization::getCurrentLocale() ,
-            LaravelLocalization::localizeURL()
+            $this->test_url . app('laravellocalization')->getCurrentLocale(),
+            app('laravellocalization')->localizeURL()
         );
 
-        $this->app['config']->set('laravel-localization.hideDefaultLocaleInURL', true);
+        app('config')->set('laravel-localization.hideDefaultLocaleInURL', true);
 
         // testing hide default locale option
         $this->assertNotEquals(
-            $this->test_url . LaravelLocalization::getDefaultLocale() ,
-            LaravelLocalization::localizeURL()
+            $this->test_url . app('laravellocalization')->getDefaultLocale(),
+            app('laravellocalization')->localizeURL()
         );
 
         $this->assertEquals(
-            $this->test_url ,
-            LaravelLocalization::localizeURL()
+            $this->test_url,
+            app('laravellocalization')->localizeURL()
         );
 
-        LaravelLocalization::setLocale('es');
+        app('laravellocalization')->setLocale('es');
 
         $this->assertEquals(
-            $this->test_url . 'es' ,
-            LaravelLocalization::localizeURL()
+            $this->test_url . 'es',
+            app('laravellocalization')->localizeURL()
         );
 
         $this->assertEquals(
             $this->test_url . 'about',
-            LaravelLocalization::localizeURL($this->test_url . 'about' , 'en')
+            app('laravellocalization')->localizeURL($this->test_url . 'about', 'en')
         );
 
         $this->assertNotEquals(
             $this->test_url . 'en/about',
-            LaravelLocalization::localizeURL($this->test_url . 'about' , 'en')
+            app('laravellocalization')->localizeURL($this->test_url . 'about', 'en')
         );
 
-        $this->app['config']->set('laravel-localization.hideDefaultLocaleInURL', false);
+        app('config')->set('laravel-localization.hideDefaultLocaleInURL', false);
 
         $this->assertEquals(
             $this->test_url . 'en/about',
-            LaravelLocalization::localizeURL($this->test_url . 'about' , 'en')
+            app('laravellocalization')->localizeURL($this->test_url . 'about', 'en')
         );
 
         $this->assertNotEquals(
             $this->test_url . 'about',
-            LaravelLocalization::localizeURL($this->test_url . 'about' , 'en')
+            app('laravellocalization')->localizeURL($this->test_url . 'about', 'en')
         );
 
 
@@ -205,136 +191,135 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
     public function testGetLocalizedURL()
     {
         $this->assertEquals(
-            $this->test_url . 'es/acerca' ,
-            LaravelLocalization::getLocalizedURL( 'es' , $this->test_url . 'en/about' )
+            $this->test_url . 'es/acerca',
+            app('laravellocalization')->getLocalizedURL('es', $this->test_url . 'en/about')
         );
 
         $this->assertEquals(
-            $this->test_url . 'es/ver/1' ,
-            LaravelLocalization::getLocalizedURL( 'es' , $this->test_url . 'view/1' )
+            $this->test_url . 'es/ver/1',
+            app('laravellocalization')->getLocalizedURL('es', $this->test_url . 'view/1')
         );
 
         $this->assertEquals(
-            $this->test_url . 'es/ver/1/proyecto' ,
-            LaravelLocalization::getLocalizedURL( 'es' , $this->test_url . 'view/1/project' )
+            $this->test_url . 'es/ver/1/proyecto',
+            app('laravellocalization')->getLocalizedURL('es', $this->test_url . 'view/1/project')
         );
 
         $this->assertEquals(
-            $this->test_url . 'es/ver/1/proyecto/1' ,
-            LaravelLocalization::getLocalizedURL( 'es' , $this->test_url . 'view/1/project/1' )
+            $this->test_url . 'es/ver/1/proyecto/1',
+            app('laravellocalization')->getLocalizedURL('es', $this->test_url . 'view/1/project/1')
         );
 
         $this->assertEquals(
-            $this->test_url . 'en/about' ,
-            LaravelLocalization::getLocalizedURL( 'en' , $this->test_url . 'about' )
+            $this->test_url . 'en/about',
+            app('laravellocalization')->getLocalizedURL('en', $this->test_url . 'about')
         );
 
         $this->assertEquals(
-            $this->test_url . LaravelLocalization::getCurrentLocale() ,
-            LaravelLocalization::getLocalizedURL()
+            $this->test_url . app('laravellocalization')->getCurrentLocale(),
+            app('laravellocalization')->getLocalizedURL()
         );
 
-        $this->app['config']->set('laravel-localization.hideDefaultLocaleInURL', true);
+        app('config')->set('laravel-localization.hideDefaultLocaleInURL', true);
         // testing default language hidden
 
         $this->assertEquals(
-            $this->test_url . 'es/acerca' ,
-            LaravelLocalization::getLocalizedURL( 'es' , $this->test_url . 'about' )
+            $this->test_url . 'es/acerca',
+            app('laravellocalization')->getLocalizedURL('es', $this->test_url . 'about')
         );
         $this->assertEquals(
-            $this->test_url . 'about' ,
-            LaravelLocalization::getLocalizedURL( 'en' , $this->test_url . 'about' )
+            $this->test_url . 'about',
+            app('laravellocalization')->getLocalizedURL('en', $this->test_url . 'about')
         );
 
         $this->assertEquals(
-            $this->test_url ,
-            LaravelLocalization::getLocalizedURL()
+            $this->test_url,
+            app('laravellocalization')->getLocalizedURL()
         );
 
         $this->assertNotEquals(
-            $this->test_url . LaravelLocalization::getDefaultLocale() ,
-            LaravelLocalization::getLocalizedURL()
+            $this->test_url . app('laravellocalization')->getDefaultLocale(),
+            app('laravellocalization')->getLocalizedURL()
         );
 
-        LaravelLocalization::setLocale('es');
+        app('laravellocalization')->setLocale('es');
 
         $this->assertNotEquals(
-            $this->test_url ,
-            LaravelLocalization::getLocalizedURL()
+            $this->test_url,
+            app('laravellocalization')->getLocalizedURL()
         );
 
         $this->assertNotEquals(
-            $this->test_url . LaravelLocalization::getDefaultLocale() ,
-            LaravelLocalization::getLocalizedURL()
+            $this->test_url . app('laravellocalization')->getDefaultLocale(),
+            app('laravellocalization')->getLocalizedURL()
         );
 
         $this->assertEquals(
-            $this->test_url . LaravelLocalization::getCurrentLocale() ,
-            LaravelLocalization::getLocalizedURL()
+            $this->test_url . app('laravellocalization')->getCurrentLocale(),
+            app('laravellocalization')->getLocalizedURL()
         );
 
         $this->assertEquals(
-            $this->test_url . 'es/acerca' ,
-            LaravelLocalization::getLocalizedURL( 'es' , $this->test_url . 'about' )
+            $this->test_url . 'es/acerca',
+            app('laravellocalization')->getLocalizedURL('es', $this->test_url . 'about')
         );
 
-        LaravelLocalization::setLocale('en');
+        app('laravellocalization')->setLocale('en');
 
         $crawler = $this->call(
             'GET',
             $this->test_url . "about",
-            [],
-            [],
-            [],
-            [ "HTTP_ACCEPT_LANGUAGE"  =>   "en,es" ]
+            [ ],
+            [ ],
+            [ ],
+            [ "HTTP_ACCEPT_LANGUAGE" => "en,es" ]
         );
 
         $this->assertResponseOk();
         $this->assertEquals(
-            $this->test_url . "es/acerca" ,
+            $this->test_url . "es/acerca",
             $crawler->getContent()
         );
 
         $this->refreshApplication();
 
-        $this->app['config']->set('laravel-localization.hideDefaultLocaleInURL', true);
+        app('config')->set('laravel-localization.hideDefaultLocaleInURL', true);
 
         $this->assertEquals(
             $this->test_url . 'test',
-            LaravelLocalization::getLocalizedURL( 'en' , $this->test_url . 'test' )
+            app('laravellocalization')->getLocalizedURL('en', $this->test_url . 'test')
         );
 
         $crawler = $this->call(
             'GET',
-            LaravelLocalization::getLocalizedURL( 'en' , $this->test_url . 'test' ),
-            [],
-            [],
-            [],
-            [ "HTTP_ACCEPT_LANGUAGE"  =>   "en,es" ]
+            app('laravellocalization')->getLocalizedURL('en', $this->test_url . 'test'),
+            [ ],
+            [ ],
+            [ ],
+            [ "HTTP_ACCEPT_LANGUAGE" => "en,es" ]
         );
 
         $this->assertResponseOk();
         $this->assertEquals(
-            "Test text" ,
+            "Test text",
             $crawler->getContent()
         );
 
-        LaravelLocalization::setLocale('es');
         $this->refreshApplication('es');
 
         $this->assertEquals(
             $this->test_url . 'es/test',
-            LaravelLocalization::getLocalizedURL( 'es' , $this->test_url . 'test' )
+            app('laravellocalization')->getLocalizedURL('es', $this->test_url . 'test')
         );
 
         $crawler = $this->call(
             'GET',
-            LaravelLocalization::getLocalizedURL( 'es' , $this->test_url . 'test' )
+            app('laravellocalization')->getLocalizedURL('es', $this->test_url . 'test')
         );
 
         $this->assertResponseOk();
         $this->assertEquals(
-            "Texto de prueba" ,
+            "Texto de prueba",
             $crawler->getContent()
         );
         $this->refreshApplication();
@@ -344,72 +329,72 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
     {
         $crawler = $this->call(
             'GET',
-            $this->test_url . "/about",
-            [],
-            [],
-            [],
-            [ "HTTP_ACCEPT_LANGUAGE"  =>   "en,es" ]
+            $this->test_url . "en/about",
+            [ ],
+            [ ],
+            [ ],
+            [ "HTTP_ACCEPT_LANGUAGE" => "en,es" ]
         );
 
         $this->assertResponseOk();
         $this->assertEquals(
-            $this->test_url . "es/acerca" ,
+            $this->test_url . "es/acerca",
             $crawler->getContent()
         );
         $this->refreshApplication();
 
         $this->assertEquals(
-            $this->test_url . 'es/acerca' ,
-            LaravelLocalization::getURLFromRouteNameTranslated( 'es' , 'LaravelLocalization::routes.about' )
+            $this->test_url . 'es/acerca',
+            app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.about')
         );
 
         $this->assertEquals(
-            $this->test_url . 'en/about' ,
-            LaravelLocalization::getURLFromRouteNameTranslated( 'en' , 'LaravelLocalization::routes.about' )
+            $this->test_url . 'en/about',
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.about')
         );
 
         $this->assertEquals(
-            $this->test_url . 'en/view/1' ,
-            LaravelLocalization::getURLFromRouteNameTranslated( 'en' , 'LaravelLocalization::routes.view' , ['id' => 1] )
+            $this->test_url . 'en/view/1',
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view', [ 'id' => 1 ])
         );
 
-        $this->app['config']->set('laravel-localization.hideDefaultLocaleInURL', true);
+        app('config')->set('laravel-localization.hideDefaultLocaleInURL', true);
 
         $this->assertEquals(
-            $this->test_url . 'about' ,
-            LaravelLocalization::getURLFromRouteNameTranslated( 'en' , 'LaravelLocalization::routes.about' )
-        );
-
-        $this->assertEquals(
-            $this->test_url . 'es/acerca' ,
-            LaravelLocalization::getURLFromRouteNameTranslated( 'es' , 'LaravelLocalization::routes.about' )
+            $this->test_url . 'about',
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.about')
         );
 
         $this->assertEquals(
-            $this->test_url . 'es/ver/1' ,
-            LaravelLocalization::getURLFromRouteNameTranslated( 'es' , 'LaravelLocalization::routes.view' , ['id' => 1] )
+            $this->test_url . 'es/acerca',
+            app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.about')
         );
 
         $this->assertEquals(
-            $this->test_url . 'view/1' ,
-            LaravelLocalization::getURLFromRouteNameTranslated( 'en' , 'LaravelLocalization::routes.view' , ['id' => 1] )
+            $this->test_url . 'es/ver/1',
+            app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view', [ 'id' => 1 ])
+        );
+
+        $this->assertEquals(
+            $this->test_url . 'view/1',
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view', [ 'id' => 1 ])
         );
 
         $this->assertNotEquals(
-            $this->test_url . 'en/view/1' ,
-            LaravelLocalization::getURLFromRouteNameTranslated( 'en' , 'LaravelLocalization::routes.view' , ['id' => 1] )
+            $this->test_url . 'en/view/1',
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view', [ 'id' => 1 ])
         );
 
-        $this->app['config']->set('laravel-localization.hideDefaultLocaleInURL', false);
+        app('config')->set('laravel-localization.hideDefaultLocaleInURL', false);
 
         $this->assertNotEquals(
-            $this->test_url . 'view/1' ,
-            LaravelLocalization::getURLFromRouteNameTranslated( 'en' , 'LaravelLocalization::routes.view' , ['id' => 1] )
+            $this->test_url . 'view/1',
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view', [ 'id' => 1 ])
         );
 
         $this->assertEquals(
-            $this->test_url . 'en/view/1' ,
-            LaravelLocalization::getURLFromRouteNameTranslated( 'en' , 'LaravelLocalization::routes.view' , ['id' => 1] )
+            $this->test_url . 'en/view/1',
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view', [ 'id' => 1 ])
         );
 
     }
@@ -417,20 +402,20 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
     public function testGetNonLocalizedURL()
     {
         $this->assertEquals(
-            $this->test_url ,
-            LaravelLocalization::getNonLocalizedURL( $this->test_url . 'en'  )
+            $this->test_url,
+            app('laravellocalization')->getNonLocalizedURL($this->test_url . 'en')
         );
         $this->assertEquals(
-            $this->test_url ,
-            LaravelLocalization::getNonLocalizedURL( $this->test_url . 'es'  )
+            $this->test_url,
+            app('laravellocalization')->getNonLocalizedURL($this->test_url . 'es')
         );
         $this->assertEquals(
-            $this->test_url . 'view/1' ,
-            LaravelLocalization::getNonLocalizedURL( $this->test_url . 'en/view/1'  )
+            $this->test_url . 'view/1',
+            app('laravellocalization')->getNonLocalizedURL($this->test_url . 'en/view/1')
         );
         $this->assertEquals(
-            $this->test_url . 'ver/1' ,
-            LaravelLocalization::getNonLocalizedURL( $this->test_url . 'es/ver/1'  )
+            $this->test_url . 'ver/1',
+            app('laravellocalization')->getNonLocalizedURL($this->test_url . 'es/ver/1')
         );
 
     }
@@ -438,16 +423,16 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
     public function testGetDefaultLocale()
     {
         $this->assertEquals(
-            'en' ,
-            LaravelLocalization::getDefaultLocale()
+            'en',
+            app('laravellocalization')->getDefaultLocale()
         );
 
-        LaravelLocalization::setLocale('es');
+        app('laravellocalization')->setLocale('es');
         $this->refreshApplication('es');
 
         $this->assertEquals(
-            'en' ,
-            LaravelLocalization::getDefaultLocale()
+            'en',
+            app('laravellocalization')->getDefaultLocale()
         );
 
     }
@@ -455,8 +440,8 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
     public function testGetSupportedLocales()
     {
         $this->assertEquals(
-            $this->supportedLocales ,
-            LaravelLocalization::getSupportedLocales()
+            $this->supportedLocales,
+            app('laravellocalization')->getSupportedLocales()
         );
 
     }
@@ -465,15 +450,14 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
     {
         $this->assertEquals(
             'English',
-            LaravelLocalization::getCurrentLocaleName()
+            app('laravellocalization')->getCurrentLocaleName()
         );
 
-        LaravelLocalization::setLocale('es');
         $this->refreshApplication('es');
 
         $this->assertEquals(
-            'Spanish' ,
-            LaravelLocalization::getCurrentLocaleName()
+            'Spanish',
+            app('laravellocalization')->getCurrentLocaleName()
         );
     }
 
@@ -481,34 +465,34 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
     {
         $this->assertEquals(
             'ltr',
-            LaravelLocalization::getCurrentLocaleDirection()
+            app('laravellocalization')->getCurrentLocaleDirection()
         );
 
-        LaravelLocalization::setLocale('es');
+        app('laravellocalization')->setLocale('es');
         $this->refreshApplication('es');
 
         $this->assertEquals(
-            'ltr' ,
-            LaravelLocalization::getCurrentLocaleDirection()
+            'ltr',
+            app('laravellocalization')->getCurrentLocaleDirection()
         );
     }
 
     public function testGetCurrentLocaleScript()
     {
-        LaravelLocalization::setLocale('es');
+        app('laravellocalization')->setLocale('es');
         $this->refreshApplication('es');
 
         $this->assertEquals(
             'Latn',
-            LaravelLocalization::getCurrentLocaleScript()
+            app('laravellocalization')->getCurrentLocaleScript()
         );
 
-        LaravelLocalization::setLocale('en');
+        app('laravellocalization')->setLocale('en');
         $this->refreshApplication('en');
 
         $this->assertEquals(
-            'Latn' ,
-            LaravelLocalization::getCurrentLocaleScript()
+            'Latn',
+            app('laravellocalization')->getCurrentLocaleScript()
         );
     }
 
@@ -516,15 +500,15 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
     {
         $this->assertEquals(
             'English',
-            LaravelLocalization::getCurrentLocaleNativeReading()
+            app('laravellocalization')->getCurrentLocaleNativeReading()
         );
 
-        LaravelLocalization::setLocale('es');
+        app('laravellocalization')->setLocale('es');
         $this->refreshApplication('es');
 
         $this->assertEquals(
-            'español' ,
-            LaravelLocalization::getCurrentLocaleNativeReading()
+            'español',
+            app('laravellocalization')->getCurrentLocaleNativeReading()
         );
     }
 
@@ -532,52 +516,52 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
     {
         $this->assertEquals(
             'en',
-            LaravelLocalization::getCurrentLocale()
+            app('laravellocalization')->getCurrentLocale()
         );
 
-        LaravelLocalization::setLocale('es');
+        app('laravellocalization')->setLocale('es');
         $this->refreshApplication('es');
 
         $this->assertEquals(
-            'es' ,
-            LaravelLocalization::getCurrentLocale()
+            'es',
+            app('laravellocalization')->getCurrentLocale()
         );
 
         $this->assertNotEquals(
-            'en' ,
-            LaravelLocalization::getCurrentLocale()
+            'en',
+            app('laravellocalization')->getCurrentLocale()
         );
     }
 
     public function testGetSupportedLanguagesKeys()
     {
         $this->assertEquals(
-            ['en' , 'es'],
-            LaravelLocalization::getSupportedLanguagesKeys()
+            [ 'en', 'es' ],
+            app('laravellocalization')->getSupportedLanguagesKeys()
         );
     }
 
     public function testGetConfigRepository()
     {
         $this->assertEquals(
-            $this->app['config'],
-            LaravelLocalization::getConfigRepository('/view/1')
+            app('config'),
+            app('laravellocalization')->getConfigRepository('/view/1')
         );
     }
 
     public function testCreateUrlFromUri()
     {
         $this->assertEquals(
-            'http://localhost/view/1' ,
-            LaravelLocalization::createUrlFromUri('/view/1')
+            'http://localhost/view/1',
+            app('laravellocalization')->createUrlFromUri('/view/1')
         );
 
-        LaravelLocalization::setLocale('es');
+        app('laravellocalization')->setLocale('es');
         $this->refreshApplication('es');
 
         $this->assertEquals(
-            'http://localhost/ver/1' ,
-            LaravelLocalization::createUrlFromUri('/ver/1')
+            'http://localhost/ver/1',
+            app('laravellocalization')->createUrlFromUri('/ver/1')
         );
     }
 
