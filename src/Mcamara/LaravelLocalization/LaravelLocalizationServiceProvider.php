@@ -49,7 +49,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
         {
             $config = array_replace_recursive($config, $userConfig);
         }
-        
+
         config([
             'laravel-localization'=> $config
         ]);

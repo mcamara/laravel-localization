@@ -2,7 +2,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/mcamara/laravel-localization/version.png)](https://packagist.org/packages/mcamara/laravel-localization) [![Total Downloads](https://poser.pugx.org/mcamara/laravel-localization/d/total.png)](https://packagist.org/packages/mcamara/laravel-localization) [![Build Status](https://travis-ci.org/mcamara/laravel-localization.png)](https://travis-ci.org/mcamara/laravel-localization)
 
-Easy i18n localization for Laravel 4, an useful tool to combine with Laravel localization classes.
+Easy i18n localization for Laravel, an useful tool to combine with Laravel localization classes.
 
 
 ## Table of Contents
@@ -10,14 +10,25 @@ Easy i18n localization for Laravel 4, an useful tool to combine with Laravel loc
 - <a href="#installation">Installation</a>
     - <a href="#composer">Composer</a>
     - <a href="#manually">Manually</a>
-    - <a href="#laravel-4">Laravel 4</a>
+    - <a href="#laravel">Laravel</a>
 - <a href="#usage">Usage</a>
-    - <a href="#filters">Filters</a>
+    - <a href="#middleware">Middleware</a>
 - <a href="#helpers">Helpers</a>
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#config">Config</a>
 - <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
+
+## Laravel compatibility
+
+Version 1 will be stable after laravel 5 is released
+
+ Laravel  | laravel-localization
+:---------|:----------
+ 4.0.x    | 0.13.x
+ 4.1.x    | 0.13.x
+ 4.2.x    | 0.15.x
+ 5.0.x    | 1.x
 
 ## Installation
 
@@ -25,19 +36,17 @@ Easy i18n localization for Laravel 4, an useful tool to combine with Laravel loc
 
 Add Laravel Localization to your `composer.json` file.
 
-    "mcamara/laravel-localization": "0.15.*"
+    "mcamara/laravel-localization": "1.*"
 
 Run `composer install` to get the latest version of the package.
-
-If you are using a laravel version lower than 4.2, you should use 0.13.* version. Moreover, 0.15 version will be the last one with support for Laravel 4.2. A new version compatible with Laravel 5 is in development and would be available soon after the final version of Laravel is released, labeled as version 1.x .
 
 ### Manually
 
 It's recommended that you use Composer, however you can download and install from this repository.
 
-### Laravel 4
+### Laravel
 
-Laravel Localization comes with a service provider for Laravel 4. You'll need to add it to your `composer.json` as mentioned in the above steps, then register the service provider with your application.
+Laravel Localization comes with a service provider for Laravel. You'll need to add it to your `composer.json` as mentioned in the above steps, then register the service provider with your application.
 
 Open `app/config/app.php` and find the `providers` key. Add `LaravelLocalizationServiceProvider` to the array.
 
@@ -54,8 +63,6 @@ You can also add an alias to the list of class aliases in the same app.php
 	'LaravelLocalization'	=> 'Mcamara\LaravelLocalization\Facades\LaravelLocalization'
 	...
 ```
-
-To finish, publish the configuration file using the command `php artisan config:publish mcamara/laravel-localization` in your laravel root path. This will create the following file `app/config/packages/mcamara/laravel-localization/config.php`, containing the most common setting options.
 
 ## Usage
 
@@ -95,11 +102,34 @@ Once the locale is defined, the locale variable will be stored in a session, so 
 
 Templates files and all locale files should follow the [Lang class](http://laravel.com/docs/localization).
 
-### Filters
+### Middleware
 
-Moreover, this package includes a filter to redirect all "non-localized" routes to a "localized" one (thanks to Sangar82).
+Moreover, this package includes a middleware obkect to redirect all "non-localized" routes to a "localized" one.
 
-So, if a user accesses to http://url-to-laravel/test and the system have this filter active and 'en' as a current locale for this user, it would redirect (301) him automatically to http://url-to-laravel/en/test. This is mainly used to avoid duplicate content and improve SEO performance.
+So, if a user accesses to http://url-to-laravel/test and the system have this middleware actived and 'en' as a current locale for this user, it would redirect (301) him automatically to http://url-to-laravel/en/test. This is mainly used to avoid duplicate content and improve SEO performance.
+
+To do so, you have to register the middleware on the app/Http/Kernel.php laravel file like this:
+
+```php
+	<?php namespace App\Http;
+
+	use Illuminate\Foundation\Http\Kernel as HttpKernel;
+
+	class Kernel extends HttpKernel {
+		/**
+		 * The application's route middleware.
+		 *
+		 * @var array
+		 */
+		protected $routeMiddleware = [
+			/**** OTHER MIDDLEWARE ****/
+			'localize' => 'Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes',
+			'localizationRedirect' => 'Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter'
+			// REDIRECTION MIDDLEWARE
+		];
+
+	}
+```
 
 
 ```php
@@ -108,7 +138,7 @@ So, if a user accesses to http://url-to-laravel/test and the system have this fi
 	Route::group(
 	array(
 		'prefix' => LaravelLocalization::setLocale(),
-		'before' => 'LaravelLocalizationRedirectFilter' // LaravelLocalization filter
+		'middleware' => [ 'localizationRedirect' ]
 	),
 	function()
 	{
@@ -126,7 +156,8 @@ So, if a user accesses to http://url-to-laravel/test and the system have this fi
 	/** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
 
 ```
-In order to active it, you just have to attach this filter to the routes you want to be accessible localized.
+
+In order to active it, you just have to attach this middleware to the routes you want to be accessible localized.
 
 If you want to hide the default locale but always show other locales in the url, switch the 'hideDefaultLocaleInURL' config value to true. Once it's true, if the default locale is en (english) all URLs containing /en/ would be redirected to the same url without this fragment '/' but maintaining the locale as en (English).
 
@@ -325,13 +356,37 @@ If you're supporting multiple locales in your project your going to want to prov
 ## Translated Routes
 
 You can adapt your URLs depending on the language you want to show them. For example, http://url/en/about and http://url/es/acerca (acerca is about in spanish) or http://url/en/view/5 and http://url/es/ver/5 (view == ver in spanish) would be redirected to the same controller using the proper filter and setting up the translation files as follows:
+
+As it is a middleware, first you have to register in on your app/Http/Kernel.php file like this:
+
+
+```php
+	<?php namespace App\Http;
+
+	use Illuminate\Foundation\Http\Kernel as HttpKernel;
+
+	class Kernel extends HttpKernel {
+		/**
+		 * The application's route middleware.
+		 *
+		 * @var array
+		 */
+		protected $routeMiddleware = [
+			/**** OTHER MIDDLEWARE ****/
+			'localize' => 'Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes',
+			// TRANSLATE ROUTES MIDDLEWARE
+		];
+
+	}
+```
+
 ```php
 	// app/routes.php
 
 	Route::group(
 	array(
 		'prefix' => LaravelLocalization::setLocale(),
-		'before' => 'LaravelLocalizationRoutes' // Route translate filter
+		'middleware' => [ 'localize' ] // Route translate middleware
 	),
 	function()
 	{
@@ -353,8 +408,6 @@ You can adapt your URLs depending on the language you want to show them. For exa
 	/** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
 ```
 In the routes file you just have to add the `LaravelLocalizationRoutes` filter and the `LaravelLocalization::transRoute` function to every route you want to translate using the translation key.
-
-_Tip:_ If you want to use this filter with other filters (like `LaravelLocalizationRedirectFilter`) you just have to join them in the Laravel way, using | (eg: `'before' => 'LaravelLocalizationRoutes|LaravelLocalizationRedirectFilter'` )
 
 Then you have to create the translation files and add there every key you want to translate. I suggest you to create a routes.php file inside your app/lang/language_abbreviation folder. For the previous example, I have created two translations files, these two files would look like:
 ```php
@@ -393,9 +446,42 @@ Be sure to pass the locale and the attributes as parameters for your closure. Yo
 
 ## Config
 
-By default only english and spanish are allowed but it can be changed using config.php file that is located at `app/config/packages/mcamara/laravel-localization/config.php` . If this file does not exist, use the following artisan command `php artisan config:publish mcamara/laravel-localization`  in order to create it.
+In order to override the config done by default to add new locales or choose whether the default locale has to be shown on the url or not(check <a href="https://raw.githubusercontent.com/mcamara/laravel-localization/master/src/config/config.php">this file</a> for more info) you can use Config Service Providers given by Laravel 5.
 
-This file have some interesting configuration settings (as the allowed locales or browser language detection, among others) feel free to play with it, all variables are self-explained.
+For example, editing the default config service provider that Laravel loads when it's installed. This file is placed in app/providers/ConfigServicePovider.php and would look like this:
+
+```php
+	<?php namespace App\Providers;
+
+	use Illuminate\Support\ServiceProvider;
+
+	class ConfigServiceProvider extends ServiceProvider {
+		public function register()
+		{
+			config([
+				'laravel-localization.supportedLocales' => [
+					'ace' => array( 'name' => 'Achinese', 'script' => 'Latn', 'native' => 'Aceh' ),
+					'ca'  => array( 'name' => 'Catalan', 'script' => 'Latn', 'native' => 'català' ),
+					'en'  => array( 'name' => 'English', 'script' => 'Latn', 'native' => 'English' ),
+				],
+
+				'laravel-localization.useAcceptLanguageHeader' => true,
+
+				'laravel-localization.useSessionLocale' => true,
+
+				'laravel-localization.useCookieLocale' => true,
+
+				'laravel-localization.hideDefaultLocaleInURL' => true
+			]);
+		}
+
+	}
+```
+
+This config would add Catalan and Achinese as languages and override any other previous supported locales and all the other options in the package.
+
+You can create your own config providers and add them on your application config file ( check the providers array in config/app.php ).
+
 
 ## Changelog
 View changelog here -> [changelog](CHANGELOG.md)
