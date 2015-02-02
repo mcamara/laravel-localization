@@ -312,37 +312,10 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
             app('laravellocalization')->getLocalizedURL('es', $this->test_url . 'test')
         );
 
-        $crawler = $this->call(
-            'GET',
-            app('laravellocalization')->getLocalizedURL('es', $this->test_url . 'test')
-        );
-
-        $this->assertResponseOk();
-        $this->assertEquals(
-            "Texto de prueba",
-            $crawler->getContent()
-        );
-        $this->refreshApplication();
     }
 
     public function testGetURLFromRouteNameTranslated()
     {
-        $crawler = $this->call(
-            'GET',
-            $this->test_url . "en/about",
-            [ ],
-            [ ],
-            [ ],
-            [ "HTTP_ACCEPT_LANGUAGE" => "en,es" ]
-        );
-
-        $this->assertResponseOk();
-        $this->assertEquals(
-            $this->test_url . "es/acerca",
-            $crawler->getContent()
-        );
-        $this->refreshApplication();
-
         $this->assertEquals(
             $this->test_url . 'es/acerca',
             app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.about')
