@@ -40,16 +40,19 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
      */
     protected function registerResources()
     {
-        $userConfigFile    = app()->configPath().'/laravel-localization/config.php';
+//        $userConfigFile    = app()->configPath().'/laravel-localization/config.php';
         $packageConfigFile = __DIR__ . '/../../config/config.php';
         $config            = $this->app['files']->getRequire($packageConfigFile);
+        $userConfig = config('laravel-localization');
 
-        if (file_exists($userConfigFile)) {
-            $userConfig = $this->app['files']->getRequire($userConfigFile);
-            $config     = array_replace_recursive($config, $userConfig);
+        if(!empty($userConfig))
+        {
+            $config = array_replace_recursive($config, $userConfig);
         }
-
-        $this->app['config']->set('laravel-localization', $config);
+        
+        config([
+            'laravel-localization'=> $config
+        ]);
     }
 
 
