@@ -1,110 +1,58 @@
 <?php namespace Mcamara\LaravelLocalization;
 
 use Illuminate\Support\ServiceProvider;
-use Route;
-use Request;
-use Redirect;
-use Session;
 
 class LaravelLocalizationServiceProvider extends ServiceProvider {
 
-	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var bool
-	 */
-	protected $defer = false;
+    /**
+     * Indicates if loading of the provider is deferred.
+     *
+     * @var bool
+     */
+    protected $defer = false;
 
-	/**
-	 * Bootstrap the application events.
-	 *
-	 * @return void
-	 */
-	public function boot()
-	{
-		$this->package('mcamara/laravel-localization');
-	}
+    /**
+     * Bootstrap the application events.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->publishes([
+            __DIR__ . '/../../config/config.php' => config_path('laravellocalization.php'),
+        ], 'config');
+    }
 
-	/**
-	 * Register the service provider.
-	 *
-	 * @return void
-	 */
-	public function register()
-	{
-        $app = $this->app;
-        $app->router->filter('LaravelLocalizationRedirectFilter', function() use($app)
-        {
-            $currentLocale = $app['laravellocalization']->getCurrentLocale();
-            $defaultLocale = $app['laravellocalization']->getDefault();
-            $params = explode('/', Request::path());
-            if (count($params) > 0)
-            {
-                $localeCode = $params[0];
-                $locales = $app['laravellocalization']->getSupportedLocales();
-                $hideDefaultLocale = $app['laravellocalization']->hideDefaultLocaleInURL();
-                $redirection = false;
-                
-                if (!empty($locales[$localeCode]))
-                {
-                    if ($localeCode === $defaultLocale && $hideDefaultLocale)
-                    {
-                        $redirection = $app['laravellocalization']->getNonLocalizedURL();
-                    }
-                }
-                else if ($currentLocale !== $defaultLocale || !$hideDefaultLocale)
-                {
-                    // If the current url does not contain any locale
-                    // The system redirect the user to the very same url "localized"
-                    // we use the current locale to redirect him
-                    $redirection = $app['laravellocalization']->getLocalizedURL();
-                }
-                    
-                if($redirection)
-                {
-                    // Save any flashed data for redirect
-                    Session::reflash();
-                    return Redirect::to($redirection, 307)->header('Vary','Accept-Language');
-                }
-            }
-        });
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return ['modules.handler', 'modules'];
+    }
 
-        /**
-         * 	This filter would set the translated route name
-         */
-        $app->router->filter('LaravelLocalizationRoutes', function()
-        {
-            $app = $this->app;
-            $routeName = $app['laravellocalization']->getRouteNameFromAPath($app['router']->current()->uri());
 
-            $app['laravellocalization']->setRouteName($routeName);
-            return;
-        });
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $packageConfigFile = __DIR__ . '/../../config/config.php';
 
-		$app['config']->package('mcamara/laravel-localization', __DIR__.'/../config');
-
-		$app['laravellocalization'] = $app->share(
-            function() use($app)
-    		{
-    			return new LaravelLocalization(
-                    $app['config'], 
-                    $app['view'], 
-                    $app['translator'], 
-                    $app['router'], 
-                    $app
-                );
-    		}
+        $this->mergeConfigFrom(
+            $packageConfigFile, 'laravel-localization'
         );
-	}
 
-	/**
-	 * Get the services provided by the provider.
-	 *
-	 * @return array
-	 */
-	public function provides()
-	{
-		return array();
-	}
+        $this->app[ 'laravellocalization' ] = $this->app->share(
+            function ()
+            {
+                return new LaravelLocalization();
+            }
+        );
+    }
 
 }

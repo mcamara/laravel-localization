@@ -1,3 +1,8 @@
+### 1.0
+- Laravel 5 supported
+- Added Middleware
+- Removed deprecated functions
+
 ### 0.15.0
 - Added tests from scratch
 - Refactored multiple functions
