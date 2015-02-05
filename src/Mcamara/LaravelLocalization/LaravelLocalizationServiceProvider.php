@@ -44,7 +44,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
         $packageConfigFile = __DIR__ . '/../../config/config.php';
 
         $this->mergeConfigFrom(
-            $packageConfigFile, 'laravel-localization'
+            $packageConfigFile, 'laravellocalization'
         );
 
         $this->app[ 'laravellocalization' ] = $this->app->share(

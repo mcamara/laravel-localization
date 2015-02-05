@@ -400,7 +400,7 @@ class LaravelLocalization {
             return $this->supportedLocales;
         }
 
-        $locales = $this->configRepository->get('laravel-localization.supportedLocales');
+        $locales = $this->configRepository->get('laravellocalization.supportedLocales');
 
         if ( empty( $locales ) || !is_array($locales) )
         {
@@ -760,7 +760,7 @@ class LaravelLocalization {
      */
     protected function useSessionLocale()
     {
-        return $this->configRepository->get('laravel-localization.useSessionLocale');
+        return $this->configRepository->get('laravellocalization.useSessionLocale');
     }
 
     /**
@@ -770,7 +770,7 @@ class LaravelLocalization {
      */
     protected function useCookieLocale()
     {
-        return $this->configRepository->get('laravel-localization.useCookieLocale');
+        return $this->configRepository->get('laravellocalization.useCookieLocale');
     }
 
     /**
@@ -780,7 +780,7 @@ class LaravelLocalization {
      */
     protected function useAcceptLanguageHeader()
     {
-        return $this->configRepository->get('laravel-localization.useAcceptLanguageHeader');
+        return $this->configRepository->get('laravellocalization.useAcceptLanguageHeader');
     }
 
     /**
@@ -790,7 +790,7 @@ class LaravelLocalization {
      */
     public function hideDefaultLocaleInURL()
     {
-        return $this->configRepository->get('laravel-localization.hideDefaultLocaleInURL');
+        return $this->configRepository->get('laravellocalization.hideDefaultLocaleInURL');
     }
 
     /**
