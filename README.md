@@ -28,7 +28,7 @@ Version 1 will be stable after laravel 5 is released
  4.0.x    | 0.13.x
  4.1.x    | 0.13.x
  4.2.x    | 0.15.x
- 5.0.x    | 1.x
+ 5.0.x    | 1.0.x
 
 ## Installation
 
@@ -36,7 +36,7 @@ Version 1 will be stable after laravel 5 is released
 
 Add Laravel Localization to your `composer.json` file.
 
-    "mcamara/laravel-localization": "1.*"
+    "mcamara/laravel-localization": "1.0.*"
 
 Run `composer install` to get the latest version of the package.
 
