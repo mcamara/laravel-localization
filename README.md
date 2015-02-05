@@ -16,12 +16,14 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
 - <a href="#helpers">Helpers</a>
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#config">Config</a>
+    - <a href="#config-files">Config files</a>
+    - <a href="#service-providers">Service providers</a>
 - <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
 
 ## Laravel compatibility
 
-Version 1 will be stable after laravel 5 is released
+Laravel 5 is released!!
 
  Laravel  | laravel-localization
 :---------|:----------
@@ -446,7 +448,13 @@ Be sure to pass the locale and the attributes as parameters for your closure. Yo
 
 ## Config
 
-In order to override the config done by default to add new locales or choose whether the default locale has to be shown on the url or not(check <a href="https://raw.githubusercontent.com/mcamara/laravel-localization/master/src/config/config.php">this file</a> for more info) you can use Config Service Providers given by Laravel 5.
+### Config Files
+
+In order to edit the default configuration for this plugin you can execute ```php artisan vendor:publish``` . After that, config/laravellocalization.php would be created. Inside this file you would find all the fields that can be editable in this plugin.
+
+### Service Providers
+
+Otherwise, you can use ConfigServiceProviders (check <a href="https://raw.githubusercontent.com/mcamara/laravel-localization/master/src/config/config.php">this file</a> for more info).
 
 For example, editing the default config service provider that Laravel loads when it's installed. This file is placed in app/providers/ConfigServicePovider.php and would look like this:
 
@@ -459,19 +467,19 @@ For example, editing the default config service provider that Laravel loads when
 		public function register()
 		{
 			config([
-				'laravel-localization.supportedLocales' => [
+				'laravellocalization.supportedLocales' => [
 					'ace' => array( 'name' => 'Achinese', 'script' => 'Latn', 'native' => 'Aceh' ),
 					'ca'  => array( 'name' => 'Catalan', 'script' => 'Latn', 'native' => 'català' ),
 					'en'  => array( 'name' => 'English', 'script' => 'Latn', 'native' => 'English' ),
 				],
 
-				'laravel-localization.useAcceptLanguageHeader' => true,
+				'laravellocalization.useAcceptLanguageHeader' => true,
 
-				'laravel-localization.useSessionLocale' => true,
+				'laravellocalization.useSessionLocale' => true,
 
-				'laravel-localization.useCookieLocale' => true,
+				'laravellocalization.useCookieLocale' => true,
 
-				'laravel-localization.hideDefaultLocaleInURL' => true
+				'laravellocalization.hideDefaultLocaleInURL' => true
 			]);
 		}
 
