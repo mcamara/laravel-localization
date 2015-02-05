@@ -906,7 +906,8 @@ class LaravelLocalization {
                 }
             }
 
-        } else
+        }
+        else
         {
             if ( !$this->router->current() )
             {
@@ -914,7 +915,6 @@ class LaravelLocalization {
             }
 
             $attributes = $this->router->current()->parameters();
-            $response = \Event::fire('routes.translation', [ 'attributes' => $attributes ]);
             if ( !empty( $response ) )
             {
                 $response = array_shift($response);
@@ -925,6 +925,8 @@ class LaravelLocalization {
                 $attributes = array_merge($attributes, $response);
             }
         }
+
+        event('routes.translation', [ $attributes ]);
 
         return $attributes;
     }
