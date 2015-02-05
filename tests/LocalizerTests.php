@@ -101,9 +101,9 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
         $packageConfigFile = __DIR__ . '/../src/config/config.php';
         $config = app('files')->getRequire($packageConfigFile);
 
-        app('config')->set('laravel-localization', $config);
+        app('config')->set('laravellocalization', $config);
 
-        $this->supportedLocales = app('config')->get('laravel-localization.supportedLocales');
+        $this->supportedLocales = app('config')->get('laravellocalization.supportedLocales');
 
         app('translator')->getLoader()->addNamespace('LaravelLocalization', realpath(dirname(__FILE__)) . "/lang");
 
@@ -143,7 +143,7 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
             app('laravellocalization')->localizeURL()
         );
 
-        app('config')->set('laravel-localization.hideDefaultLocaleInURL', true);
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
 
         // testing hide default locale option
         $this->assertNotEquals(
@@ -173,7 +173,7 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
             app('laravellocalization')->localizeURL($this->test_url . 'about', 'en')
         );
 
-        app('config')->set('laravel-localization.hideDefaultLocaleInURL', false);
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', false);
 
         $this->assertEquals(
             $this->test_url . 'en/about',
@@ -220,7 +220,7 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
             app('laravellocalization')->getLocalizedURL()
         );
 
-        app('config')->set('laravel-localization.hideDefaultLocaleInURL', true);
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
         // testing default language hidden
 
         $this->assertEquals(
@@ -283,7 +283,7 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
 
         $this->refreshApplication();
 
-        app('config')->set('laravel-localization.hideDefaultLocaleInURL', true);
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
 
         $this->assertEquals(
             $this->test_url . 'test',
@@ -331,7 +331,7 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
             app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view', [ 'id' => 1 ])
         );
 
-        app('config')->set('laravel-localization.hideDefaultLocaleInURL', true);
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
 
         $this->assertEquals(
             $this->test_url . 'about',
@@ -358,7 +358,7 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
             app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view', [ 'id' => 1 ])
         );
 
-        app('config')->set('laravel-localization.hideDefaultLocaleInURL', false);
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', false);
 
         $this->assertNotEquals(
             $this->test_url . 'view/1',
