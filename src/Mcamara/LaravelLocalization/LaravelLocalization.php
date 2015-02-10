@@ -654,6 +654,8 @@ class LaravelLocalization {
      */
     public function getRouteNameFromAPath( $path )
     {
+        $attributes = $this->extractAttributes($path);
+
         $path = str_replace(url(), "", $path);
         if ( $path[ 0 ] !== '/' )
         {
@@ -664,12 +666,11 @@ class LaravelLocalization {
 
         foreach ( $this->translatedRoutes as $route )
         {
-            if ( $this->translator->trans($route) == $path )
+            if ( $this->substituteAttributesInRoute( $attributes, $this->translator->trans($route)) === $path )
             {
                 return $route;
             }
         }
-
         return false;
     }
 

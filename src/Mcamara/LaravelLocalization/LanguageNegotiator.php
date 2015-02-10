@@ -1,7 +1,4 @@
-<?php
-
-namespace Mcamara\LaravelLocalization;
-
+<?php namespace Mcamara\LaravelLocalization;
 
 use Locale;
 use Illuminate\Http\Request;
