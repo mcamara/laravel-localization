@@ -50,7 +50,7 @@ It's recommended that you use Composer, however you can download and install fro
 
 Laravel Localization comes with a service provider for Laravel. You'll need to add it to your `composer.json` as mentioned in the above steps, then register the service provider with your application.
 
-Open `app/config/app.php` and find the `providers` key. Add `LaravelLocalizationServiceProvider` to the array.
+Open `config/app.php` and find the `providers` key. Add `LaravelLocalizationServiceProvider` to the array.
 
 ```php
 	...
@@ -58,7 +58,7 @@ Open `app/config/app.php` and find the `providers` key. Add `LaravelLocalization
 	...
 ```
 
-You can also add an alias to the list of class aliases in the same app.php
+You can also add an alias to the list of class aliases in the same file.
 
 ```php
 	...
@@ -68,12 +68,12 @@ You can also add an alias to the list of class aliases in the same app.php
 
 ## Usage
 
-Laravel Localization uses the URL given for the request. In order to achieve this purpose, a group should be added into the routes.php file. It will filter all pages that must be localized.
+Laravel Localization uses the URL given for the request. In order to achieve this purpose, a route group should be added into the `routes.php` file. It will filter all pages that must be localized.
 
 ```php
-	// app/routes.php
+	// app/Http/routes.php
 
-	Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
+	Route::group(['prefix' => LaravelLocalization::setLocale()), function()
 	{
 		/** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
 		Route::get('/', function()
@@ -84,13 +84,13 @@ Laravel Localization uses the URL given for the request. In order to achieve thi
 		Route::get('test',function(){
 			return View::make('test');
 		});
-	});
+	}];
 
 	/** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
 
 ```
 
-Once this group is added to the routes file, a user can access all locales added into 'supportedLocales' ('en' and 'es' by default, look at the config section to change that option). For example, a user can now access to two different locales, using the following addresses:
+Once this route group is added to the routes file, a user can access all locales added into `supportedLocales` ('en' and 'es' by default, look at the config section to change that option). For example, a user can now access two different locales, using the following addresses:
 
 ```
 	http://url-to-laravel/en
@@ -98,19 +98,19 @@ Once this group is added to the routes file, a user can access all locales added
 	http://url-to-laravel
 ```
 
-If the locale is not present in the url or it is not defined in 'supportedLocales', the system will use the application default locale or the user's browser default locale (if defined in config file).
+If the locale is not present in the url or it is not defined in `supportedLocales`, the system will use the application default locale or the user's browser default locale (if defined in config file).
 
 Once the locale is defined, the locale variable will be stored in a session, so it is not necessary to write the /lang/ section in the url after defining it once, using the last known locale for the user. If the user accesses to a different locale this session value would be changed, translating any other page he visits with the last chosen locale.
 
-Templates files and all locale files should follow the [Lang class](http://laravel.com/docs/localization).
+Template files and all locale files should follow the [Lang class](http://laravel.com/docs/5.0/localization).
 
 ### Middleware
 
-Moreover, this package includes a middleware obkect to redirect all "non-localized" routes to a "localized" one.
+Moreover, this package includes a middleware object to redirect all "non-localized" routes to the corresponding "localized".
 
-So, if a user accesses to http://url-to-laravel/test and the system have this middleware actived and 'en' as a current locale for this user, it would redirect (301) him automatically to http://url-to-laravel/en/test. This is mainly used to avoid duplicate content and improve SEO performance.
+So, if a user navigates to http://url-to-laravel/test and the system has this middleware active and 'en' as the current locale for this user, it would redirect (301) him automatically to http://url-to-laravel/en/test. This is mainly used to avoid duplicate content and improve SEO performance.
 
-To do so, you have to register the middleware on the app/Http/Kernel.php laravel file like this:
+To do so, you have to register the middleware in the `app/Http/Kernel.php` file like this:
 
 ```php
 	<?php namespace App\Http;
@@ -135,13 +135,13 @@ To do so, you have to register the middleware on the app/Http/Kernel.php laravel
 
 
 ```php
-	// app/routes.php
+	// app/Http/routes.php
 
 	Route::group(
-	array(
+	[
 		'prefix' => LaravelLocalization::setLocale(),
 		'middleware' => [ 'localizationRedirect' ]
-	),
+	],
 	function()
 	{
 		/** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
@@ -159,11 +159,11 @@ To do so, you have to register the middleware on the app/Http/Kernel.php laravel
 
 ```
 
-In order to active it, you just have to attach this middleware to the routes you want to be accessible localized.
+In order to activate it, you just have to attach this middleware to the routes you want to be accessible localized.
 
-If you want to hide the default locale but always show other locales in the url, switch the 'hideDefaultLocaleInURL' config value to true. Once it's true, if the default locale is en (english) all URLs containing /en/ would be redirected to the same url without this fragment '/' but maintaining the locale as en (English).
+If you want to hide the default locale but always show other locales in the url, switch the `hideDefaultLocaleInURL` config value to true. Once it's true, if the default locale is en (english) all URLs containing /en/ would be redirected to the same url without this fragment '/' but maintaining the locale as en (English).
 
-**IMPORTANT** - When hideDefaultLocaleInURL is set to true, the unlocalized root is treated as the applications default locale ```app.locale```.  Because of this language negotiation using the Accept-Language header will **NEVER** occur when hideDefaultLocaleInURL is true.
+**IMPORTANT** - When `hideDefaultLocaleInURL` is set to true, the unlocalized root is treated as the applications default locale `app.locale`.  Because of this language negotiation using the Accept-Language header will **NEVER** occur when `hideDefaultLocaleInURL` is true.
 
 ## Helpers
 
@@ -254,9 +254,9 @@ This function will return all supported locales and their properties as an array
 ```php
 	/**
 	 * Returns supported languages language key
-	 * 
+	 *
 	 * @return array 	keys of supported languages
-	 */ 
+	 */
 	public function getSupportedLanguagesKeys()
 
 	//Should be called like this:
@@ -284,7 +284,7 @@ This function will return an array with all the keys for the supported locales.
 This function will change the application's current locale.
 If the locale is not passed, the locale will be determined via a cookie (if stored previously), the session (if stored previously), browser Accept-Language header or the default application locale (depending on your config file).
 
-The function have to be called in the prefix of any route that should be translated (see Filters sections for further information).
+The function has to be called in the prefix of any route that should be translated (see Filters sections for further information).
 
 
 ### Get Current Locale Name
@@ -301,7 +301,7 @@ The function have to be called in the prefix of any route that should be transla
 	{{ LaravelLocalization::getCurrentLocaleName() }}
 ```
 
-This function will return current locale name as string (English/Spanish/Arabic/ ..etc).
+This function will return current locale's name as string (English/Spanish/Arabic/ ..etc).
 
 
 ### Get Current Locale Direction
@@ -318,7 +318,7 @@ This function will return current locale name as string (English/Spanish/Arabic/
 	{{ LaravelLocalization::getCurrentLocaleDirection() }}
 ```
 
-This function will return current locale direction as string (ltr/rtl).
+This function will return current locale's direction as string (ltr/rtl).
 
 
 ### Get Current Locale Script
@@ -340,7 +340,7 @@ This function will return the [ISO 15924](http://www.unicode.org/iso15924) code 
 
 ## Creating a language selector
 
-If you're supporting multiple locales in your project your going to want to provide the users with a way to change language.  Below is a simple example of blade template code you can use to create your own language selector.
+If you're supporting multiple locales in your project you will probably want to provide the users with a way to change language. Below is a simple example of blade template code you can use to create your own language selector.
 
 ```
 <ul class="language_bar_chooser">
@@ -359,7 +359,7 @@ If you're supporting multiple locales in your project your going to want to prov
 
 You can adapt your URLs depending on the language you want to show them. For example, http://url/en/about and http://url/es/acerca (acerca is about in spanish) or http://url/en/view/5 and http://url/es/ver/5 (view == ver in spanish) would be redirected to the same controller using the proper filter and setting up the translation files as follows:
 
-As it is a middleware, first you have to register in on your app/Http/Kernel.php file like this:
+As it is a middleware, first you have to register in on your `app/Http/Kernel.php` file like this:
 
 
 ```php
@@ -383,13 +383,13 @@ As it is a middleware, first you have to register in on your app/Http/Kernel.php
 ```
 
 ```php
-	// app/routes.php
+	// app/Http/routes.php
 
 	Route::group(
-	array(
+	[
 		'prefix' => LaravelLocalization::setLocale(),
 		'middleware' => [ 'localize' ] // Route translate middleware
-	),
+	],
 	function()
 	{
       /** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
@@ -403,7 +403,7 @@ As it is a middleware, first you have to register in on your app/Http/Kernel.php
           return View::make('about');
       });
       Route::get(LaravelLocalization::transRoute('routes.view'),function($id){
-          return View::make('view',array('id'=>$id));
+          return View::make('view',['id'=>$id]);
       });
 	});
 
@@ -411,52 +411,52 @@ As it is a middleware, first you have to register in on your app/Http/Kernel.php
 ```
 In the routes file you just have to add the `LaravelLocalizationRoutes` filter and the `LaravelLocalization::transRoute` function to every route you want to translate using the translation key.
 
-Then you have to create the translation files and add there every key you want to translate. I suggest you to create a routes.php file inside your app/lang/language_abbreviation folder. For the previous example, I have created two translations files, these two files would look like:
+Then you have to create the translation files and add there every key you want to translate. I suggest to create a routes.php file inside your resources/lang/language_abbreviation folder. For the previous example, I have created two translations files, these two files would look like:
 ```php
-	// app/lang/en/routes.php
-    return array(
+	// resources/lang/en/routes.php
+    return [
       "about" 		=> 	"about",
       "view" 		=> 	"view/{id}", //we add a route parameter
       // other translated routes
-	);
+	];
 ```
 ```php
-	// app/lang/es/routes.php
-    return array(
+	// resources/lang/es/routes.php
+    return [
       "about" 		=> 	"acerca",
       "view" 		=> 	"ver/{id}", //we add a route parameter
       // other translated routes
-	);
+	];
 ```
 
-Once files are saved, you can access to http://url/en/about , http://url/es/acerca , http://url/en/view/5 and http://url/es/ver/5 without any problem. The getLanguageBar function would work as desired and it will translate the routes to all translated languages (don't forget to add any new route to the translation file).
+Once files are saved, you can access to http://url/en/about , http://url/es/acerca , http://url/en/view/5 and http://url/es/ver/5 without any problem. The `getLanguageBar` function would work as desired and it will translate the routes to all translated languages (don't forget to add any new route to the translation file).
 
 ## Events
 
 You can capture the URL parameters during translation if you wish to translate them too. To do so, just create an event listener for the `routes.translation` event like so :
 
-````
+```php
 Event::listen('routes.translation', function($locale, $attributes)
 {
 	// Do your magic
 
     return $attributes;
 });
-````
+```
 
-Be sure to pass the locale and the attributes as parameters for your closure. You can also use Event Subscribers, see : [http://laravel.com/docs/events#event-subscribers](http://laravel.com/docs/events#event-subscribers)
+Be sure to pass the locale and the attributes as parameters to the closure. You may also use Event Subscribers, see: [http://laravel.com/docs/events#event-subscribers](http://laravel.com/docs/events#event-subscribers)
 
 ## Config
 
 ### Config Files
 
-In order to edit the default configuration for this plugin you can execute ```php artisan vendor:publish``` . After that, config/laravellocalization.php would be created. Inside this file you would find all the fields that can be editable in this plugin.
+In order to edit the default configuration for this package you may execute `php artisan vendor:publish` . After that, config/laravellocalization.php will be created. Inside this file you will find all the fields that can be edited in this package.
 
 ### Service Providers
 
-Otherwise, you can use ConfigServiceProviders (check <a href="https://raw.githubusercontent.com/mcamara/laravel-localization/master/src/config/config.php">this file</a> for more info).
+Otherwise, you can use `ConfigServiceProviders` (check <a href="https://raw.githubusercontent.com/mcamara/laravel-localization/master/src/config/config.php">this file</a> for more info).
 
-For example, editing the default config service provider that Laravel loads when it's installed. This file is placed in app/providers/ConfigServicePovider.php and would look like this:
+For example, editing the default config service provider that Laravel loads when it's installed. This file is placed in `app/providers/ConfigServicePovider.php` and would look like this:
 
 ```php
 	<?php namespace App\Providers;
@@ -488,8 +488,7 @@ For example, editing the default config service provider that Laravel loads when
 
 This config would add Catalan and Achinese as languages and override any other previous supported locales and all the other options in the package.
 
-You can create your own config providers and add them on your application config file ( check the providers array in config/app.php ).
-
+You can create your own config providers and add them on your application config file (check the providers array in `config/app.php`).
 
 ## Changelog
 View changelog here -> [changelog](CHANGELOG.md)
@@ -497,4 +496,3 @@ View changelog here -> [changelog](CHANGELOG.md)
 ## License
 
 Laravel Localization is an open-sourced laravel package licensed under the MIT license
-
