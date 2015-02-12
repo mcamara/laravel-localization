@@ -9,8 +9,6 @@ use Illuminate\Routing\Router;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\URL;
-use Session;
-use Cookie;
 
 
 class LaravelLocalization {
@@ -524,9 +522,9 @@ class LaravelLocalization {
      */
     protected function getSessionLocale()
     {
-        if ( $this->useSessionLocale() && Session::has($this->cookieSessionName) )
+        if ( $this->useSessionLocale() && app('session')->has($this->cookieSessionName) )
         {
-            return Session::get($this->cookieSessionName);
+            return session($this->cookieSessionName);
         }
 
         return false;
@@ -540,7 +538,7 @@ class LaravelLocalization {
     {
         if ( $this->useSessionLocale() )
         {
-            Session::put($this->cookieSessionName, $locale);
+            session($this->cookieSessionName, $locale);
         }
     }
 
@@ -804,7 +802,7 @@ class LaravelLocalization {
     {
         if ( empty( $this->baseUrl ) )
         {
-            return URL::to($uri);
+            return app('url')->to($uri);
         }
 
         return $this->baseUrl . ltrim($uri, "/");
