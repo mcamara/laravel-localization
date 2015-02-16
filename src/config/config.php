@@ -324,4 +324,4 @@ return [
     //
 	'hideDefaultLocaleInURL' => false,
 
-);
+];
