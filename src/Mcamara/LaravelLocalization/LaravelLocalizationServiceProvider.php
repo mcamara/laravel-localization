@@ -54,5 +54,4 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
             }
         );
     }
-
 }

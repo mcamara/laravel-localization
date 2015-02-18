@@ -1,8 +1,4 @@
-<?php
-
-
-namespace Mcamara\LaravelLocalization\Middleware;
-
+<?php namespace Mcamara\LaravelLocalization\Middleware;
 
 use Closure;
 use Illuminate\Http\RedirectResponse;
@@ -56,5 +52,4 @@ class LaravelLocalizationRedirectFilter implements Middleware {
 
         return $next($request);
     }
-
 }

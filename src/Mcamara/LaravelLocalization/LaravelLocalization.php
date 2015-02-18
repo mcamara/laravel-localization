@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\URL;
 
-
 class LaravelLocalization {
 
     /**
@@ -220,7 +219,7 @@ class LaravelLocalization {
      */
     public function getLocalizedURL( $locale = null, $url = null, $attributes = array() )
     {
-        if ( is_null($locale) )
+        if ( $locale === null )
         {
             $locale = $this->getCurrentLocale();
         }
@@ -967,5 +966,4 @@ class LaravelLocalization {
 
         return $url;
     }
-
 }
