@@ -286,6 +286,21 @@ If the locale is not passed, the locale will be determined via a cookie (if stor
 
 The function have to be called in the prefix of any route that should be translated (see Filters sections for further information).
 
+### Get Current Locale
+
+```php
+    /**
+     * Returns current language
+     *
+     * @return string current language
+     */
+    public function getCurrentLocale()
+
+	//Should be called in a view like this:
+	{{ LaravelLocalization::getCurrentLocale() }}
+```
+
+This function will return the key of the current locale.
 
 ### Get Current Locale Name
 
