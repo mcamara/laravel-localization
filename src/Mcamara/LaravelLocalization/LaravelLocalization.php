@@ -685,7 +685,7 @@ class LaravelLocalization {
         // check if this url is a translated url
         foreach ( $this->translatedRoutes as $translatedRoute )
         {
-            if ( $this->translator->trans($translatedRoute, [ ], "", $url_locale) == $path )
+            if ( $this->translator->trans($translatedRoute, [ ], "", $url_locale) == rawurldecode($path) )
             {
                 return $translatedRoute;
             }
