@@ -538,7 +538,7 @@ class LaravelLocalization {
     {
         if ( $this->useSessionLocale() )
         {
-            session($this->cookieSessionName, $locale);
+            session([ $this->cookieSessionName => $locale ]);
         }
     }
 
