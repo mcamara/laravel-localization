@@ -1,3 +1,7 @@
+### 1.0.7
+- Added Session and Cookie Middleware
+- Deleted useSessionLocale and useCookieLocale from config file
+
 ### 1.0
 - Laravel 5 supported
 - Added Middleware

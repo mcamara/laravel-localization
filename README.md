@@ -13,6 +13,7 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
     - <a href="#laravel">Laravel</a>
 - <a href="#usage">Usage</a>
     - <a href="#middleware">Middleware</a>
+    - <a href="#sessions">Sessions</a>
 - <a href="#helpers">Helpers</a>
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#config">Config</a>
@@ -100,7 +101,7 @@ Once this route group is added to the routes file, a user can access all locales
 
 If the locale is not present in the url or it is not defined in `supportedLocales`, the system will use the application default locale or the user's browser default locale (if defined in config file).
 
-Once the locale is defined, the locale variable will be stored in a session, so it is not necessary to write the /lang/ section in the url after defining it once, using the last known locale for the user. If the user accesses to a different locale this session value would be changed, translating any other page he visits with the last chosen locale.
+Once the locale is defined, the locale variable will be stored in a session (if the middleware is enabled), so it is not necessary to write the /lang/ section in the url after defining it once, using the last known locale for the user. If the user accesses to a different locale this session value would be changed, translating any other page he visits with the last chosen locale.
 
 Template files and all locale files should follow the [Lang class](http://laravel.com/docs/5.0/localization).
 
@@ -164,6 +165,14 @@ In order to activate it, you just have to attach this middleware to the routes y
 If you want to hide the default locale but always show other locales in the url, switch the `hideDefaultLocaleInURL` config value to true. Once it's true, if the default locale is en (english) all URLs containing /en/ would be redirected to the same url without this fragment '/' but maintaining the locale as en (English).
 
 **IMPORTANT** - When `hideDefaultLocaleInURL` is set to true, the unlocalized root is treated as the applications default locale `app.locale`.  Because of this language negotiation using the Accept-Language header will **NEVER** occur when `hideDefaultLocaleInURL` is true.
+
+### Sessions
+
+In version 1.0.7 a new middleware to control session storage has been added. I have created it because Laravel 5 changed the order for calls and you cannot access to the session from a function called from 'prefix'.
+
+To use it just add `Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect` to the Middleware list, it will automatically store and redirect users to the locale stored in the session.
+
+Just a reminder, old config values like `useSessionLocale` and `useCookieLocale` will be ignored.
 
 ## Helpers
 
@@ -489,10 +498,6 @@ For example, editing the default config service provider that Laravel loads when
 				],
 
 				'laravellocalization.useAcceptLanguageHeader' => true,
-
-				'laravellocalization.useSessionLocale' => true,
-
-				'laravellocalization.useCookieLocale' => true,
 
 				'laravellocalization.hideDefaultLocaleInURL' => true
 			]);
