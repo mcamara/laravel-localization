@@ -170,7 +170,7 @@ If you want to hide the default locale but always show other locales in the url,
 
 In version 1.0.7 a new middleware to control session storage has been added. I have created it because Laravel 5 changed the order for calls and you cannot access to the session from a function called from 'prefix'.
 
-To use it just add `Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect` to the Middleware list, it will automatically store and redirect users to the locale stored in the session.
+To use it just add `Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect` to the $middleware array in `app/Http/Kernel.php`, it will automatically store and redirect users to the locale stored in the session.
 
 Just a reminder, old config values like `useSessionLocale` and `useCookieLocale` will be ignored.
 
