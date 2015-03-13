@@ -127,7 +127,8 @@ To do so, you have to register the middleware in the `app/Http/Kernel.php` file 
 		protected $routeMiddleware = [
 			/**** OTHER MIDDLEWARE ****/
 			'localize' => 'Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes',
-			'localizationRedirect' => 'Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter'
+			'localizationRedirect' => 'Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter',
+			'localeSessionRedirect' => 'Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect'
 			// REDIRECTION MIDDLEWARE
 		];
 
@@ -141,7 +142,7 @@ To do so, you have to register the middleware in the `app/Http/Kernel.php` file 
 	Route::group(
 	[
 		'prefix' => LaravelLocalization::setLocale(),
-		'middleware' => [ 'localizationRedirect' ]
+		'middleware' => [ 'localizationRedirect', 'localeSessionRedirect' ]
 	],
 	function()
 	{
@@ -165,14 +166,6 @@ In order to activate it, you just have to attach this middleware to the routes y
 If you want to hide the default locale but always show other locales in the url, switch the `hideDefaultLocaleInURL` config value to true. Once it's true, if the default locale is en (english) all URLs containing /en/ would be redirected to the same url without this fragment '/' but maintaining the locale as en (English).
 
 **IMPORTANT** - When `hideDefaultLocaleInURL` is set to true, the unlocalized root is treated as the applications default locale `app.locale`.  Because of this language negotiation using the Accept-Language header will **NEVER** occur when `hideDefaultLocaleInURL` is true.
-
-### Sessions
-
-In version 1.0.7 a new middleware to control session storage has been added. I have created it because Laravel 5 changed the order for calls and you cannot access to the session from a function called from 'prefix'.
-
-To use it just add `Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect` to the $middleware array in `app/Http/Kernel.php`, it will automatically store and redirect users to the locale stored in the session.
-
-Just a reminder, old config values like `useSessionLocale` and `useCookieLocale` will be ignored.
 
 ## Helpers
 
