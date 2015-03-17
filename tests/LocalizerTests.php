@@ -5,7 +5,8 @@ use Illuminate\Routing\RouteCollection;
 
 class LocalizerTests extends \Orchestra\Testbench\TestCase {
 
-    protected $test_url = 'http://localhost/';
+    protected $test_url  = 'http://localhost/';
+    protected $test_url2 = 'http://localhost';
 
     protected $supportedLocales = [ ];
 
@@ -140,6 +141,12 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
     {
         $this->assertEquals(
             $this->test_url . app('laravellocalization')->getCurrentLocale(),
+            app('laravellocalization')->localizeURL()
+        );
+
+        // Missing trailing slash in a URL
+        $this->assertEquals(
+            $this->test_url2 . '/' . app('laravellocalization')->getCurrentLocale(),
             app('laravellocalization')->localizeURL()
         );
 
