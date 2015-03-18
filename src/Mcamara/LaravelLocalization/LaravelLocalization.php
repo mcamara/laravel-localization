@@ -740,7 +740,12 @@ class LaravelLocalization {
         {
             $attributes = [ ];
             $parse = parse_url($url);
-            $parse = explode("/", $parse[ 'path' ]);
+            if ( isset( $parse[ 'path' ] ) ) {
+                $parse = explode("/", $parse[ 'path' ]);
+            }
+            else {
+                $parse = [];
+            }
             $url = [ ];
             foreach ( $parse as $segment )
             {
