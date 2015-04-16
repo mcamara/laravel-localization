@@ -467,7 +467,7 @@ Be sure to pass the locale and the attributes as parameters to the closure. You 
 
 ### Config Files
 
-In order to edit the default configuration for this package you may execute `php artisan config:publish mcamara/laravel-localization` . After that, config/laravellocalization.php will be created. Inside this file you will find all the fields that can be edited in this package.
+In order to edit the default configuration for this package you may execute `php artisan vendor:publish` . After that, config/laravellocalization.php will be created. Inside this file you will find all the fields that can be edited in this package.
 
 ### Service Providers
 
