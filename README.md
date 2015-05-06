@@ -142,7 +142,7 @@ To do so, you have to register the middleware in the `app/Http/Kernel.php` file 
 	Route::group(
 	[
 		'prefix' => LaravelLocalization::setLocale(),
-		'middleware' => [ 'localizationRedirect', 'localeSessionRedirect' ]
+		'middleware' => [ 'localeSessionRedirect', 'localizationRedirect' ]
 	],
 	function()
 	{
