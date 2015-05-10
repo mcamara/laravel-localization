@@ -450,7 +450,7 @@ Once files are saved, you can access to http://url/en/about , http://url/es/acer
 
 ## Events
 
-You can capture the URL parameters during translation if you wish to translate them too. To do so, just create an event listener for the `routes.translation` event like so :
+You can capture the URL parameters during translation if you wish to translate them too. To do so, just create an event listener for the `routes.translation` event like so:
 
 ```php
 Event::listen('routes.translation', function($locale, $attributes)
@@ -467,7 +467,13 @@ Be sure to pass the locale and the attributes as parameters to the closure. You 
 
 ### Config Files
 
-In order to edit the default configuration for this package you may execute `php artisan vendor:publish` . After that, config/laravellocalization.php will be created. Inside this file you will find all the fields that can be edited in this package.
+In order to edit the default configuration for this package you may execute:
+
+```
+php artisan vendor:publish --provider="Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider"
+```
+
+After that, `config/laravellocalization.php` will be created. Inside this file you will find all the fields that can be edited in this package.
 
 ### Service Providers
 
