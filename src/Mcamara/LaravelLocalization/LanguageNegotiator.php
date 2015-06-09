@@ -63,7 +63,9 @@ class LanguageNegotiator {
         // If any (i.e. "*") is acceptable, return the first supported format
         if ( isset( $matches[ '*' ] ) )
         {
-            return array_shift($this->supportedLanguages);
+            reset($this->supportedLanguages);
+
+            return key($array);
         }
 
         if ( class_exists('Locale') && !empty( $_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ] ) )
