@@ -223,11 +223,6 @@ class LaravelLocalization {
             $attributes = $this->extractAttributes($url);
         }
 
-        if ( $locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale) )
-        {
-            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
-        }
-
         if ( empty( $url ) )
         {
             if ( !empty( $this->routeName ) )
@@ -237,6 +232,11 @@ class LaravelLocalization {
 
             $url = $this->request->fullUrl();
 
+        }
+        
+        if ( $locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale) )
+        {
+            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
         }
 
         $base_path = $this->request->getBaseUrl();
