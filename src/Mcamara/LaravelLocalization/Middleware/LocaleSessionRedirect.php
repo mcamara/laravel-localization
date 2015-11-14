@@ -26,7 +26,7 @@ class LocaleSessionRedirect implements Middleware {
 
         $locale = session('locale', false);
 
-        if ( $locale && !( app('laravellocalization')->getDefaultLocale() === $locale && app('laravellocalization')->hideDefaultLocaleInURL() ) )
+        if ( $locale && app('laravellocalization')->checkLocaleInSupportedLocales($locale) && !( app('laravellocalization')->getDefaultLocale() === $locale && app('laravellocalization')->hideDefaultLocaleInURL() ) )
         {
             app('session')->reflash();
             $redirection = app('laravellocalization')->getLocalizedURL($locale);
