@@ -233,7 +233,7 @@ class LaravelLocalization {
             $url = $this->request->fullUrl();
 
         }
-        
+
         if ( $locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale) )
         {
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
@@ -370,6 +370,16 @@ class LaravelLocalization {
     public function getDefaultLocale()
     {
         return $this->defaultLocale;
+    }
+
+    /**
+     * Set default locale
+     *
+     * @return string
+     */
+    public function setDefaultLocale($locale)
+    {
+        $this->defaultLocale = $locale;
     }
 
     /**

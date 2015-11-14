@@ -10,6 +10,10 @@
             "name": "Marc Cámara",
             "email": "mcamara88@gmail.com",
             "role": "Developer"
+        },
+        {
+            "name": "Jack + Joe",
+            "email": "randy@jackjoe.be"
         }
     ],
     "require": {
