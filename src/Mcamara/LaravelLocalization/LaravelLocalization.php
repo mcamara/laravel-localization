@@ -164,7 +164,7 @@ class LaravelLocalization {
 
         $this->app->setLocale($this->currentLocale);
 
-        return $locale;
+        return $this->currentLocale;
     }
 
     /**
