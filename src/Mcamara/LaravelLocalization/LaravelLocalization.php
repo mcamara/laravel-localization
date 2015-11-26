@@ -164,6 +164,11 @@ class LaravelLocalization {
 
         $this->app->setLocale($this->currentLocale);
 
+        // Regional locale such as de_DE, so formatLocalized works in Carbon
+        $regional = $this->getCurrentLocaleRegional();
+        if($regional)
+            setlocale(LC_TIME, $regional.'.utf8');
+
         return $locale;
     }
 
@@ -486,6 +491,20 @@ class LaravelLocalization {
 
         // or get application default language
         return $this->configRepository->get('app.locale');
+    }
+
+    /**
+     * Returns current regional
+     * @return string current regional
+     */
+    public function getCurrentLocaleRegional()
+    {
+        // need to check if it exists, since 'regional' has been added 
+        // after version 1.0.11 and existing users will not have it
+        if(isset($this->supportedLocales[ $this->getCurrentLocale() ][ 'regional' ]) )
+            return $this->supportedLocales[ $this->getCurrentLocale() ][ 'regional' ];
+        else
+            return null;
     }
 
     /**
