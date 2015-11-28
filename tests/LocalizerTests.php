@@ -441,6 +441,21 @@ class LocalizerTests extends \Orchestra\Testbench\TestCase {
         );
     }
 
+    public function testGetCurrentLocaleRegional()
+    {
+        $this->assertEquals(
+            'en_GB',
+            app('laravellocalization')->getCurrentLocaleRegional()
+        );
+
+        $this->refreshApplication('es');
+
+        $this->assertEquals(
+            'es_ES',
+            app('laravellocalization')->getCurrentLocaleRegional()
+        );
+    }
+
     public function testGetCurrentLocaleDirection()
     {
         $this->assertEquals(
