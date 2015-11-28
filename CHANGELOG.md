@@ -1,3 +1,6 @@
+### 1.0.12
+- Added regional for date localization
+
 ### 1.0.7
 - Added Session and Cookie Middleware
 - Deleted useSessionLocale and useCookieLocale from config file
