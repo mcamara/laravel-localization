@@ -4,7 +4,7 @@ return [
 
 	// Uncomment the languages that your site supports - or add new ones.
 	// These are sorted by the native name, which is the order you might show them in a language selector.
-	// Regional languages are sorted by their base languge, so "British English" sorts as "English, British"
+	// Regional languages are sorted by their base language, so "British English" sorts as "English, British"
 	'supportedLocales' => [
 		//'ace'         => ['name' => 'Achinese',               'script' => 'Latn', 'native' => 'Aceh', 'regional' => ''],
 		//'af'          => ['name' => 'Afrikaans',              'script' => 'Latn', 'native' => 'Afrikaans', 'regional' => 'af_ZA'],
