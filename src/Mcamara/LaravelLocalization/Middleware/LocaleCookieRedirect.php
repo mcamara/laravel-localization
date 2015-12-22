@@ -1,11 +1,9 @@
 <?php namespace Mcamara\LaravelLocalization\Middleware;
 
-use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Http\RedirectResponse;
 use Closure;
 
-
-class LocaleCookieRedirect implements Middleware {
+class LocaleCookieRedirect {
 
     /**
      * Handle an incoming request.

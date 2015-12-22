@@ -3,9 +3,8 @@
 use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Routing\Middleware;
 
-class LaravelLocalizationRedirectFilter implements Middleware {
+class LaravelLocalizationRedirectFilter {
 
     /**
      * Handle an incoming request.
