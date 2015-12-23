@@ -1,3 +1,6 @@
+### 1.1
+- Added compatibility with Laravel 5.2
+
 ### 1.0.12
 - Added regional for date localization
 
