@@ -28,12 +28,13 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
 
 Laravel 5 is released!!
 
- Laravel  | laravel-localization
-:---------|:----------
- 4.0.x    | 0.13.x
- 4.1.x    | 0.13.x
- 4.2.x    | 0.15.x
- 5.x.x    | 1.0.x
+ Laravel      | laravel-localization
+:-------------|:----------
+ 4.0.x        | 0.13.x
+ 4.1.x        | 0.13.x
+ 4.2.x        | 0.15.x
+ 5.0.x/5.1.x  | 1.0.x
+ 5.2.x        | 1.1.x
 
 ## Installation
 
@@ -41,7 +42,7 @@ Laravel 5 is released!!
 
 Add Laravel Localization to your `composer.json` file.
 
-    "mcamara/laravel-localization": "1.0.*"
+    "mcamara/laravel-localization": "1.1.*"
 
 Run `composer install` to get the latest version of the package.
 

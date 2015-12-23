@@ -238,7 +238,7 @@ class LaravelLocalization {
             $url = $this->request->fullUrl();
 
         }
-        
+
         if ( $locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale) )
         {
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
@@ -499,7 +499,7 @@ class LaravelLocalization {
      */
     public function getCurrentLocaleRegional()
     {
-        // need to check if it exists, since 'regional' has been added 
+        // need to check if it exists, since 'regional' has been added
         // after version 1.0.11 and existing users will not have it
         if(isset($this->supportedLocales[ $this->getCurrentLocale() ][ 'regional' ]) )
             return $this->supportedLocales[ $this->getCurrentLocale() ][ 'regional' ];
@@ -604,7 +604,7 @@ class LaravelLocalization {
     {
         $attributes = $this->extractAttributes($path);
 
-        $path = str_replace(url(), "", $path);
+        $path = str_replace(url('/'), "", $path);
         if ( $path[ 0 ] !== '/' )
         {
             $path = '/' . $path;
