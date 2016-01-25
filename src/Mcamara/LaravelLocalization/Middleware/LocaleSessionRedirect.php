@@ -18,7 +18,7 @@ class LocaleSessionRedirect implements Middleware {
         $params = explode('/', $request->path());
         $locale = session('locale', false);
 
-        if ( count($params) > 0 && $locale = app('laravellocalization')->checkLocaleInSupportedLocales($params[ 0 ]) )
+        if ( count($params) > 0 && app('laravellocalization')->checkLocaleInSupportedLocales($params[ 0 ]) )
         {
             session([ 'locale' => $params[ 0 ] ]);
 
