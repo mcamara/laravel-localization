@@ -17,7 +17,7 @@ class LocaleCookieRedirect {
         $params = explode('/', $request->path());
         $locale = $request->cookie('locale', false);
 
-        if ( count($params) > 0 && $locale = app('laravellocalization')->checkLocaleInSupportedLocales($params[ 0 ]) )
+        if ( count($params) > 0 && app('laravellocalization')->checkLocaleInSupportedLocales($params[ 0 ]) )
         {
             cookie('locale', $params[ 0 ]);
 
