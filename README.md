@@ -367,7 +367,7 @@ If you're supporting multiple locales in your project you will probably want to 
 	@foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
         <li>
             <a rel="alternate" hreflang="{{$localeCode}}" href="{{LaravelLocalization::getLocalizedURL($localeCode) }}">
-                {{{ $properties['native'] }}}
+                {{ $properties['native'] }}
             </a>
         </li>
 	@endforeach
