@@ -45,7 +45,7 @@ class LaravelLocalizationRedirectFilter {
                 // Save any flashed data for redirect
                 app('session')->reflash();
 
-                return new RedirectResponse($redirection, 301, [ 'Vary' => 'Accept-Language' ]);
+                return new RedirectResponse($redirection, 302, [ 'Vary' => 'Accept-Language' ]);
             }
         }
 
