@@ -12,26 +12,21 @@ class LocaleCookieRedirect {
      * @param  \Closure $next
      * @return mixed
      */
-    public function handle( $request, Closure $next )
-    {
-        $params = explode('/', $request->path());
-        $locale = $request->cookie('locale', false);
+     public function handle($request, Closure $next) {
+     	$params = explode('/', $request->path());
+	$locale = $request->cookie('locale', false);
+	
+	if (count($params) > 0 && app('laravellocalization')->checkLocaleInSupportedLocales($params[0])) {
+		return $next($request)->withCookie(cookie()->forever('locale', $params[0]));
+	}
+	
+	if ($locale && !(app('laravellocalization')->getDefaultLocale() === $locale && app('laravellocalization')->hideDefaultLocaleInURL())) {
+		$redirection = app('laravellocalization')->getLocalizedURL($locale);
+		$redirectResponse = new RedirectResponse($redirection, 302, ['Vary' => 'Accept-Language']);
 
-        if ( count($params) > 0 && app('laravellocalization')->checkLocaleInSupportedLocales($params[ 0 ]) )
-        {
-            cookie('locale', $params[ 0 ]);
-
-            return $next($request);
-        }
-
-        if ( $locale && !( app('laravellocalization')->getDefaultLocale() === $locale && app('laravellocalization')->hideDefaultLocaleInURL() ) )
-        {
-            app('session')->reflash();
-            $redirection = app('laravellocalization')->getLocalizedURL($locale);
-
-            return new RedirectResponse($redirection, 302, [ 'Vary' => 'Accept-Language' ]);
-        }
-
-        return $next($request);
-    }
+		return $redirectResponse->withCookie(cookie()->forever('locale', $params[0]));
+	}
+	
+	return $next($request);
+     }
 }
