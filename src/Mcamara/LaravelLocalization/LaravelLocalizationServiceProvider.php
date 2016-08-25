@@ -47,11 +47,13 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
             $packageConfigFile, 'laravellocalization'
         );
 
-        $this->app[ 'laravellocalization' ] = $this->app->share(
+        $this->app[ LaravelLocalization::class ] = $this->app->share(
             function ()
             {
                 return new LaravelLocalization();
             }
         );
+
+        $this->app->alias(LaravelLocalization::class, 'laravellocalization');
     }
 }
