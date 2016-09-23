@@ -1,5 +1,7 @@
 # Laravel Localization
 
+[![Join the chat at https://gitter.im/mcamara/laravel-localization](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mcamara/laravel-localization?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Latest Stable Version](https://poser.pugx.org/mcamara/laravel-localization/version.png)](https://packagist.org/packages/mcamara/laravel-localization) [![Total Downloads](https://poser.pugx.org/mcamara/laravel-localization/d/total.png)](https://packagist.org/packages/mcamara/laravel-localization) [![Build Status](https://travis-ci.org/mcamara/laravel-localization.png)](https://travis-ci.org/mcamara/laravel-localization)
 
 Easy i18n localization for Laravel, an useful tool to combine with Laravel localization classes.
@@ -13,6 +15,7 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
     - <a href="#laravel">Laravel</a>
 - <a href="#usage">Usage</a>
     - <a href="#middleware">Middleware</a>
+    - <a href="#sessions">Sessions</a>
 - <a href="#helpers">Helpers</a>
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#config">Config</a>
@@ -25,12 +28,13 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
 
 Laravel 5 is released!!
 
- Laravel  | laravel-localization
-:---------|:----------
- 4.0.x    | 0.13.x
- 4.1.x    | 0.13.x
- 4.2.x    | 0.15.x
- 5.0.x    | 1.0.x
+ Laravel      | laravel-localization
+:-------------|:----------
+ 4.0.x        | 0.13.x
+ 4.1.x        | 0.13.x
+ 4.2.x        | 0.15.x
+ 5.0.x/5.1.x  | 1.0.x
+ 5.2.x        | 1.1.x
 
 ## Installation
 
@@ -38,7 +42,7 @@ Laravel 5 is released!!
 
 Add Laravel Localization to your `composer.json` file.
 
-    "mcamara/laravel-localization": "1.0.*"
+    "mcamara/laravel-localization": "1.1.*"
 
 Run `composer install` to get the latest version of the package.
 
@@ -54,7 +58,7 @@ Open `config/app.php` and find the `providers` key. Add `LaravelLocalizationServ
 
 ```php
 	...
-	'Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider'
+	Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider::class
 	...
 ```
 
@@ -62,7 +66,7 @@ You can also add an alias to the list of class aliases in the same file.
 
 ```php
 	...
-	'LaravelLocalization'	=> 'Mcamara\LaravelLocalization\Facades\LaravelLocalization'
+	'LaravelLocalization'	=> Mcamara\LaravelLocalization\Facades\LaravelLocalization::class
 	...
 ```
 
@@ -73,7 +77,7 @@ Laravel Localization uses the URL given for the request. In order to achieve thi
 ```php
 	// app/Http/routes.php
 
-	Route::group(['prefix' => LaravelLocalization::setLocale()), function()
+	Route::group(['prefix' => LaravelLocalization::setLocale()], function()
 	{
 		/** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
 		Route::get('/', function()
@@ -84,7 +88,7 @@ Laravel Localization uses the URL given for the request. In order to achieve thi
 		Route::get('test',function(){
 			return View::make('test');
 		});
-	}];
+	});
 
 	/** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
 
@@ -100,7 +104,7 @@ Once this route group is added to the routes file, a user can access all locales
 
 If the locale is not present in the url or it is not defined in `supportedLocales`, the system will use the application default locale or the user's browser default locale (if defined in config file).
 
-Once the locale is defined, the locale variable will be stored in a session, so it is not necessary to write the /lang/ section in the url after defining it once, using the last known locale for the user. If the user accesses to a different locale this session value would be changed, translating any other page he visits with the last chosen locale.
+Once the locale is defined, the locale variable will be stored in a session (if the middleware is enabled), so it is not necessary to write the /lang/ section in the url after defining it once, using the last known locale for the user. If the user accesses to a different locale this session value would be changed, translating any other page he visits with the last chosen locale.
 
 Template files and all locale files should follow the [Lang class](http://laravel.com/docs/5.0/localization).
 
@@ -125,8 +129,9 @@ To do so, you have to register the middleware in the `app/Http/Kernel.php` file 
 		 */
 		protected $routeMiddleware = [
 			/**** OTHER MIDDLEWARE ****/
-			'localize' => 'Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes',
-			'localizationRedirect' => 'Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter'
+			'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+			'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
+			'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class
 			// REDIRECTION MIDDLEWARE
 		];
 
@@ -140,7 +145,7 @@ To do so, you have to register the middleware in the `app/Http/Kernel.php` file 
 	Route::group(
 	[
 		'prefix' => LaravelLocalization::setLocale(),
-		'middleware' => [ 'localizationRedirect' ]
+		'middleware' => [ 'localeSessionRedirect', 'localizationRedirect' ]
 	],
 	function()
 	{
@@ -362,7 +367,7 @@ If you're supporting multiple locales in your project you will probably want to 
 	@foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
         <li>
             <a rel="alternate" hreflang="{{$localeCode}}" href="{{LaravelLocalization::getLocalizedURL($localeCode) }}">
-                {{{ $properties['native'] }}}
+                {{ $properties['native'] }}
             </a>
         </li>
 	@endforeach
@@ -448,7 +453,7 @@ Once files are saved, you can access to http://url/en/about , http://url/es/acer
 
 ## Events
 
-You can capture the URL parameters during translation if you wish to translate them too. To do so, just create an event listener for the `routes.translation` event like so :
+You can capture the URL parameters during translation if you wish to translate them too. To do so, just create an event listener for the `routes.translation` event like so:
 
 ```php
 Event::listen('routes.translation', function($locale, $attributes)
@@ -465,7 +470,13 @@ Be sure to pass the locale and the attributes as parameters to the closure. You 
 
 ### Config Files
 
-In order to edit the default configuration for this package you may execute `php artisan vendor:publish` . After that, config/laravellocalization.php will be created. Inside this file you will find all the fields that can be edited in this package.
+In order to edit the default configuration for this package you may execute:
+
+```
+php artisan vendor:publish --provider="Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider"
+```
+
+After that, `config/laravellocalization.php` will be created. Inside this file you will find all the fields that can be edited in this package.
 
 ### Service Providers
 
@@ -489,10 +500,6 @@ For example, editing the default config service provider that Laravel loads when
 				],
 
 				'laravellocalization.useAcceptLanguageHeader' => true,
-
-				'laravellocalization.useSessionLocale' => true,
-
-				'laravellocalization.useCookieLocale' => true,
 
 				'laravellocalization.hideDefaultLocaleInURL' => true
 			]);

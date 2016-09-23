@@ -1,3 +1,13 @@
+### 1.1
+- Added compatibility with Laravel 5.2
+
+### 1.0.12
+- Added regional for date localization
+
+### 1.0.7
+- Added Session and Cookie Middleware
+- Deleted useSessionLocale and useCookieLocale from config file
+
 ### 1.0
 - Laravel 5 supported
 - Added Middleware

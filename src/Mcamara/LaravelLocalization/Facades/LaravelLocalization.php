@@ -13,5 +13,4 @@ class LaravelLocalization extends Facade {
     {
         return 'laravellocalization';
     }
-
 }

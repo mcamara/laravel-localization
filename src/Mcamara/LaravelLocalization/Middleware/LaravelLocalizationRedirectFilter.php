@@ -1,15 +1,10 @@
-<?php
-
-
-namespace Mcamara\LaravelLocalization\Middleware;
-
+<?php namespace Mcamara\LaravelLocalization\Middleware;
 
 use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Routing\Middleware;
 
-class LaravelLocalizationRedirectFilter implements Middleware {
+class LaravelLocalizationRedirectFilter {
 
     /**
      * Handle an incoming request.
@@ -42,7 +37,7 @@ class LaravelLocalizationRedirectFilter implements Middleware {
                 // If the current url does not contain any locale
                 // The system redirect the user to the very same url "localized"
                 // we use the current locale to redirect him
-                $redirection = app('laravellocalization')->getLocalizedURL();
+                $redirection = app('laravellocalization')->getLocalizedURL(session('locale'), $request->fullUrl());
             }
 
             if ( $redirection )
@@ -50,11 +45,10 @@ class LaravelLocalizationRedirectFilter implements Middleware {
                 // Save any flashed data for redirect
                 app('session')->reflash();
 
-                return new RedirectResponse($redirection, 307, [ 'Vary', 'Accept-Language' ]);
+                return new RedirectResponse($redirection, 302, [ 'Vary' => 'Accept-Language' ]);
             }
         }
 
         return $next($request);
     }
-
 }

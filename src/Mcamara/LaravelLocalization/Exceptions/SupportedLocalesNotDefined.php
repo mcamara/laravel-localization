@@ -1,14 +1,11 @@
-<?php
-
-namespace Mcamara\LaravelLocalization\Exceptions;
-
+<?php namespace Mcamara\LaravelLocalization\Exceptions;
 
 use Exception;
 
 class SupportedLocalesNotDefined extends Exception {
 
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct("Supported locales must be defined.");
     }
