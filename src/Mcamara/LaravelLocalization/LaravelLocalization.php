@@ -228,7 +228,7 @@ class LaravelLocalization {
 
         if ( empty( $attributes ) )
         {
-            $attributes = $this->extractAttributes($url);
+            $attributes = $this->extractAttributes($url, $locale);
         }
 
         if ( empty( $url ) )
@@ -761,12 +761,13 @@ class LaravelLocalization {
     /**
      * Extract attributes for current url
      *
-     * @param  string|null|false $url to extract attributes, if not present, the system will look for attributes in the current call
+     * @param bool|false|null|string $url to extract attributes, if not present, the system will look for attributes in the current call
      *
-     * @return array    Array with attributes
+     * @param string $locale
+     * @return array Array with attributes
      *
      */
-    protected function extractAttributes( $url = false )
+    protected function extractAttributes( $url = false, $locale='' )
     {
         if ( !empty( $url ) )
         {
@@ -855,7 +856,7 @@ class LaravelLocalization {
             }
 
             $attributes = $this->router->current()->parameters();
-            $response = event('routes.translation', [ $attributes ]);
+            $response = event('routes.translation', [ $locale, $attributes ]);
 
             if ( !empty( $response ) )
             {
