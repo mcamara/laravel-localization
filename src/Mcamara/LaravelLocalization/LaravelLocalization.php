@@ -908,4 +908,28 @@ class LaravelLocalization {
 
         return $url;
     }
+
+    /**
+     * Duplicate all routes that have the "setLocale" prefix (detected by "/" as the first char)
+     */
+    public function setUnitTestingRoutes()
+    {
+        $langs = array_keys($this->getSupportedLocales());
+        foreach ($this->router->getRoutes() as $r) {
+            foreach ($langs as $lang) {
+                $action = $r->getAction();
+                if ($action['prefix'][0] == '/' ) {
+                    $newUri = str_replace($action['prefix'] . '/', '',  '/' . $r->getUri());
+                    $action['prefix'] = $lang . $action['prefix'];
+                    if (in_array('GET', $r->getMethods()) && in_array('POST', $r->getMethods())) {
+                        $this->router->any($newUri, $action);
+                    }
+                    else {
+                        $this->router->{strtolower($r->getMethods()[0])}($newUri, $action);
+                    }
+                }
+            }
+            
+        }
+    }
 }
