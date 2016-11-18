@@ -283,7 +283,10 @@ class LaravelLocalization {
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
         }
 
-        $parsed_url[ 'path' ] = $locale . '/' . ltrim(ltrim($base_path, '/') . '/' . $parsed_url[ 'path' ], '/');
+        if ( !empty( $locale ) )
+        {
+            $parsed_url[ 'path' ] = $locale . '/' . ltrim(ltrim($base_path, '/') . '/' . $parsed_url[ 'path' ], '/');
+        }
 
         //Make sure that the pass path is returned with a leading slash only if it come in with one.
         if ( starts_with($path, '/') === true )
