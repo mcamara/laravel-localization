@@ -214,7 +214,7 @@ class LaravelLocalization {
      *
      * @return string|false                URL translated, False if url does not exist
      */
-    public function getLocalizedURL( $locale = null, $url = null, $attributes = array() )
+    public function getLocalizedURL( $locale = null, $url = null, $attributes = array(), $forceDefaultLocale = false )
     {
         if ( $locale === null )
         {
@@ -283,7 +283,7 @@ class LaravelLocalization {
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
         }
 
-        if ( !empty( $locale ) && ( $locale != $this->defaultLocale || !$this->hideDefaultLocaleInURL() ) )
+        if ( !empty( $locale ) && ( $forceDefaultLocale || $locale != $this->defaultLocale || !$this->hideDefaultLocaleInURL() ) )
         {
             $parsed_url[ 'path' ] = $locale . '/' . ltrim($parsed_url[ 'path' ], '/');
         }
