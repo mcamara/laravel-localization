@@ -210,11 +210,11 @@ class LaravelLocalization {
      * @param  string|boolean $locale Locale to adapt, false to remove locale
      * @param  string|false $url URL to adapt in the current language. If not passed, the current url would be taken.
      * @param  array $attributes Attributes to add to the route, if empty, the system would try to extract them from the url.
-     *
+     * @param  bool $forceDefaultLocale Force default locale to be included in the URL, even if hideDefaultLocaleInURL is set to true.
      *
      * @return string|false                URL translated, False if url does not exist
      */
-    public function getLocalizedURL( $locale = null, $url = null, $attributes = array() )
+    public function getLocalizedURL( $locale = null, $url = null, $attributes = array(), $forceDefaultLocale = false )
     {
         if ( $locale === null )
         {
@@ -283,7 +283,7 @@ class LaravelLocalization {
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
         }
 
-        if ( !empty( $locale ) && ( $locale != $this->defaultLocale || !$this->hideDefaultLocaleInURL() ) )
+        if ( !empty( $locale ) && ( $forceDefaultLocale || $locale != $this->defaultLocale || !$this->hideDefaultLocaleInURL() ) )
         {
             $parsed_url[ 'path' ] = $locale . '/' . ltrim($parsed_url[ 'path' ], '/');
         }
