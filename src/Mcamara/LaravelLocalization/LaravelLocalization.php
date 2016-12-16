@@ -48,6 +48,13 @@ class LaravelLocalization {
     protected $request;
 
     /**
+     * Illuminate url class.
+     *
+     * @var \Illuminate\Routing\UrlGenerator
+     */
+    protected $url;
+
+    /**
      * Illuminate request class.
      *
      * @var Illuminate\Foundation\Application
@@ -109,6 +116,7 @@ class LaravelLocalization {
         $this->translator = $this->app[ 'translator' ];
         $this->router = $this->app[ 'router' ];
         $this->request = $this->app[ 'request' ];
+        $this->url = $this->app[ 'url' ];
 
         // set default locale
         $this->defaultLocale = $this->configRepository->get('app.locale');
@@ -240,6 +248,9 @@ class LaravelLocalization {
 
             $url = $this->request->fullUrl();
 
+        } else
+        {
+            $url = $this->url->to($url);
         }
 
         if ( $locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale) )
