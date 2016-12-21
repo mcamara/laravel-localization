@@ -4,7 +4,7 @@ use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
-class LaravelLocalizationRedirectFilter {
+class LaravelLocalizationRedirectFilter extends LaravelLocalizationMiddlewareBase {
 
     /**
      * Handle an incoming request.
@@ -15,6 +15,11 @@ class LaravelLocalizationRedirectFilter {
      */
     public function handle( $request, Closure $next )
     {
+        // If the URL of the request is in exceptions.
+        if ($this->shouldIgnore($request)) {
+            return $next($request);
+        }
+
         $currentLocale = app('laravellocalization')->getCurrentLocale();
         $defaultLocale = app('laravellocalization')->getDefaultLocale();
         $params = explode('/', $request->path());

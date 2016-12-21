@@ -3,7 +3,7 @@
 use Illuminate\Http\RedirectResponse;
 use Closure;
 
-class LocaleCookieRedirect {
+class LocaleCookieRedirect extends LaravelLocalizationMiddlewareBase {
 
     /**
      * Handle an incoming request.
@@ -13,6 +13,12 @@ class LocaleCookieRedirect {
      * @return mixed
      */
      public function handle($request, Closure $next) {
+
+         // If the URL of the request is in exceptions.
+         if ($this->shouldIgnore($request)) {
+             return $next($request);
+         }
+
      	$params = explode('/', $request->path());
 	$locale = $request->cookie('locale', false);
 	
