@@ -1,18 +1,21 @@
-<?php namespace Mcamara\LaravelLocalization\Middleware;
+<?php
+
+namespace Mcamara\LaravelLocalization\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 
-class LaravelLocalizationRoutes extends LaravelLocalizationMiddlewareBase {
-
+class LaravelLocalizationRoutes extends LaravelLocalizationMiddlewareBase
+{
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure                 $next
+     *
      * @return mixed
      */
-    public function handle( $request, Closure $next )
+    public function handle($request, Closure $next)
     {
         // If the URL of the request is in exceptions.
         if ($this->shouldIgnore($request)) {
@@ -21,9 +24,9 @@ class LaravelLocalizationRoutes extends LaravelLocalizationMiddlewareBase {
 
         $app = app();
 
-        $routeName = $app[ 'laravellocalization' ]->getRouteNameFromAPath($request->getUri());
+        $routeName = $app['laravellocalization']->getRouteNameFromAPath($request->getUri());
 
-        $app[ 'laravellocalization' ]->setRouteName($routeName);
+        $app['laravellocalization']->setRouteName($routeName);
 
         return $next($request);
     }
