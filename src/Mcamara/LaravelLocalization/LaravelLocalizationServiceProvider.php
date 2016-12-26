@@ -1,9 +1,11 @@
-<?php namespace Mcamara\LaravelLocalization;
+<?php
+
+namespace Mcamara\LaravelLocalization;
 
 use Illuminate\Support\ServiceProvider;
 
-class LaravelLocalizationServiceProvider extends ServiceProvider {
-
+class LaravelLocalizationServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -19,7 +21,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
     public function boot()
     {
         $this->publishes([
-            __DIR__ . '/../../config/config.php' => config_path('laravellocalization.php'),
+            __DIR__.'/../../config/config.php' => config_path('laravellocalization.php'),
         ], 'config');
     }
 
@@ -33,7 +35,6 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
         return ['modules.handler', 'modules'];
     }
 
-
     /**
      * Register the service provider.
      *
@@ -41,15 +42,14 @@ class LaravelLocalizationServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        $packageConfigFile = __DIR__ . '/../../config/config.php';
+        $packageConfigFile = __DIR__.'/../../config/config.php';
 
         $this->mergeConfigFrom(
             $packageConfigFile, 'laravellocalization'
         );
 
-        $this->app[ LaravelLocalization::class ] = $this->app->share(
-            function ()
-            {
+        $this->app[LaravelLocalization::class] = $this->app->share(
+            function () {
                 return new LaravelLocalization();
             }
         );
