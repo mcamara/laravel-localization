@@ -65,7 +65,6 @@ class LanguageNegotiator
                 }
             }
         }
-        
         // If any (i.e. "*") is acceptable, return the first supported format
         if (isset($matches['*'])) {
             reset($this->supportedLanguages);
