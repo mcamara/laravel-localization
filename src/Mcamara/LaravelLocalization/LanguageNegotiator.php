@@ -57,12 +57,12 @@ class LanguageNegotiator
             if (!empty($this->supportedLanguages[$key])) {
                 return $key;
             }
-        }
-        
-        // Search for acceptable locale by 'regional' => 'af_ZA' or 'lang' => 'af-ZA' match.
-        foreach ( $this->supportedLanguages as $key_supported => $locale ) {
-            if ( $locale['regional'] == $key || $locale['lang'] == $key ) {
-                return $key_supported;
+                    
+            // Search for acceptable locale by 'regional' => 'af_ZA' or 'lang' => 'af-ZA' match.
+            foreach ( $this->supportedLanguages as $key_supported => $locale ) {
+                if ( $locale['regional'] == $key || $locale['lang'] == $key ) {
+                    return $key_supported;
+                }
             }
         }
         
