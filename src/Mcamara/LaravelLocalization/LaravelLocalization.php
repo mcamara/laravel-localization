@@ -275,7 +275,7 @@ class LaravelLocalization
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
         }
 
-        if (!empty($locale) && ($locale != $this->defaultLocale || !$this->hideDefaultLocaleInURL())) {
+        if (!empty($locale)) {
             $parsed_url['path'] = $locale.'/'.ltrim($parsed_url['path'], '/');
         }
         $parsed_url['path'] = ltrim(ltrim($base_path, '/').'/'.$parsed_url['path'], '/');
