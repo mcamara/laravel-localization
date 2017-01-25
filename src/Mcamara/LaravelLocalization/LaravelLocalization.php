@@ -750,7 +750,8 @@ class LaravelLocalization
             }
 
             foreach ($this->router->getRoutes() as $route) {
-                $path = $route->getUri();
+                $path = method_exists($route, 'uri') ? $route->uri() : $route->getUri();
+
                 if (!preg_match("/{[\w]+}/", $path)) {
                     continue;
                 }
