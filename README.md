@@ -35,6 +35,7 @@ Laravel 5 is released!!
  4.2.x        | 0.15.x
  5.0.x/5.1.x  | 1.0.x
  5.2.x/5.3.x  | 1.1.x
+ 5.4.x        | 1.2.x
 
 ## Installation
 
