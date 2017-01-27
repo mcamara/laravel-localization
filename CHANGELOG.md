@@ -1,4 +1,4 @@
-### [Unreleased]
+### 1.2
 - Added compatibility with Laravel 5.4
 
 ### 1.1
