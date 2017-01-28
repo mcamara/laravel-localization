@@ -14,10 +14,10 @@
     ],
     "require": {
         "php": ">=5.6.0",
-        "laravel/framework": "~5.2"
+        "laravel/framework": "5.4.*"
     },
     "require-dev": {
-        "orchestra/testbench": "3.2.*"
+        "orchestra/testbench-browser-kit": "~3.4"
     },
     "autoload": {
         "classmap": [
