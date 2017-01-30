@@ -308,14 +308,14 @@ class LaravelLocalization
      *
      * @return string|false URL translated
      */
-    public function getURLFromRouteNameTranslated($locale, $transKeyName, $attributes = [])
+    public function getURLFromRouteNameTranslated($locale = null, $transKeyName, $attributes = [])
     {
+        if ($locale === null) {
+            $locale = $this->getCurrentLocale();
+        }
+        
         if (!$this->checkLocaleInSupportedLocales($locale)) {
             throw new UnsupportedLocaleException('Locale \''.$locale.'\' is not in the list of supported locales.');
-        }
-
-        if (!is_string($locale)) {
-            $locale = $this->getDefaultLocale();
         }
 
         $route = '';
