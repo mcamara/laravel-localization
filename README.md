@@ -42,7 +42,7 @@ Laravel 5 is released!!
 
 Add Laravel Localization to your `composer.json` file.
 
-    "mcamara/laravel-localization": "1.1.*"
+    "mcamara/laravel-localization": "1.2.*"
 
 Run `composer install` to get the latest version of the package.
 
