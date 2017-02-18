@@ -1,3 +1,6 @@
+### 1.2.3
+- Added `getLocalesOrder()` function to the package
+
 ### 1.2
 - Added compatibility with Laravel 5.4
 

@@ -4,7 +4,7 @@
     "keywords": ["localization", "laravel", "php"],
     "homepage": "https://github.com/mcamara/laravel-localization",
     "license": "MIT",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "authors": [
         {
             "name": "Marc Cámara",
@@ -17,7 +17,8 @@
         "laravel/framework": "~5.2"
     },
     "require-dev": {
-        "orchestra/testbench-browser-kit": "~3.4"
+        "orchestra/testbench-browser-kit": "~3.4",
+        "phpunit/phpunit": "5.4.*"
     },
     "autoload": {
         "classmap": [
