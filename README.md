@@ -254,6 +254,23 @@ It returns a route, localized to the desired locale using the locale passed. If 
 
 This function will return all supported locales and their properties as an array.
 
+### Get Supported Locales Custom Order
+
+```php
+    /**
+     * Return an array of all supported Locales but in the order the user
+     * has specified in the config file. Useful for the language selector.
+     *
+     * @return array
+     */
+     public function getLocalesOrder()
+
+	//Should be called like this:
+	{{ LaravelLocalization::getLocalesOrder() }}
+```
+
+This function will return all supported locales but in the order specified in the configuration file. You can use this function to print locales in the language selector.
+
 ### Get Supported Locales Keys
 
 ```php
