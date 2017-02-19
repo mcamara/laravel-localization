@@ -327,7 +327,7 @@ class LaravelLocalization
             $route = '/'.$locale;
         }
         if (is_string($locale) && $this->translator->has($transKeyName, $locale)) {
-            $translation = $this->translator->trans($transKeyName, [], '', $locale);
+            $translation = $this->translator->trans($transKeyName, [], $locale);
             $route .= '/'.$translation;
 
             $route = $this->substituteAttributesInRoute($attributes, $route);
@@ -389,6 +389,27 @@ class LaravelLocalization
     }
 
     /**
+     * Return an array of all supported Locales but in the order the user
+     * has specified in the config file. Useful for the language selector.
+     *
+     * @return array
+     */
+    public function getLocalesOrder()
+    {
+        $locales = $this->getSupportedLocales();
+
+        $order = $this->configRepository->get('laravellocalization.localesOrder');
+
+        uksort($locales, function ($a, $b) use ($order) {
+            $pos_a = array_search($a, $order);
+            $pos_b = array_search($b, $order);
+            return $pos_a - $pos_b;
+        });
+
+        return $locales;
+    }
+
+    /**
      * Returns current locale name.
      *
      * @return string current locale name
@@ -442,9 +463,9 @@ class LaravelLocalization
             case 'Mong':
             case 'Tfng':
             case 'Thaa':
-                return 'rtl';
+            return 'rtl';
             default:
-                return 'ltr';
+            return 'ltr';
         }
     }
 
@@ -630,7 +651,7 @@ class LaravelLocalization
     {
         // check if this url is a translated url
         foreach ($this->translatedRoutes as $translatedRoute) {
-            if ($this->translator->trans($translatedRoute, [], '', $url_locale) == rawurldecode($path)) {
+            if ($this->translator->trans($translatedRoute, [], $url_locale) == rawurldecode($path)) {
                 return $translatedRoute;
             }
         }
@@ -769,7 +790,8 @@ class LaravelLocalization
             }
 
             foreach ($this->router->getRoutes() as $route) {
-                $path = $route->getUri();
+                $path = method_exists($route, 'uri') ? $route->uri() : $route->getUri();
+
                 if (!preg_match("/{[\w]+}/", $path)) {
                     continue;
                 }

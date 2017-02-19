@@ -2,7 +2,7 @@
 
 use Illuminate\Routing\Route;
 
-class LocalizerTests extends \Orchestra\Testbench\TestCase
+class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
 {
     protected $test_url = 'http://localhost/';
     protected $test_url2 = 'http://localhost';
