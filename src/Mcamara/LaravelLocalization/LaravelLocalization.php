@@ -278,9 +278,12 @@ class LaravelLocalization
         if (!empty($locale) && ($locale != $this->defaultLocale || !$this->hideDefaultLocaleInURL())) {
             $parsed_url['path'] = $locale.'/'.ltrim($parsed_url['path'], '/');
         }
-        $parsed_url['path'] = ltrim(ltrim($base_path, '/').'/'.$parsed_url['path'], '/');
+        elseif ( !empty( $locale ) && ( $locale != $this->defaultLocale || $this->hideDefaultLocaleInURL() ) ) {
+            $parsed_url['path'] = $this->getDefaultLocale() . '/' . ltrim($parsed_url[ 'path' ], '/');
+        }
+        $parsed_url['path'] = ltrim(ltrim($base_path, '/') . '/' . $parsed_url[ 'path' ], '/');
 
-        //Make sure that the pass path is returned with a leading slash only if it come in with one.
+        // Make sure that the pass path is returned with a leading slash only if it come in with one.
         if (starts_with($path, '/') === true) {
             $parsed_url['path'] = '/'.$parsed_url['path'];
         }
@@ -424,6 +427,22 @@ class LaravelLocalization
     public function getCurrentLocaleNative()
     {
         return $this->supportedLocales[$this->getCurrentLocale()]['native'];
+    }
+
+    /**
+     * Returns selected locale native name
+     * @param  string $locale the localeName you want the native for
+     *
+     * @return string selected locale native name
+     */
+    public function getLocalizedNative($locale)
+    {
+        if ( !$this->checkLocaleInSupportedLocales($locale) )
+        {
+            throw new UnsupportedLocaleException('Locale \'' . $locale . '\' is not in the list of supported locales.');
+        }
+
+        return $this->supportedLocales[ $locale ][ 'native' ];
     }
 
     /**

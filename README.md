@@ -361,18 +361,51 @@ This function will return current locale's direction as string (ltr/rtl).
 ### Get Current Locale Script
 
 ```php
+    /**
+     * Returns current locale script
+     *
+     * @return string current locale script
+     */
+    public function getCurrentLocaleScript()
+
+    //Should be called in a view like this:
+    {{ LaravelLocalization::getCurrentLocaleScript() }}
+```
+
+This function will return the [ISO 15924](http://www.unicode.org/iso15924) code for the current locale script as a string; "Latn", "Cyrl", "Arab", etc.
+
+### Get Current Locale Native
+
+```php
+    /**
+     * Returns current locale script
+     *
+     * @return string current locale script
+     */
+    public function getCurrentLocaleScript()
+
+    //Should be called in a view like this:
+    {{ LaravelLocalization::getCurrentLocaleScript() }}
+```
+
+This function will return the native name for the current locale as a string; "español", "British English", "Deutsch", etc.
+
+### Get Selected Locale Native
+
+```php
 	/**
 	 * Returns current locale script
 	 *
 	 * @return string current locale script
 	 */
-	public function getCurrentLocaleScript()
+	public function getLocalizedNative($locale)
 
 	//Should be called in a view like this:
-	{{ LaravelLocalization::getCurrentLocaleScript() }}
+	{{ LaravelLocalization::getLocalizedNative(string $locale) }}
 ```
 
-This function will return the [ISO 15924](http://www.unicode.org/iso15924) code for the current locale script as a string; "Latn", "Cyrl", "Arab", etc.
+This function will return the native name for the any other locale as a string; "español", "British English", "Deutsch", etc.
+usefull incase you want to make a single language switcher instead of a multi one like the below example.
 
 
 ## Creating a language selector
