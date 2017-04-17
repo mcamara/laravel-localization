@@ -15,7 +15,6 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
     - <a href="#laravel">Laravel</a>
 - <a href="#usage">Usage</a>
     - <a href="#middleware">Middleware</a>
-    - <a href="#sessions">Sessions</a>
 - <a href="#helpers">Helpers</a>
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#config">Config</a>
@@ -429,7 +428,7 @@ function() {
 	Route::get(LaravelLocalization::transRoute('routes.about'), function() {
 		return View::make('about');
 	});
-	
+
 	Route::get(LaravelLocalization::transRoute('routes.view'), function($id) {
 		return View::make('view',['id'=>$id]);
 	});
