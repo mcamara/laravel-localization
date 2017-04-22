@@ -189,51 +189,12 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
     public function testGetLocalizedURL()
     {
         $this->assertEquals(
-            $this->test_url.'es/acerca',
-            app('laravellocalization')->getLocalizedURL('es', $this->test_url.'en/about')
-        );
-
-        $this->assertEquals(
-            $this->test_url.'es/ver/1',
-            app('laravellocalization')->getLocalizedURL('es', $this->test_url.'view/1')
-        );
-
-        $this->assertEquals(
-            $this->test_url.'es/ver/1/proyecto',
-            app('laravellocalization')->getLocalizedURL('es', $this->test_url.'view/1/project')
-        );
-
-        $this->assertEquals(
-            $this->test_url.'es/ver/1/proyecto/1',
-            app('laravellocalization')->getLocalizedURL('es', $this->test_url.'view/1/project/1')
-        );
-
-        $this->assertEquals(
-            $this->test_url.'en/about',
-            app('laravellocalization')->getLocalizedURL('en', $this->test_url.'about')
-        );
-
-        $this->assertEquals(
             $this->test_url.app('laravellocalization')->getCurrentLocale(),
             app('laravellocalization')->getLocalizedURL()
         );
 
         app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
         // testing default language hidden
-
-        $this->assertEquals(
-            $this->test_url.'es/acerca',
-            app('laravellocalization')->getLocalizedURL('es', $this->test_url.'about')
-        );
-        $this->assertEquals(
-            $this->test_url.'about',
-            app('laravellocalization')->getLocalizedURL('en', $this->test_url.'about')
-        );
-
-        $this->assertEquals(
-            $this->test_url,
-            app('laravellocalization')->getLocalizedURL()
-        );
 
         $this->assertNotEquals(
             $this->test_url.app('laravellocalization')->getDefaultLocale(),
@@ -309,6 +270,90 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             $this->test_url.'es/test',
             app('laravellocalization')->getLocalizedURL('es', $this->test_url.'test')
         );
+    }
+
+    /**
+     * @param bool $hideDefaultLocaleInURL
+     * @param bool $forceDefault
+     * @param string $locale
+     * @param string $path
+     * @param string $expectedURL
+     *
+     * @dataProvider getLocalizedURLDataProvider
+     */
+    public function testGetLocalizedURLFormat($hideDefaultLocaleInURL, $forceDefault, $locale, $path, $expectedURL)
+    {
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', $hideDefaultLocaleInURL);
+        $this->assertEquals(
+            $expectedURL,
+            app('laravellocalization')->getLocalizedURL($locale, $path, [], $forceDefault)
+        );
+
+    }
+
+    public function getLocalizedURLDataProvider()
+    {
+        return [
+            // Do not hide default
+            [false, false, 'es', $this->test_url,                       $this->test_url.'es'],
+            [false, false, 'es', $this->test_url.'es',                  $this->test_url.'es'],
+            [false, false, 'es', $this->test_url.'en/about',            $this->test_url.'es/acerca'],
+            [false, false, 'es', $this->test_url.'ver/1',               $this->test_url.'es/ver/1'],
+            [false, false, 'es', $this->test_url.'view/1/project',      $this->test_url.'es/ver/1/proyecto'],
+            [false, false, 'es', $this->test_url.'view/1/project/1',    $this->test_url.'es/ver/1/proyecto/1'],
+
+            // Do not hide default
+            [false, false, 'en', $this->test_url.'en',                  $this->test_url.'en'],
+            [false, false, 'en', $this->test_url.'about',               $this->test_url.'en/about'],
+            [false, false, 'en', $this->test_url.'ver/1',               $this->test_url.'en/ver/1'],
+            [false, false, 'en', $this->test_url.'view/1/project',      $this->test_url.'en/view/1/project'],
+            [false, false, 'en', $this->test_url.'view/1/project/1',    $this->test_url.'en/view/1/project/1'],
+
+            // Hide default
+            [true,  false, 'es', $this->test_url,                       $this->test_url.'es'],
+            [true,  false, 'es', $this->test_url.'es',                  $this->test_url.'es'],
+            [true,  false, 'es', $this->test_url.'en/about',            $this->test_url.'es/acerca'],
+            [true,  false, 'es', $this->test_url.'ver/1',               $this->test_url.'es/ver/1'],
+            [true,  false, 'es', $this->test_url.'view/1/project',      $this->test_url.'es/ver/1/proyecto'],
+            [true,  false, 'es', $this->test_url.'view/1/project/1',    $this->test_url.'es/ver/1/proyecto/1'],
+
+            // Hide default
+            [true,  false, 'en', $this->test_url.'en',                  $this->test_url.''],
+            [true,  false, 'en', $this->test_url.'about',               $this->test_url.'about'],
+            [true,  false, 'en', $this->test_url.'ver/1',               $this->test_url.'ver/1'],
+            [true,  false, 'en', $this->test_url.'view/1/project',      $this->test_url.'view/1/project'],
+            [true,  false, 'en', $this->test_url.'view/1/project/1',    $this->test_url.'view/1/project/1'],
+
+            // Do not hide default FORCE SHOWING
+            [false, true,  'es', $this->test_url,                       $this->test_url.'es'],
+            [false, true,  'es', $this->test_url.'es',                  $this->test_url.'es'],
+            [false, true,  'es', $this->test_url.'en/about',            $this->test_url.'es/acerca'],
+            [false, true,  'es', $this->test_url.'ver/1',               $this->test_url.'es/ver/1'],
+            [false, true,  'es', $this->test_url.'view/1/project',      $this->test_url.'es/ver/1/proyecto'],
+            [false, true,  'es', $this->test_url.'view/1/project/1',    $this->test_url.'es/ver/1/proyecto/1'],
+
+            // Do not hide default FORCE SHOWING
+            [false, true,  'en', $this->test_url.'en',                  $this->test_url.'en'],
+            [false, true,  'en', $this->test_url.'about',               $this->test_url.'en/about'],
+            [false, true,  'en', $this->test_url.'ver/1',               $this->test_url.'en/ver/1'],
+            [false, true,  'en', $this->test_url.'view/1/project',      $this->test_url.'en/view/1/project'],
+            [false, true,  'en', $this->test_url.'view/1/project/1',    $this->test_url.'en/view/1/project/1'],
+
+            // Hide default FORCE SHOWING
+            [true,  true,  'es', $this->test_url,                       $this->test_url.'es'],
+            [true,  true,  'es', $this->test_url.'es',                  $this->test_url.'es'],
+            [true,  true,  'es', $this->test_url.'en/about',            $this->test_url.'es/acerca'],
+            [true,  true,  'es', $this->test_url.'ver/1',               $this->test_url.'es/ver/1'],
+            [true,  true,  'es', $this->test_url.'view/1/project',      $this->test_url.'es/ver/1/proyecto'],
+            [true,  true,  'es', $this->test_url.'view/1/project/1',    $this->test_url.'es/ver/1/proyecto/1'],
+
+            // Hide default FORCE SHOWING
+            [true,  true,  'en', $this->test_url.'en',                  $this->test_url.'en'],
+            [true,  true,  'en', $this->test_url.'about',               $this->test_url.'en/about'],
+            [true,  true,  'en', $this->test_url.'ver/1',               $this->test_url.'en/ver/1'],
+            [true,  true,  'en', $this->test_url.'view/1/project',      $this->test_url.'en/view/1/project'],
+            [true,  true,  'en', $this->test_url.'view/1/project/1',    $this->test_url.'en/view/1/project/1'],
+        ];
     }
 
     public function testGetURLFromRouteNameTranslated()
