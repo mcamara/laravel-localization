@@ -38,36 +38,24 @@ Laravel 5 is released!!
 
 ## Installation
 
-### Composer
+Install the package via composer: `composer require mcamara/laravel-localization`
 
-Add Laravel Localization to your `composer.json` file.
-
-    "mcamara/laravel-localization": "1.2.*"
-
-Run `composer install` to get the latest version of the package.
-
-### Manually
-
-It's recommended that you use Composer, however you can download and install from this repository.
-
-### Laravel
-
-Laravel Localization comes with a service provider for Laravel. You'll need to add it to your `composer.json` as mentioned in the above steps, then register the service provider with your application.
-
-Open `config/app.php` and find the `providers` key. Add `LaravelLocalizationServiceProvider` to the array.
+Register the ServiceProvider in `config/app.php`
 
 ```php
-...
-Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider::class
-...
+        'providers' => [
+		// [...]
+                Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider::class,
+        ],
 ```
 
-You can also add an alias to the list of class aliases in the same file.
+You may also register the `LaravelLocalization` Facade:
 
 ```php
-...
-'LaravelLocalization'	=> Mcamara\LaravelLocalization\Facades\LaravelLocalization::class
-...
+        'aliases' => [
+		// [...]
+                'LaravelLocalization' => Mcamara\LaravelLocalization\Facades\LaravelLocalization::class,
+        ],
 ```
 
 ## Usage
@@ -429,7 +417,7 @@ function() {
 	Route::get(LaravelLocalization::transRoute('routes.about'), function() {
 		return View::make('about');
 	});
-	
+
 	Route::get(LaravelLocalization::transRoute('routes.view'), function($id) {
 		return View::make('view',['id'=>$id]);
 	});
