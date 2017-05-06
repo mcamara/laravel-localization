@@ -328,7 +328,7 @@ class LaravelLocalization
             $route = '/'.$locale;
         }
         if (is_string($locale) && $this->translator->has($transKeyName, $locale)) {
-            $translation = $this->translator->trans($transKeyName, [], $locale);
+            $translation = $this->translator->trans($transKeyName, [], "messages",$locale);
             $route .= '/'.$translation;
 
             $route = $this->substituteAttributesInRoute($attributes, $route);
