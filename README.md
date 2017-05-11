@@ -362,16 +362,17 @@ This function will return the [ISO 15924](http://www.unicode.org/iso15924) code 
 If you're supporting multiple locales in your project you will probably want to provide the users with a way to change language. Below is a simple example of blade template code you can use to create your own language selector.
 
 ```
-<ul class="language_bar_chooser">
-	@foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+<ul>
+    @foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
         <li>
-            <a rel="alternate" hreflang="{{$localeCode}}" href="{{LaravelLocalization::getLocalizedURL($localeCode) }}">
+            <a rel="alternate" hreflang="{{ $localeCode }}" href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
                 {{ $properties['native'] }}
             </a>
         </li>
-	@endforeach
+    @endforeach
 </ul>
 ```
+Here default language will be forced in getLocalizedURL() to be present in the URL even `hideDefaultLocaleInURL = true`.
 
 ## Translated Routes
 
