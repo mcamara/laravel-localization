@@ -118,7 +118,8 @@ class Kernel extends HttpKernel {
 		/**** OTHER MIDDLEWARE ****/
 		'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
 		'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
-		'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class
+		'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
+                'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class
 		// REDIRECTION MIDDLEWARE
 	];
 }
@@ -131,7 +132,7 @@ class Kernel extends HttpKernel {
 Route::group(
 [
 	'prefix' => LaravelLocalization::setLocale(),
-	'middleware' => [ 'localeSessionRedirect', 'localizationRedirect' ]
+	'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ]
 ],
 function()
 {
@@ -155,6 +156,15 @@ In order to activate it, you just have to attach this middleware to the routes y
 If you want to hide the default locale but always show other locales in the url, switch the `hideDefaultLocaleInURL` config value to true. Once it's true, if the default locale is en (english) all URLs containing /en/ would be redirected to the same url without this fragment '/' but maintaining the locale as en (English).
 
 **IMPORTANT** - When `hideDefaultLocaleInURL` is set to true, the unlocalized root is treated as the applications default locale `app.locale`.  Because of this language negotiation using the Accept-Language header will **NEVER** occur when `hideDefaultLocaleInURL` is true.
+
+### Set current locale as view-base-path
+
+To set the current locale as view-base-path, simply register the localeViewPath-middlware in your Kernel.php, like it is descriped above.
+
+Now you can wrap your views in language-based folders like the translation files.
+
+`resources/views/en/`, `resources/vies/fr`, ...
+
 
 ## Helpers
 
