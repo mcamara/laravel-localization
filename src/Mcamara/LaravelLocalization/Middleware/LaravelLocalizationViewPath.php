@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace Mcamara\LaravelLocalization\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\View;
