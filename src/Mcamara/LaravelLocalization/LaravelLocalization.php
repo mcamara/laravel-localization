@@ -419,6 +419,16 @@ class LaravelLocalization
     {
         return $this->supportedLocales[$this->getCurrentLocale()]['name'];
     }
+    
+    /**
+     * Returns current locale Flag image
+     *
+     * @return string current locale image
+     */
+    public function getCurrentLocaleImage()
+    {
+        return $this->supportedLocales[ $this->getCurrentLocale() ][ 'img' ];
+    }
 
     /**
      * Returns current locale native name.
