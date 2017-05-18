@@ -11,6 +11,7 @@ use Illuminate\Translation\Translator;
 use Illuminate\View\Factory;
 use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
 use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
+use Carbon\Carbon;
 
 class LaravelLocalization
 {
@@ -168,7 +169,10 @@ class LaravelLocalization
         }
 
         $this->app->setLocale($this->currentLocale);
-
+        
+        // setLocale to use Carbon source locales. Enables diffForHumans() localized
+        Carbon::setLocale(config('app.locale'));
+        
         // Regional locale such as de_DE, so formatLocalized works in Carbon
         $regional = $this->getCurrentLocaleRegional();
         if ($regional) {
