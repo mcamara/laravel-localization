@@ -434,6 +434,22 @@ class LaravelLocalization
     }
 
     /**
+    * Returns selected locale native name.
+    *
+    * @param string $locale the localeName you want the native for
+    *
+    * @return string selected locale native name
+    */
+   public function getLocalizedNative($locale)
+   {
+       if (!$this->checkLocaleInSupportedLocales($locale)) {
+           throw new UnsupportedLocaleException('Locale \''.$locale.'\' is not in the list of supported locales.');
+       }
+
+       return $this->supportedLocales[$locale]['native'];
+   }
+
+    /**
      * Returns current locale direction.
      *
      * @return string current locale direction

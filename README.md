@@ -367,6 +367,21 @@ public function getCurrentLocaleScript()
 
 This function will return the [ISO 15924](http://www.unicode.org/iso15924) code for the current locale script as a string; "Latn", "Cyrl", "Arab", etc.
 
+
+### Get Selected Locale Native
+
+```php
+  	/**
+  	 * Returns current locale script
+  	 *
+  	 * @return string current locale script
+  	 */
+ 	public function getLocalizedNative($locale)
+
+  	//Should be called in a view like this:
+ 	{{ LaravelLocalization::getLocalizedNative(string $locale) }}
+```
+
 ## Creating a language selector
 
 If you're supporting multiple locales in your project you will probably want to provide the users with a way to change language. Below is a simple example of blade template code you can use to create your own language selector.
