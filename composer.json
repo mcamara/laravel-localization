@@ -26,6 +26,16 @@
             "Mcamara\\LaravelLocalization": "src/"
         }
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mcamara\\LaravelLocalization\\LaravelLocalizationServiceProvider"
+            ],
+            "aliases": {
+                "LaravelLocalization": "Mcamara\\LaravelLocalization\\Facades\\LaravelLocalization"
+            }
+        }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
