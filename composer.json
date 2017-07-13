@@ -35,7 +35,7 @@
                 "LaravelLocalization": "Mcamara\\LaravelLocalization\\Facades\\LaravelLocalization"
             }
         }
-    }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
