@@ -211,7 +211,7 @@ class LaravelLocalization
      * @param string|bool  $locale     Locale to adapt, false to remove locale
      * @param string|false $url        URL to adapt in the current language. If not passed, the current url would be taken.
      * @param array        $attributes Attributes to add to the route, if empty, the system would try to extract them from the url.
-     * @param bool         $forceDefaultLocation Force to show default location even hideDefaultLocaleInURL set as TRUE	
+     * @param bool         $forceDefaultLocation Force to show default location even hideDefaultLocaleInURL set as TRUE
      *
      * @throws SupportedLocalesNotDefined
      * @throws UnsupportedLocaleException
@@ -429,6 +429,22 @@ class LaravelLocalization
     {
         return $this->supportedLocales[$this->getCurrentLocale()]['native'];
     }
+
+    /**
+    * Returns selected locale native name.
+    *
+    * @param string $locale the localeName you want the native for
+    *
+    * @return string selected locale native name
+    */
+   public function getLocalizedNative($locale)
+   {
+       if (!$this->checkLocaleInSupportedLocales($locale)) {
+           throw new UnsupportedLocaleException('Locale \''.$locale.'\' is not in the list of supported locales.');
+       }
+
+       return $this->supportedLocales[$locale]['native'];
+   }
 
     /**
      * Returns current locale direction.
