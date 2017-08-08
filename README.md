@@ -372,9 +372,9 @@ This function will return the [ISO 15924](http://www.unicode.org/iso15924) code 
 
 ```php
   	/**
-  	 * Returns current locale script
+  	 * Returns current locale native
   	 *
-  	 * @return string current locale script
+  	 * @return string current locale native
   	 */
  	public function getLocalizedNative($locale)
 
