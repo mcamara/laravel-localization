@@ -17,7 +17,7 @@
     },
     "require-dev": {
         "orchestra/testbench-browser-kit": "~3.4",
-        "phpunit/phpunit": "5.4.*"
+        "phpunit/phpunit": "6.0.*"
     },
     "autoload": {
         "classmap": [
