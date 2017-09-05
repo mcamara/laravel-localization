@@ -211,7 +211,7 @@ class LaravelLocalization
      * @param string|bool  $locale     Locale to adapt, false to remove locale
      * @param string|false $url        URL to adapt in the current language. If not passed, the current url would be taken.
      * @param array        $attributes Attributes to add to the route, if empty, the system would try to extract them from the url.
-     * @param bool         $forceDefaultLocation Force to show default location even hideDefaultLocaleInURL set as TRUE	
+     * @param bool         $forceDefaultLocation Force to show default location even hideDefaultLocaleInURL set as TRUE
      *
      * @throws SupportedLocalesNotDefined
      * @throws UnsupportedLocaleException
@@ -276,7 +276,7 @@ class LaravelLocalization
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation);
         }
 
-	if (!empty($locale)) {
+        if (!empty($locale)) {
             if ($locale != $this->getDefaultLocale() || !$this->hideDefaultLocaleInURL() || $forceDefaultLocation) {
                 $parsed_url['path'] = $locale.'/'.ltrim($parsed_url['path'], '/');
             }
@@ -829,7 +829,7 @@ class LaravelLocalization
                 return [];
             }
 
-            $attributes = $this->router->current()->parameters();
+            $attributes = $this->normalizeAttributes($this->router->current()->parameters());
             $response = event('routes.translation', [$locale, $attributes]);
 
             if (!empty($response)) {
@@ -875,5 +875,22 @@ class LaravelLocalization
         $url .= isset($parsed_url['fragment']) ? '#'.$parsed_url['fragment'] : '';
 
         return $url;
+    }
+
+    /**
+     * Normalize attributes gotten from request parameters.
+     *
+     * @param      array  $attributes  The attributes
+     * @return     array  The normalized attributes
+     */
+    protected function normalizeAttributes($attributes)
+    {
+        if (array_key_exists('data', $attributes) && is_array($attributes['data']) && ! count($attributes['data'])) {
+            $attributes['data'] = null;
+
+            return $attributes;
+        }
+
+        return $attributes;
     }
 }
