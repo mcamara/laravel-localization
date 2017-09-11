@@ -12,12 +12,12 @@
         }
     ],
     "require": {
-        "php": ">=5.6.0",
-        "laravel/framework": "~5.2, ~5.3, ~5.4"
+        "php": ">=7.0.0",
+        "laravel/framework": "~5.2, ~5.3, ~5.4, ~5.5"
     },
     "require-dev": {
         "orchestra/testbench-browser-kit": "~3.4",
-        "phpunit/phpunit": "5.4.*"
+        "phpunit/phpunit": "6.0.*"
     },
     "autoload": {
         "classmap": [
