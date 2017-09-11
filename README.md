@@ -25,8 +25,6 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
 
 ## Laravel compatibility
 
-Laravel 5 is released!!
-
  Laravel      | laravel-localization
 :-------------|:----------
  4.0.x        | 0.13.x
@@ -34,6 +32,7 @@ Laravel 5 is released!!
  4.2.x        | 0.15.x
  5.0.x/5.1.x  | 1.0.x
  5.2.x-5.4.x  | 1.2.x
+ 5.5	      | 1.3.x
 
 ## Installation
 
