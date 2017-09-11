@@ -1,14 +1,20 @@
 {
-    "name": "mcamara/laravel-localization",
+    "name": "lemaur/laravel-localization",
     "description": "Easy localization for Laravel",
     "keywords": ["localization", "laravel", "php"],
-    "homepage": "https://github.com/mcamara/laravel-localization",
+    "homepage": "https://github.com/lemaur/laravel-localization",
     "license": "MIT",
     "authors": [
         {
             "name": "Marc Cámara",
             "email": "mcamara88@gmail.com",
             "role": "Developer"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/lemaur/laravel-localization"
         }
     ],
     "require": {
