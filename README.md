@@ -20,6 +20,7 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
 - <a href="#config">Config</a>
     - <a href="#config-files">Config files</a>
     - <a href="#service-providers">Service providers</a>
+- <a href="#caching-routes">Caching routes</a>
 - <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
 
@@ -516,6 +517,10 @@ class ConfigServiceProvider extends ServiceProvider {
 This config would add Catalan and Achinese as languages and override any other previous supported locales and all the other options in the package.
 
 You can create your own config providers and add them on your application config file (check the providers array in `config/app.php`).
+
+## Caching routes
+
+If you want to cache the routes in all languages, please refer to this package: [https://github.com/czim/laravel-localization-route-cache](https://github.com/czim/laravel-localization-route-cache)
 
 ## Changelog
 View changelog here -> [changelog](CHANGELOG.md)
