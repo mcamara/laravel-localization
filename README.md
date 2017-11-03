@@ -437,7 +437,7 @@ function() {
 ```
 In the routes file you just have to add the `LaravelLocalizationRoutes` filter and the `LaravelLocalization::transRoute` function to every route you want to translate using the translation key.
 
-Then you have to create the translation files and add there every key you want to translate. I suggest to create a routes.php file inside your resources/lang/language_abbreviation folder. For the previous example, I have created two translations files, these two files would look like:
+Then you have to create the translation files and add there every key you want to translate. I suggest to create a routes.php file inside your `resources/lang/language_abbreviation` folder. For the previous example, I have created two translations files, these two files would look like:
 ```php
 // resources/lang/en/routes.php
 return [
