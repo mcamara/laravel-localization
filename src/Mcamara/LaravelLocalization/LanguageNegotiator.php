@@ -23,6 +23,11 @@ class LanguageNegotiator
     private $request;
 
     /**
+     * @var bool
+     */
+    private $use_intl = false;
+
+    /**
      * @param string  $defaultLocale
      * @param array   $supportedLanguages
      * @param Request $request
@@ -30,7 +35,26 @@ class LanguageNegotiator
     public function __construct($defaultLocale, $supportedLanguages, Request $request)
     {
         $this->defaultLocale = $defaultLocale;
-        $this->supportedLanguages = $supportedLanguages;
+
+        if (class_exists('Locale')) {
+            $this->use_intl = true;
+
+            foreach ($supportedLanguages as $key => $supportedLanguage) {
+                if ( ! isset($supportedLanguage['lang'])) {
+                    $supportedLanguage['lang'] = Locale::canonicalize($key);
+                } else {
+                    $supportedLanguage['lang'] = Locale::canonicalize($supportedLanguage['lang']);
+                }
+                if (isset($supportedLanguage['regional'])) {
+                    $supportedLanguage['regional'] = Locale::canonicalize($supportedLanguage['regional']);
+                }
+
+                $this->supportedLanguages[$key] = $supportedLanguage;
+            }
+        } else {
+            $this->supportedLanguages = $supportedLanguages;
+        }
+
         $this->request = $request;
     }
 
@@ -57,7 +81,11 @@ class LanguageNegotiator
             if (!empty($this->supportedLanguages[$key])) {
                 return $key;
             }
-                    
+
+            if ($this->use_intl) {
+                $key = Locale::canonicalize($key);
+            }
+
             // Search for acceptable locale by 'regional' => 'af_ZA' or 'lang' => 'af-ZA' match.
             foreach ( $this->supportedLanguages as $key_supported => $locale ) {
                 if ( (isset($locale['regional']) && $locale['regional'] == $key) || (isset($locale['lang']) && $locale['lang'] == $key) ) {
@@ -72,7 +100,7 @@ class LanguageNegotiator
             return key($this->supportedLanguages);
         }
 
-        if (class_exists('Locale') && !empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        if ($this->use_intl && !empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $http_accept_language = Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
 
             if (!empty($this->supportedLanguages[$http_accept_language])) {

@@ -19,6 +19,9 @@
         "orchestra/testbench-browser-kit": "~3.4",
         "phpunit/phpunit": "6.0.*"
     },
+    "suggest": {
+        "ext-intl": "*"
+    },
     "autoload": {
         "classmap": [
         ],

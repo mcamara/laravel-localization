@@ -590,4 +590,48 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             app('laravellocalization')->createUrlFromUri('/ver/1')
         );
     }
+
+
+    /**
+     * @dataProvider accept_language_variations_data
+     */
+    public function testLanguageNegotiation($accept_string, $must_resolve_to, $asd = null) {
+        $full_config = include __DIR__ . '/full-config/config.php';
+
+        $request = $this->createMock(\Illuminate\Http\Request::class);
+        $request->expects($this->any())->method('header')->with('Accept-Language')->willReturn($accept_string);
+
+        $negotiator = app(\Mcamara\LaravelLocalization\LanguageNegotiator::class,
+            [
+                    'defaultLocale' => 'wrong',
+                    'supportedLanguages' => $full_config['supportedLocales'],
+                    'request' => $request
+            ]
+        );
+
+        $language = $negotiator->negotiateLanguage();
+
+        $this->assertEquals($must_resolve_to, $language);
+    }
+
+    public function accept_language_variations_data() {
+        $variations = [
+            ['en-GB', 'en-GB'],
+            ['en-US', 'en-US'],
+            ['en-ZA', 'en'],
+            ['en', 'en'],
+            ['az-AZ', 'az'],
+            ['fr-CA,fr;q=0.8', 'fr-CA'],
+            ['fr-150', 'fr'],
+            ['zh-Hant-cn', 'zh-Hant'],
+            ['zh-cn', 'zh']
+        ];
+
+        $dataset = [];
+        foreach ($variations as $variation) {
+            $dataset[$variation[0]] = $variation;
+        }
+
+        return $dataset;
+    }
 }
