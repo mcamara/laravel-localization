@@ -39,7 +39,9 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
 
 Install the package via composer: `composer require mcamara/laravel-localization`
 
-Register the ServiceProvider in `config/app.php`
+In Laravel 5.5, the service provider and facade will automatically get registered. For older versions of the framework, follow the steps below:
+
+Register the service provider in `config/app.php`
 
 ```php
         'providers' => [
@@ -48,7 +50,7 @@ Register the ServiceProvider in `config/app.php`
         ],
 ```
 
-You may also register the `LaravelLocalization` Facade:
+You may also register the `LaravelLocalization` facade:
 
 ```php
         'aliases' => [
