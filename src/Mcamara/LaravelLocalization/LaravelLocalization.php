@@ -368,6 +368,7 @@ class LaravelLocalization
     /**
      * Return an array of all supported Locales.
      *
+     * @param boolean $excludeCurrent
      * @throws SupportedLocalesNotDefined
      *
      * @return array
