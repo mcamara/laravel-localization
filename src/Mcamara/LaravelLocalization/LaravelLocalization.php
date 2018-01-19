@@ -372,21 +372,21 @@ class LaravelLocalization
      *
      * @return array
      */
-    public function getSupportedLocales()
+    public function getSupportedLocales($excludeCurrent = false)
     {
-        if (!empty($this->supportedLocales)) {
-            return $this->supportedLocales;
+        if (empty($this->supportedLocales)) {
+            $this->supportedLocales = $this->configRepository->get('laravellocalization.supportedLocales');
         }
 
-        $locales = $this->configRepository->get('laravellocalization.supportedLocales');
-
-        if (empty($locales) || !is_array($locales)) {
+        if (empty($this->supportedLocales) || !is_array($this->supportedLocales)) {
             throw new SupportedLocalesNotDefined();
         }
 
-        $this->supportedLocales = $locales;
+        if ($excludeCurrent) {
+            unset($this->supportedLocales[$this->currentLocale]);
+        }
 
-        return $locales;
+        return $this->supportedLocales;
     }
 
     /**

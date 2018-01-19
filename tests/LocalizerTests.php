@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Routing\Route;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
 {
@@ -455,6 +456,20 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             $this->supportedLocales,
             app('laravellocalization')->getSupportedLocales()
         );
+    }
+
+    public function testGetSupportedLocalesExceptCurrent()
+    {
+        $allLocalesCount = count($this->supportedLocales);
+        $currentLocale = $this->defaultLocale;
+        
+        $this->assertThat(
+            LaravelLocalization::getSupportedLocales(true),
+            $this->logicalNot(
+                $this->arrayHasKey($currentLocale)
+            )
+        );
+        $this->assertCount($allLocalesCount - 1, LaravelLocalization::getSupportedLocales(true));
     }
 
     public function testGetCurrentLocaleName()
