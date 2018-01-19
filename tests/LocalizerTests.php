@@ -470,6 +470,8 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             )
         );
         $this->assertCount($allLocalesCount - 1, LaravelLocalization::getSupportedLocales(true));
+
+        $this->assertCount($allLocalesCount, LaravelLocalization::getSupportedLocales(false));
     }
 
     public function testGetCurrentLocaleName()

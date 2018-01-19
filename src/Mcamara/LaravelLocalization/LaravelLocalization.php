@@ -383,7 +383,10 @@ class LaravelLocalization
         }
 
         if ($excludeCurrent) {
-            unset($this->supportedLocales[$this->currentLocale]);
+            $locales = $this->supportedLocales;
+            unset($locales[$this->currentLocale]);
+            
+            return $locales;
         }
 
         return $this->supportedLocales;
