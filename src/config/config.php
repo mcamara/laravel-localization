@@ -239,7 +239,7 @@ return [
         //'uz-Arab'     => ['name' => 'Uzbek (Arabic)',         'script' => 'Arab', 'native' => 'اۉزبېک', 'regional' => ''],
         //'tg-Arab'     => ['name' => 'Tajik (Arabic)',         'script' => 'Arab', 'native' => 'تاجیکی', 'regional' => 'tg_TJ'],
         //'sd'          => ['name' => 'Sindhi',                 'script' => 'Arab', 'native' => 'سنڌي', 'regional' => 'sd_IN'],
-        //'fa'          => ['name' => 'Persian',                'script' => 'Arab', 'native' => 'فارسی', 'regional' => 'fa_IR'],
+        //'fa'          => ['name' => 'Persian',                'script' => 'Farsi', 'native' => 'فارسی', 'regional' => 'fa_IR'],
         //'pa-Arab'     => ['name' => 'Punjabi (Arabic)',       'script' => 'Arab', 'native' => 'پنجاب', 'regional' => 'pa_IN'],
         //'ps'          => ['name' => 'Pashto',                 'script' => 'Arab', 'native' => 'پښتو', 'regional' => 'ps_AF'],
         //'ks'          => ['name' => 'Kashmiri (Arabic)',      'script' => 'Arab', 'native' => 'کأشُر', 'regional' => 'ks_IN'],
