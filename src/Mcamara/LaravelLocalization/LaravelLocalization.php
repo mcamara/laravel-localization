@@ -443,6 +443,7 @@ class LaravelLocalization
 
         switch ($this->getCurrentLocaleScript()) {
             // Other (historic) RTL scripts exist, but this list contains the only ones in current use.
+	    case 'Farsi':	
             case 'Arab':
             case 'Hebr':
             case 'Mong':
