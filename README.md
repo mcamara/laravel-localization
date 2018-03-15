@@ -33,7 +33,7 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
  4.2.x        | 0.15.x
  5.0.x/5.1.x  | 1.0.x
  5.2.x-5.4.x (PHP 7 not required)  | 1.2.x
- 5.2.x-5.5.x (PHP 7 required) | 1.3.x
+ 5.2.x-5.6.x (PHP 7 required) | 1.3.x
 
 ## Installation
 
