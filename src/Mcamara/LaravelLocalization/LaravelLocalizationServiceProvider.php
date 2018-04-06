@@ -21,7 +21,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../../config/config.php' => config_path('LaravelLocalization.php'),
+            __DIR__.'/../../config/config.php' => config_path('laravel-localization.php'),
         ], 'config');
     }
 
@@ -45,7 +45,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         $packageConfigFile = __DIR__.'/../../config/config.php';
 
         $this->mergeConfigFrom(
-            $packageConfigFile, 'LaravelLocalization'
+            $packageConfigFile, 'laravel-localization'
         );
 
         $this->app->singleton(LaravelLocalization::class, function () {
