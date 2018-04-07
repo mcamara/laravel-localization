@@ -25,7 +25,9 @@ class LaravelLocalizationRedirectFilter extends LaravelLocalizationMiddlewareBas
 
         $currentLocale = app('laravellocalization')->getCurrentLocale();
         $defaultLocale = app('laravellocalization')->getDefaultLocale();
-        $params = explode('/', $request->path());
+        $params = explode('/', $request->getPathInfo());
+        // Dump the first element (empty string) as getPathInfo() always returns a leading slash
+        array_shift($params);
 
         if (count($params) > 0) {
             $localeCode = $params[0];
