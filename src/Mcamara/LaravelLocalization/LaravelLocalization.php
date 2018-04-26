@@ -3,6 +3,7 @@
 namespace Mcamara\LaravelLocalization;
 
 use Illuminate\Config\Repository;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
@@ -551,6 +552,9 @@ class LaravelLocalization
     protected function substituteAttributesInRoute($attributes, $route)
     {
         foreach ($attributes as $key => $value) {
+            if ($value instanceOf UrlRoutable) {
+                $value = $value->getRouteKey();
+            }
             $route = str_replace('{'.$key.'}', $value, $route);
             $route = str_replace('{'.$key.'?}', $value, $route);
         }
