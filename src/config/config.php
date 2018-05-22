@@ -314,6 +314,7 @@ return [
     //Example: 'localesOrder' => ['es','en'],
     'localesOrder' => [],
 
+    //  If you want to use custom lang url segments like 'at' instead of 'de-AT', you can use the mapping to tallow the LanguageNegotiator to assign the descired locales based on HTTP Accept Language Header. For example you want ot use 'at', so map HTTP Accept Language Header 'de-AT' to 'at' (['de-AT' => 'at']).
     'localesMapping' => []
 
 ];
