@@ -199,7 +199,7 @@ return [
         //'ts'          => ['name' => 'Tsonga',                 'script' => 'Latn', 'native' => 'Xitsonga', 'regional' => 'ts_ZA'],
         //'dje'         => ['name' => 'Zarma',                  'script' => 'Latn', 'native' => 'Zarmaciine', 'regional' => ''],
         //'yo'          => ['name' => 'Yoruba',                 'script' => 'Latn', 'native' => 'Èdè Yorùbá', 'regional' => 'yo_NG'],
-        //'de-AT'       => ['name' => 'Austrian German',        'script' => 'Latn', 'native' => 'Österreichisches Deutsch', 'regional' => 'de_AT'],
+        'de-AT'       => ['name' => 'Austrian German',        'script' => 'Latn', 'native' => 'Österreichisches Deutsch', 'regional' => 'de_AT'],
         //'is'          => ['name' => 'Icelandic',              'script' => 'Latn', 'native' => 'íslenska', 'regional' => 'is_IS'],
         //'cs'          => ['name' => 'Czech',                  'script' => 'Latn', 'native' => 'čeština', 'regional' => 'cs_CZ'],
         //'bas'         => ['name' => 'Basa',                   'script' => 'Latn', 'native' => 'Ɓàsàa', 'regional' => ''],
@@ -309,9 +309,11 @@ return [
     //
     'hideDefaultLocaleInURL' => false,
 
-    // If you want to display the locales in particular order in the language selector you should write the order here. 
+    // If you want to display the locales in particular order in the language selector you should write the order here.
     //CAUTION: Please consider using the appropriate locale code otherwise it will not work
     //Example: 'localesOrder' => ['es','en'],
     'localesOrder' => [],
+
+    'localesMapping' => []
 
 ];
