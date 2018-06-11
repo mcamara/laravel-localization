@@ -166,7 +166,7 @@ To set the current locale as view-base-path, simply register the localeViewPath-
 
 Now you can wrap your views in language-based folders like the translation files.
 
-`resources/views/en/`, `resources/vies/fr`, ...
+`resources/views/en/`, `resources/views/fr`, ...
 
 
 ## Helpers
