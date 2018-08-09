@@ -665,7 +665,8 @@ class LaravelLocalization
         foreach ($this->translatedRoutes as $translatedRoute) {
             $routeName = $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
 
-            if ($this->getNonLocalizedURL($routeName) == $this->getNonLocalizedURL($url)) {
+            // We can ignore extra url parts and compare only their url_path (ignore parameters that are not Laravel attributes)
+            if (parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH) == parse_url($this->getNonLocalizedURL($url), PHP_URL_PATH)) {
                 return $translatedRoute;
             }
         }
