@@ -789,15 +789,13 @@ class LaravelLocalization
                         if ($segment === $url[$i]) {
                             $i++;
                             continue;
-                        }
-                        if (preg_match("/{[\w]+}/", $segment)) {
+                        } elseif (preg_match("/{[\w]+}/", $segment)) {
                             // must-have parameters
                             $attribute_name = preg_replace(['/}/', '/{/', "/\?/"], '', $segment);
                             $attributes[$attribute_name] = $url[$i];
                             $i++;
                             continue;
-                        }
-                        if (preg_match("/{[\w]+\?}/", $segment)) {
+                        } elseif (preg_match("/{[\w]+\?}/", $segment)) {
                             // optional parameters
                             if (!isset($path[$j + 1]) || $path[$j + 1] !== $url[$i]) {
                                 // optional parameter taken
@@ -805,7 +803,14 @@ class LaravelLocalization
                                 $attributes[$attribute_name] = $url[$i];
                                 $i++;
                                 continue;
+                            } else {
+                                $match = false;
+                                break;
                             }
+                        } else {
+                            // As soon as one segment doesn't match, then we have the wrong route
+                            $match = false;
+                            break;
                         }
                     } elseif (!preg_match("/{[\w]+\?}/", $segment)) {
                         // no optional parameters but no more $url given
