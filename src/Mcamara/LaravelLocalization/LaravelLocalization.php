@@ -758,6 +758,7 @@ class LaravelLocalization
             $attributes = [];
             $parse = parse_url($url);
             if (isset($parse['path'])) {
+                $parse['path'] = trim(str_replace('/'.$this->currentLocale.'/', '', $parse['path']), "/");
                 $url = explode('/', trim($parse['path'], '/'));
             } else {
                 $url = [];
