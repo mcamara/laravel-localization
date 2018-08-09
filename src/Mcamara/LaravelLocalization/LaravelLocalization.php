@@ -606,15 +606,11 @@ class LaravelLocalization
     {
         $attributes = $this->extractAttributes($path);
 
-        $path = str_replace(url('/'), '', $path);
-        if ($path[0] !== '/') {
-            $path = '/'.$path;
-        }
-        $path = str_replace('/'.$this->currentLocale.'/', '', $path);
-        $path = trim($path, '/');
+        $path = parse_url($path)['path'];
+        $path = trim(str_replace('/'.$this->currentLocale.'/', '', $path), "/");
 
         foreach ($this->translatedRoutes as $route) {
-            if ($this->substituteAttributesInRoute($attributes, $this->translator->trans($route)) === $path) {
+            if (trim($this->substituteAttributesInRoute($attributes, $this->translator->trans($route)), '/') === $path) {
                 return $route;
             }
         }

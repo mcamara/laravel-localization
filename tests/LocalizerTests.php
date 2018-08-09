@@ -276,6 +276,38 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         );
     }
 
+        /**
+     * @param string $path
+     * @param string|bool $expectedRouteName
+     *
+     * @dataProvider getRouteNameFromAPathDataProvider
+     */
+    public function testGetRouteNameFromAPath($path, $expectedRouteName)
+    {
+        $this->assertEquals(
+            $expectedRouteName,
+            app('laravellocalization')->getRouteNameFromAPath($path)
+        );
+    }
+
+    public function getRouteNameFromAPathDataProvider()
+    {
+        return [
+            [$this->test_url,                       false],
+            [$this->test_url.'es',                  false],
+            [$this->test_url.'en/about',            'LaravelLocalization::routes.about'],
+            [$this->test_url.'ver/1',               false],
+            [$this->test_url.'view/1',              'LaravelLocalization::routes.view'],
+            [$this->test_url.'view/1/project',      'LaravelLocalization::routes.view_project'],
+            [$this->test_url.'view/1/project/1',    'LaravelLocalization::routes.view_project'],
+            [$this->test_url.'manage/1',            'LaravelLocalization::routes.manage'],
+            [$this->test_url.'manage',              'LaravelLocalization::routes.manage'],
+            [$this->test_url.'manage/',             'LaravelLocalization::routes.manage'],
+            [$this->test_url.'manage/0',            'LaravelLocalization::routes.manage'],
+            [$this->test_url.'manage/0?ex=2&ex2=a', 'LaravelLocalization::routes.manage'],
+        ];
+    }
+
     /**
      * @param bool $hideDefaultLocaleInURL
      * @param bool $forceDefault
