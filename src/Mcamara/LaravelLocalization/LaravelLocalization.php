@@ -774,6 +774,7 @@ class LaravelLocalization
             }
 
             foreach ($this->router->getRoutes() as $route) {
+                $attributes = [];
                 $path = method_exists($route, 'uri') ? $route->uri() : $route->getUri();
 
                 if (!preg_match("/{[\w]+}/", $path)) {
@@ -782,6 +783,13 @@ class LaravelLocalization
 
                 $path = explode('/', $path);
                 $i = 0;
+
+                // The system's route can't be smaller
+                // only the $url can be missing segments (optional parameters)
+                // We can assume it's the wrong route
+                if (count($path) < count($url)) {
+                    continue;
+                }
 
                 $match = true;
                 foreach ($path as $j => $segment) {
