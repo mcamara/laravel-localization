@@ -762,22 +762,16 @@ class LaravelLocalization
             $attributes = [];
             $parse = parse_url($url);
             if (isset($parse['path'])) {
-                $parse = explode('/', $parse['path']);
+                $url = explode('/', trim($parse['path'], '/'));
             } else {
-                $parse = [];
-            }
-            $url = [];
-            foreach ($parse as $segment) {
-                if (!empty($segment)) {
-                    $url[] = $segment;
-                }
+                $url = [];
             }
 
             foreach ($this->router->getRoutes() as $route) {
                 $attributes = [];
                 $path = method_exists($route, 'uri') ? $route->uri() : $route->getUri();
 
-                if (!preg_match("/{[\w]+}/", $path)) {
+                if (!preg_match("/{[\w]+\??}/", $path)) {
                     continue;
                 }
 
