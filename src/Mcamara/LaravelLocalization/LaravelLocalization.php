@@ -812,7 +812,11 @@ class LaravelLocalization
                             $match = false;
                             break;
                         }
-                    } elseif (!preg_match("/{[\w]+\?}/", $segment)) {
+                    } elseif (preg_match("/{[\w]+\?}/", $segment)) {
+                        $attribute_name = preg_replace(['/}/', '/{/', "/\?/"], '', $segment);
+                        $attributes[$attribute_name] = null;
+                        $i++;
+                    } else {
                         // no optional parameters but no more $url given
                         // this route does not match the url
                         $match = false;
