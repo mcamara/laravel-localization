@@ -67,6 +67,10 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             app('router')->get(app('laravellocalization')->transRoute('LaravelLocalization::routes.view_project'), ['as'=> 'view_project', function () {
                 return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
             }, ]);
+
+            app('router')->get(app('laravellocalization')->transRoute('LaravelLocalization::routes.manage'), ['as'=> 'manage', function () {
+                return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
+            }, ]);
         });
     }
 
@@ -301,6 +305,11 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             [false, false, 'es', $this->test_url.'ver/1',               $this->test_url.'es/ver/1'],
             [false, false, 'es', $this->test_url.'view/1/project',      $this->test_url.'es/ver/1/proyecto'],
             [false, false, 'es', $this->test_url.'view/1/project/1',    $this->test_url.'es/ver/1/proyecto/1'],
+            [false, false, 'es', $this->test_url.'manage/1',            $this->test_url.'es/administrar/1'],
+            [false, false, 'es', $this->test_url.'manage',              $this->test_url.'es/administrar'],
+            [false, false, 'es', $this->test_url.'manage/',             $this->test_url.'es/administrar'],
+            [false, false, 'es', $this->test_url.'manage/0',            $this->test_url.'es/administrar/0'],
+            [false, false, 'es', $this->test_url.'manage/0?ex=2&ex2=a', $this->test_url.'es/administrar/0?ex=2&ex2=a'],
 
             // Do not hide default
             [false, false, 'en', $this->test_url.'en',                  $this->test_url.'en'],
@@ -308,6 +317,11 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             [false, false, 'en', $this->test_url.'ver/1',               $this->test_url.'en/ver/1'],
             [false, false, 'en', $this->test_url.'view/1/project',      $this->test_url.'en/view/1/project'],
             [false, false, 'en', $this->test_url.'view/1/project/1',    $this->test_url.'en/view/1/project/1'],
+            [false, false, 'en', $this->test_url.'manage/1',            $this->test_url.'en/manage/1'],
+            [false, false, 'en', $this->test_url.'manage',              $this->test_url.'en/manage'],
+            [false, false, 'en', $this->test_url.'manage/',             $this->test_url.'en/manage'],
+            [false, false, 'en', $this->test_url.'manage/0',            $this->test_url.'en/manage/0'],
+            [false, false, 'en', $this->test_url.'manage/0?ex=2&ex2=a', $this->test_url.'en/manage/0?ex=2&ex2=a'],
 
             // Hide default
             [true,  false, 'es', $this->test_url,                       $this->test_url.'es'],
@@ -316,6 +330,11 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             [true,  false, 'es', $this->test_url.'ver/1',               $this->test_url.'es/ver/1'],
             [true,  false, 'es', $this->test_url.'view/1/project',      $this->test_url.'es/ver/1/proyecto'],
             [true,  false, 'es', $this->test_url.'view/1/project/1',    $this->test_url.'es/ver/1/proyecto/1'],
+            [true,  false, 'es', $this->test_url.'manage/1',            $this->test_url.'es/administrar/1'],
+            [true,  false, 'es', $this->test_url.'manage',              $this->test_url.'es/administrar'],
+            [true,  false, 'es', $this->test_url.'manage/',             $this->test_url.'es/administrar'],
+            [true,  false, 'es', $this->test_url.'manage/0',            $this->test_url.'es/administrar/0'],
+            [true,  false, 'es', $this->test_url.'manage/0?ex=2&ex2=a', $this->test_url.'es/administrar/0?ex=2&ex2=a'],
 
             // Hide default
             [true,  false, 'en', $this->test_url.'en',                  $this->test_url.''],
@@ -323,6 +342,11 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             [true,  false, 'en', $this->test_url.'ver/1',               $this->test_url.'ver/1'],
             [true,  false, 'en', $this->test_url.'view/1/project',      $this->test_url.'view/1/project'],
             [true,  false, 'en', $this->test_url.'view/1/project/1',    $this->test_url.'view/1/project/1'],
+            [true,  false, 'en', $this->test_url.'manage/1',            $this->test_url.'manage/1'],
+            [true,  false, 'en', $this->test_url.'manage',              $this->test_url.'manage'],
+            [true,  false, 'en', $this->test_url.'manage/',             $this->test_url.'manage'],
+            [true,  false, 'en', $this->test_url.'manage/0',            $this->test_url.'manage/0'],
+            [true,  false, 'en', $this->test_url.'manage/0?ex=2&ex2=a', $this->test_url.'manage/0?ex=2&ex2=a'],
 
             // Do not hide default FORCE SHOWING
             [false, true,  'es', $this->test_url,                       $this->test_url.'es'],
@@ -331,6 +355,11 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             [false, true,  'es', $this->test_url.'ver/1',               $this->test_url.'es/ver/1'],
             [false, true,  'es', $this->test_url.'view/1/project',      $this->test_url.'es/ver/1/proyecto'],
             [false, true,  'es', $this->test_url.'view/1/project/1',    $this->test_url.'es/ver/1/proyecto/1'],
+            [false, true,  'es', $this->test_url.'manage/1',            $this->test_url.'es/administrar/1'],
+            [false, true,  'es', $this->test_url.'manage',              $this->test_url.'es/administrar'],
+            [false, true,  'es', $this->test_url.'manage/',             $this->test_url.'es/administrar'],
+            [false, true,  'es', $this->test_url.'manage/0',            $this->test_url.'es/administrar/0'],
+            [false, true,  'es', $this->test_url.'manage/0?ex=2&ex2=a', $this->test_url.'es/administrar/0?ex=2&ex2=a'],
 
             // Do not hide default FORCE SHOWING
             [false, true,  'en', $this->test_url.'en',                  $this->test_url.'en'],
@@ -338,6 +367,11 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             [false, true,  'en', $this->test_url.'ver/1',               $this->test_url.'en/ver/1'],
             [false, true,  'en', $this->test_url.'view/1/project',      $this->test_url.'en/view/1/project'],
             [false, true,  'en', $this->test_url.'view/1/project/1',    $this->test_url.'en/view/1/project/1'],
+            [false, true,  'en', $this->test_url.'manage/1',            $this->test_url.'en/manage/1'],
+            [false, true,  'en', $this->test_url.'manage',              $this->test_url.'en/manage'],
+            [false, true,  'en', $this->test_url.'manage/',             $this->test_url.'en/manage'],
+            [false, true,  'en', $this->test_url.'manage/0',            $this->test_url.'en/manage/0'],
+            [false, true,  'en', $this->test_url.'manage/0?ex=2&ex2=a', $this->test_url.'en/manage/0?ex=2&ex2=a'],
 
             // Hide default FORCE SHOWING
             [true,  true,  'es', $this->test_url,                       $this->test_url.'es'],
@@ -346,6 +380,11 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             [true,  true,  'es', $this->test_url.'ver/1',               $this->test_url.'es/ver/1'],
             [true,  true,  'es', $this->test_url.'view/1/project',      $this->test_url.'es/ver/1/proyecto'],
             [true,  true,  'es', $this->test_url.'view/1/project/1',    $this->test_url.'es/ver/1/proyecto/1'],
+            [true,  true,  'es', $this->test_url.'manage/1',            $this->test_url.'es/administrar/1'],
+            [true,  true,  'es', $this->test_url.'manage',              $this->test_url.'es/administrar'],
+            [true,  true,  'es', $this->test_url.'manage/',             $this->test_url.'es/administrar'],
+            [true,  true,  'es', $this->test_url.'manage/0',            $this->test_url.'es/administrar/0'],
+            [true,  true,  'es', $this->test_url.'manage/0?ex=2&ex2=a', $this->test_url.'es/administrar/0?ex=2&ex2=a'],
 
             // Hide default FORCE SHOWING
             [true,  true,  'en', $this->test_url.'en',                  $this->test_url.'en'],
@@ -353,6 +392,11 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             [true,  true,  'en', $this->test_url.'ver/1',               $this->test_url.'en/ver/1'],
             [true,  true,  'en', $this->test_url.'view/1/project',      $this->test_url.'en/view/1/project'],
             [true,  true,  'en', $this->test_url.'view/1/project/1',    $this->test_url.'en/view/1/project/1'],
+            [true,  true,  'en', $this->test_url.'manage/1',            $this->test_url.'en/manage/1'],
+            [true,  true,  'en', $this->test_url.'manage',              $this->test_url.'en/manage'],
+            [true,  true,  'en', $this->test_url.'manage/',             $this->test_url.'en/manage'],
+            [true,  true,  'en', $this->test_url.'manage/0',            $this->test_url.'en/manage/0'],
+            [true,  true,  'en', $this->test_url.'manage/0?ex=2&ex2=a', $this->test_url.'en/manage/0?ex=2&ex2=a'],
         ];
     }
 
