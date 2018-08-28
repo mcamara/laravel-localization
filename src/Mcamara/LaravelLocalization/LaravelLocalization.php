@@ -172,9 +172,10 @@ class LaravelLocalization
 
         // Regional locale such as de_DE, so formatLocalized works in Carbon
         $regional = $this->getCurrentLocaleRegional();
+	$suffix = $this->configRepository->get('laravellocalization.utf8suffix');
         if ($regional) {
-            setlocale(LC_TIME, $regional);
-            setlocale(LC_MONETARY, $regional);
+            setlocale(LC_TIME, $regional . $suffix);
+            setlocale(LC_MONETARY, $regional . $suffix);
         }
 
         return $locale;
