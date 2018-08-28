@@ -149,7 +149,7 @@ class LanguageNegotiator
                 }
                 // Unweighted values, get high weight by their position in the
                 // list
-                $q = isset($q) ? $q : 1000 - count($matches);
+                $q = $q ?? 1000 - \count($matches);
                 $matches[$l] = $q;
 
                 //If for some reason the Accept-Language header only sends language with country

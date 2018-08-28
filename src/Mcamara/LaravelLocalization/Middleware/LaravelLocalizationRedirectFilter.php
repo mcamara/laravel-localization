@@ -4,7 +4,6 @@ namespace Mcamara\LaravelLocalization\Middleware;
 
 use Closure;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class LaravelLocalizationRedirectFilter extends LaravelLocalizationMiddlewareBase 
 {
@@ -29,7 +28,7 @@ class LaravelLocalizationRedirectFilter extends LaravelLocalizationMiddlewareBas
         // Dump the first element (empty string) as getPathInfo() always returns a leading slash
         array_shift($params);
 
-        if (count($params) > 0) {
+        if (\count($params) > 0) {
             $localeCode = $params[0];
             $locales = app('laravellocalization')->getSupportedLocales();
             $hideDefaultLocale = app('laravellocalization')->hideDefaultLocaleInURL();
