@@ -1,4 +1,4 @@
-### Unreleased (1.3)
+### Unreleased (1.3.11)
 - Merged in solution for caching translated and localized routes (originally in separate package [czim/laravel-localization-route-cache](https://github.com/czim/laravel-localization-route-cache)) by [CZim](https://github.com/czim).  
     If you used this package, be sure to remove it when upgrading to this version.
 
