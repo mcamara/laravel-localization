@@ -530,9 +530,12 @@ You can create your own config providers and add them on your application config
 
 ## Caching routes
 
-If you want to cache the routes in all languages, please refer to this package: [https://github.com/czim/laravel-localization-route-cache](https://github.com/czim/laravel-localization-route-cache)
+More information on support on [cached (translated) routes here](CACHING.md).
+
+Note that the separate [czim/laravel-localization-route-cache](https://github.com/czim/laravel-localization-route-cache) package is no longer required.
 
 ## Changelog
+
 View changelog here -> [changelog](CHANGELOG.md)
 
 ## License
