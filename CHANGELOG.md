@@ -1,6 +1,7 @@
-### Unreleased (1.3.11)
+### 1.3.11
 - Merged in solution for caching translated and localized routes (originally in separate package [czim/laravel-localization-route-cache](https://github.com/czim/laravel-localization-route-cache)) by [CZim](https://github.com/czim).  
     If you used this package, be sure to remove it when upgrading to this version.
+- Added `'utf8suffix' => env('LARAVELLOCALIZATION_UTF8SUFFIX', '.UTF-8')` to config file.
 
 ### 1.2.3
 - Added `getLocalesOrder()` function to the package
