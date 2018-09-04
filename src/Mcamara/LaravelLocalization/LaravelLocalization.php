@@ -10,6 +10,11 @@ use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 class LaravelLocalization
 {
     /**
+     * The env key that the forced locale for routing is stored in.
+     */
+    const ENV_ROUTE_KEY = 'ROUTING_LOCALE';
+
+    /**
      * Config repository.
      *
      * @var \Illuminate\Config\Repository
@@ -138,6 +143,12 @@ class LaravelLocalization
             // If the locale has not been passed through the function
             // it tries to get it from the first segment of the url
             $locale = $this->request->segment(1);
+
+            // If the locale is determined by env, use that
+            // Note that this is how per-locale route caching is performed.
+            if ( ! $locale) {
+                $locale = $this->getForcedLocale();
+            }
         }
 
         if (!empty($this->supportedLocales[$locale])) {
@@ -748,6 +759,31 @@ class LaravelLocalization
     }
 
     /**
+     * Returns serialized translated routes for caching purposes.
+     *
+     * @return string
+     */
+    public function getSerializedTranslatedRoutes()
+    {
+        return base64_encode(serialize($this->translatedRoutes));
+    }
+
+    /**
+     * Sets the translated routes list.
+     * Only useful from a cached routes context.
+     *
+     * @param string $serializedRoutes
+     */
+    public function setSerializedTranslatedRoutes($serializedRoutes)
+    {
+        if ( ! $serializedRoutes) {
+            return;
+        }
+
+        $this->translatedRoutes = unserialize(base64_decode($serializedRoutes));
+    }
+
+    /**
      * Extract attributes for current url.
      *
      * @param bool|false|null|string $url    to extract attributes, if not present, the system will look for attributes in the current call
@@ -889,4 +925,14 @@ class LaravelLocalization
          }
          return $attributes;
      }
+
+    /**
+     * Returns the forced environment set route locale.
+     *
+     * @return string|null
+     */
+    protected function getForcedLocale()
+    {
+        return env(static::ENV_ROUTE_KEY);
+    }
 }

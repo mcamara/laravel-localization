@@ -41,10 +41,36 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
             $packageConfigFile, 'laravellocalization'
         );
 
+        $this->registerBindings();
+
+        $this->registerCommands();
+    }
+
+    /**
+     * Registers app bindings and aliases.
+     */
+    protected function registerBindings()
+    {
         $this->app->singleton(LaravelLocalization::class, function () {
             return new LaravelLocalization();
         });
 
         $this->app->alias(LaravelLocalization::class, 'laravellocalization');
+    }
+
+    /**
+     * Registers route caching commands.
+     */
+    protected function registerCommands()
+    {
+        $this->app->singleton('laravellocalizationroutecache.cache', Commands\RouteTranslationsCacheCommand::class);
+        $this->app->singleton('laravellocalizationroutecache.clear', Commands\RouteTranslationsClearCommand::class);
+        $this->app->singleton('laravellocalizationroutecache.list', Commands\RouteTranslationsListCommand::class);
+
+        $this->commands([
+            'laravellocalizationroutecache.cache',
+            'laravellocalizationroutecache.clear',
+            'laravellocalizationroutecache.list',
+        ]);
     }
 }
