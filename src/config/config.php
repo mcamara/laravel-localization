@@ -314,4 +314,8 @@ return [
     //Example: 'localesOrder' => ['es','en'],
     'localesOrder' => [],
 
+    // Locale suffix for LC_TIME and LC_MONETARY
+    // Defaults to most common ".UTF-8". Set to blank on Windows systems, change to ".utf8" on CentOS and similar.
+    'utf8suffix' => env('LARAVELLOCALIZATION_UTF8SUFFIX', '.UTF-8'),
+
 ];
