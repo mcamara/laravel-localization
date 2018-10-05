@@ -10,7 +10,7 @@ class LaravelLocalizationMiddlewareBase
      *
      * @var array
      */
-    protected $except = [];
+    protected $except;
 
     /**
      * Determine if the request has a URI that should not be localized.
@@ -20,6 +20,7 @@ class LaravelLocalizationMiddlewareBase
      */
     protected function shouldIgnore($request)
     {
+        $this->except = $this->except ?? config('laravellocalization.urlsIgnored', []);
         foreach ($this->except as $except) {
             if ($except !== '/') {
                 $except = trim($except, '/');
