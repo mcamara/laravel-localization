@@ -60,6 +60,53 @@ You may also register the `LaravelLocalization` facade:
         ],
 ```
 
+## Config
+
+### Config Files
+
+In order to edit the default configuration (where for e.g. you can find `supportedLocales`) for this package you may execute:
+
+```
+php artisan vendor:publish --provider="Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider"
+```
+
+After that, `config/laravellocalization.php` will be created. Inside this file you will find all the fields that can be edited in this package.
+
+### Service Providers
+
+Otherwise, you can use `ConfigServiceProviders` (check <a href="https://raw.githubusercontent.com/mcamara/laravel-localization/master/src/config/config.php">this file</a> for more info).
+
+For example, editing the default config service provider that Laravel loads when it's installed. This file is placed in `app/providers/ConfigServicePovider.php` and would look like this:
+
+```php
+<?php namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+
+class ConfigServiceProvider extends ServiceProvider {
+	public function register()
+	{
+		config([
+			'laravellocalization.supportedLocales' => [
+				'ace' => array( 'name' => 'Achinese', 'script' => 'Latn', 'native' => 'Aceh' ),
+				'ca'  => array( 'name' => 'Catalan', 'script' => 'Latn', 'native' => 'català' ),
+				'en'  => array( 'name' => 'English', 'script' => 'Latn', 'native' => 'English' ),
+			],
+
+			'laravellocalization.useAcceptLanguageHeader' => true,
+
+			'laravellocalization.hideDefaultLocaleInURL' => true
+		]);
+	}
+
+}
+```
+
+This config would add Catalan and Achinese as languages and override any other previous supported locales and all the other options in the package.
+
+You can create your own config providers and add them on your application config file (check the providers array in `config/app.php`).
+
+
 ## Usage
 
 Laravel Localization uses the URL given for the request. In order to achieve this purpose, a route group should be added into the `routes.php` file. It will filter all pages that must be localized.
@@ -481,52 +528,6 @@ Event::listen('routes.translation', function($locale, $attributes)
 ```
 
 Be sure to pass the locale and the attributes as parameters to the closure. You may also use Event Subscribers, see: [http://laravel.com/docs/events#event-subscribers](http://laravel.com/docs/events#event-subscribers)
-
-## Config
-
-### Config Files
-
-In order to edit the default configuration for this package you may execute:
-
-```
-php artisan vendor:publish --provider="Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider"
-```
-
-After that, `config/laravellocalization.php` will be created. Inside this file you will find all the fields that can be edited in this package.
-
-### Service Providers
-
-Otherwise, you can use `ConfigServiceProviders` (check <a href="https://raw.githubusercontent.com/mcamara/laravel-localization/master/src/config/config.php">this file</a> for more info).
-
-For example, editing the default config service provider that Laravel loads when it's installed. This file is placed in `app/providers/ConfigServicePovider.php` and would look like this:
-
-```php
-<?php namespace App\Providers;
-
-use Illuminate\Support\ServiceProvider;
-
-class ConfigServiceProvider extends ServiceProvider {
-	public function register()
-	{
-		config([
-			'laravellocalization.supportedLocales' => [
-				'ace' => array( 'name' => 'Achinese', 'script' => 'Latn', 'native' => 'Aceh' ),
-				'ca'  => array( 'name' => 'Catalan', 'script' => 'Latn', 'native' => 'català' ),
-				'en'  => array( 'name' => 'English', 'script' => 'Latn', 'native' => 'English' ),
-			],
-
-			'laravellocalization.useAcceptLanguageHeader' => true,
-
-			'laravellocalization.hideDefaultLocaleInURL' => true
-		]);
-	}
-
-}
-```
-
-This config would add Catalan and Achinese as languages and override any other previous supported locales and all the other options in the package.
-
-You can create your own config providers and add them on your application config file (check the providers array in `config/app.php`).
 
 ## Caching routes
 
