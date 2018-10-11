@@ -13,14 +13,14 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
     - <a href="#composer">Composer</a>
     - <a href="#manually">Manually</a>
     - <a href="#laravel">Laravel</a>
+- <a href="#config">Config</a>
+    - <a href="#config-files">Config files</a>
+    - <a href="#service-providers">Service providers</a>
 - <a href="#usage">Usage</a>
     - <a href="#middleware">Middleware</a>
 - <a href="#helpers">Helpers</a>
     - <a href="#route-model-binding">Route Model Binding</a>
 - <a href="#translated-routes">Translated Routes</a>
-- <a href="#config">Config</a>
-    - <a href="#config-files">Config files</a>
-    - <a href="#service-providers">Service providers</a>
 - <a href="#caching-routes">Caching routes</a>
 - <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
