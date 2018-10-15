@@ -216,6 +216,17 @@ Now you can wrap your views in language-based folders like the translation files
 
 `resources/views/en/`, `resources/views/fr`, ...
 
+### Map your own custom lang url segments
+
+If you want to use custom lang url segments like 'uk' instead of 'en-GB', you can use the mapping ```localesMapping```key to allow the LanguageNegotiator to assign the desired locales based on HTTP Accept Language Header. Here is a quick example, how to map HTTP Accept Language Header 'en-GB' to url segment 'uk':
+
+```php
+// config/laravellocalization.php
+
+'localesMapping' => [
+	'en-GB' => 'uk'
+],
+```
 
 ## Helpers
 
