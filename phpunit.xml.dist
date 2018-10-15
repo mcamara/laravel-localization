@@ -15,4 +15,10 @@
             <directory suffix=".php">./tests/</directory>
         </testsuite>
     </testsuites>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src/Mcamara</directory>
+        </whitelist>
+    </filter>
 </phpunit>
