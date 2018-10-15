@@ -227,6 +227,7 @@ class LaravelLocalization
             $attributes = $this->extractAttributes($url, $locale);
         }
         $urlQuery = parse_url($url, PHP_URL_QUERY);
+        $urlQuery = $urlQuery ? '?'.$urlQuery : '';
 
         if (empty($url)) {
             if (!empty($this->routeName)) {
@@ -239,7 +240,7 @@ class LaravelLocalization
         }
 
         if ($locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale)) {
-            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).($urlQuery ? '?'.$urlQuery : '');
+            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).$urlQuery;
         }
 
         $base_path = $this->request->getBaseUrl();
@@ -269,7 +270,7 @@ class LaravelLocalization
         $parsed_url['path'] = ltrim($parsed_url['path'], '/');
 
         if ($translatedRoute = $this->findTranslatedRouteByPath($parsed_url['path'], $url_locale)) {
-            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).($urlQuery ? '?'.$urlQuery : '');
+            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).$urlQuery;
         }
 
 	    if (!empty($locale)) {
@@ -288,10 +289,10 @@ class LaravelLocalization
         $url = $this->unparseUrl($parsed_url);
 
         if ($this->checkUrl($url)) {
-            return $url.($urlQuery ? '?'.$urlQuery : '');
+            return $url.$urlQuery;
         }
 
-        return $this->createUrlFromUri($url).($urlQuery ? '?'.$urlQuery : '');
+        return $this->createUrlFromUri($url).$urlQuery;
     }
 
     /**
