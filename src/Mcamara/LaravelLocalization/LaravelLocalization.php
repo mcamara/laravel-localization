@@ -187,6 +187,19 @@ class LaravelLocalization
     }
 
     /**
+     * Check if $locale is default locale and supposed to be hidden in url
+     *
+     * @param string $locale Locale to be checked
+     *
+     * @return boolean Returns true if above requirement are met, otherwise false
+     */
+
+     public function isHiddenDefault($locale)
+     {
+       return  ($this->getDefaultLocale() === $locale && $this->hideDefaultLocaleInURL());
+     }
+
+    /**
      * Set and return supported locales.
      *
      * @param array $locales Locales that the App supports

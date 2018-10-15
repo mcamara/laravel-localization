@@ -30,8 +30,17 @@ class LocaleSessionRedirect extends LaravelLocalizationMiddlewareBase
 
             return $next($request);
         }
+        elseif(empty($locale) && app('laravellocalization')->hideDefaultLocaleInURL() && app('laravellocalization')->useAcceptLanguageHeader()){
+          // When default locale is hidden and accept language header is true,
+          // then compute browser language when no session has been set.
+          // Once the session has been set, there is no need
+          // to negotiate language from browser again.
+          $negotiator = new LanguageNegotiator(LaravelLocalization::getDefaultLocale(), LaravelLocalization::getSupportedLocales(), $request);
+          $locale     = $negotiator->negotiateLanguage();
+          session(['locale' => $locale]);          
+        }
 
-        if ($locale && app('laravellocalization')->checkLocaleInSupportedLocales($locale) && !(app('laravellocalization')->getDefaultLocale() === $locale && app('laravellocalization')->hideDefaultLocaleInURL())) {
+        if ($locale && app('laravellocalization')->checkLocaleInSupportedLocales($locale) && !(app('laravellocalization')->isHiddenDefault($locale))) {
             app('session')->reflash();
             $redirection = app('laravellocalization')->getLocalizedURL($locale);
 

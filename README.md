@@ -206,7 +206,7 @@ In order to activate it, you just have to attach this middleware to the routes y
 
 If you want to hide the default locale but always show other locales in the url, switch the `hideDefaultLocaleInURL` config value to true. Once it's true, if the default locale is en (english) all URLs containing /en/ would be redirected to the same url without this fragment '/' but maintaining the locale as en (English).
 
-**IMPORTANT** - When `hideDefaultLocaleInURL` is set to true, the unlocalized root is treated as the applications default locale `app.locale`.  Because of this language negotiation using the Accept-Language header will **NEVER** occur when `hideDefaultLocaleInURL` is true.
+When `hideDefaultLocaleInURL` and `useAcceptLanguageHeader` are both set to true,then the language negotiation using the Accept-Language header will only occur while the session('locale') is empty. After negotiation, the session('locale') will be set accordingly and will not be called again.
 
 ### Set current locale as view-base-path
 
