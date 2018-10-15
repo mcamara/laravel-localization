@@ -729,6 +729,11 @@ class LaravelLocalization
         return $this->configRepository->get('laravellocalization.useAcceptLanguageHeader');
     }
 
+    public function hideUrlAndAcceptHeader()
+    {
+      return $this->hideDefaultLocaleInURL() && $this->useAcceptLanguageHeader();
+    }
+
     /**
      * Returns the translation key for a given path.
      *
