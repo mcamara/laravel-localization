@@ -251,6 +251,8 @@ class LaravelLocalization
         if (empty($attributes)) {
             $attributes = $this->extractAttributes($url, $locale);
         }
+        $urlQuery = parse_url($url, PHP_URL_QUERY);
+        $urlQuery = $urlQuery ? '?'.$urlQuery : '';
 
         if (empty($url)) {
             if (!empty($this->routeName)) {
@@ -263,7 +265,7 @@ class LaravelLocalization
         }
 
         if ($locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale)) {
-            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation);
+            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).$urlQuery;
         }
 
         $base_path = $this->request->getBaseUrl();
@@ -293,7 +295,7 @@ class LaravelLocalization
         $parsed_url['path'] = ltrim($parsed_url['path'], '/');
 
         if ($translatedRoute = $this->findTranslatedRouteByPath($parsed_url['path'], $url_locale)) {
-            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation);
+            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).$urlQuery;
         }
 
 	    if (!empty($locale)) {
@@ -312,10 +314,10 @@ class LaravelLocalization
         $url = $this->unparseUrl($parsed_url);
 
         if ($this->checkUrl($url)) {
-            return $url;
+            return $url.$urlQuery;
         }
 
-        return $this->createUrlFromUri($url);
+        return $this->createUrlFromUri($url).$urlQuery;
     }
 
     /**
@@ -359,7 +361,7 @@ class LaravelLocalization
             return false;
         }
 
-        return rtrim($this->createUrlFromUri($route));
+        return rtrim($this->createUrlFromUri($route), '/');
     }
 
     /**
@@ -630,15 +632,11 @@ class LaravelLocalization
     {
         $attributes = $this->extractAttributes($path);
 
-        $path = str_replace(url('/'), '', $path);
-        if ($path[0] !== '/') {
-            $path = '/'.$path;
-        }
-        $path = str_replace('/'.$this->currentLocale.'/', '', $path);
-        $path = trim($path, '/');
+        $path = parse_url($path)['path'];
+        $path = trim(str_replace('/'.$this->currentLocale.'/', '', $path), "/");
 
         foreach ($this->translatedRoutes as $route) {
-            if ($this->substituteAttributesInRoute($attributes, $this->translator->trans($route)) === $path) {
+            if (trim($this->substituteAttributesInRoute($attributes, $this->translator->trans($route)), '/') === $path) {
                 return $route;
             }
         }
@@ -689,7 +687,8 @@ class LaravelLocalization
         foreach ($this->translatedRoutes as $translatedRoute) {
             $routeName = $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
 
-            if ($this->getNonLocalizedURL($routeName) == $this->getNonLocalizedURL($url)) {
+            // We can ignore extra url parts and compare only their url_path (ignore arguments that are not attributes)
+            if (parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH) == parse_url($this->getNonLocalizedURL($url), PHP_URL_PATH)) {
                 return $translatedRoute;
             }
         }
@@ -815,26 +814,29 @@ class LaravelLocalization
             $attributes = [];
             $parse = parse_url($url);
             if (isset($parse['path'])) {
-                $parse = explode('/', $parse['path']);
+                $parse['path'] = trim(str_replace('/'.$this->currentLocale.'/', '', $parse['path']), "/");
+                $url = explode('/', trim($parse['path'], '/'));
             } else {
-                $parse = [];
-            }
-            $url = [];
-            foreach ($parse as $segment) {
-                if (!empty($segment)) {
-                    $url[] = $segment;
-                }
+                $url = [];
             }
 
             foreach ($this->router->getRoutes() as $route) {
+                $attributes = [];
                 $path = method_exists($route, 'uri') ? $route->uri() : $route->getUri();
 
-                if (!preg_match("/{[\w]+}/", $path)) {
+                if (!preg_match("/{[\w]+\??}/", $path)) {
                     continue;
                 }
 
                 $path = explode('/', $path);
                 $i = 0;
+
+                // The system's route can't be smaller
+                // only the $url can be missing segments (optional parameters)
+                // We can assume it's the wrong route
+                if (count($path) < count($url)) {
+                    continue;
+                }
 
                 $match = true;
                 foreach ($path as $j => $segment) {
@@ -842,15 +844,13 @@ class LaravelLocalization
                         if ($segment === $url[$i]) {
                             $i++;
                             continue;
-                        }
-                        if (preg_match("/{[\w]+}/", $segment)) {
+                        } elseif (preg_match("/{[\w]+}/", $segment)) {
                             // must-have parameters
                             $attribute_name = preg_replace(['/}/', '/{/', "/\?/"], '', $segment);
                             $attributes[$attribute_name] = $url[$i];
                             $i++;
                             continue;
-                        }
-                        if (preg_match("/{[\w]+\?}/", $segment)) {
+                        } elseif (preg_match("/{[\w]+\?}/", $segment)) {
                             // optional parameters
                             if (!isset($path[$j + 1]) || $path[$j + 1] !== $url[$i]) {
                                 // optional parameter taken
@@ -858,9 +858,20 @@ class LaravelLocalization
                                 $attributes[$attribute_name] = $url[$i];
                                 $i++;
                                 continue;
+                            } else {
+                                $match = false;
+                                break;
                             }
+                        } else {
+                            // As soon as one segment doesn't match, then we have the wrong route
+                            $match = false;
+                            break;
                         }
-                    } elseif (!preg_match("/{[\w]+\?}/", $segment)) {
+                    } elseif (preg_match("/{[\w]+\?}/", $segment)) {
+                        $attribute_name = preg_replace(['/}/', '/{/', "/\?/"], '', $segment);
+                        $attributes[$attribute_name] = null;
+                        $i++;
+                    } else {
                         // no optional parameters but no more $url given
                         // this route does not match the url
                         $match = false;
