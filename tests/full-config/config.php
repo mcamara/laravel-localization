@@ -314,4 +314,7 @@ return [
     //Example: 'localesOrder' => ['es','en'],
     'localesOrder' => [],
 
+    // URLs which should not be processed, e.g. '/nova', '/nova/*', '/nova-api/*' or specific application URLs
+    // Defaults to []
+    'urlsIgnored' => [],
 ];

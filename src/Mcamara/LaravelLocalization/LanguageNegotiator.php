@@ -2,11 +2,28 @@
 
 namespace Mcamara\LaravelLocalization;
 
+use Illuminate\Config\Repository;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Locale;
 
 class LanguageNegotiator
 {
+
+    /**
+     * Config repository.
+     *
+     * @var \Illuminate\Config\Repository
+     */
+    protected $configRepository;
+
+    /**
+     * Illuminate request class.
+     *
+     * @var Illuminate\Foundation\Application
+     */
+    protected $app;
+
     /**
      * @var string
      */
@@ -34,6 +51,10 @@ class LanguageNegotiator
      */
     public function __construct($defaultLocale, $supportedLanguages, Request $request)
     {
+        $this->app = app();
+
+        $this->configRepository = $this->app['config'];
+
         $this->defaultLocale = $defaultLocale;
 
         if (class_exists('Locale')) {
@@ -78,6 +99,9 @@ class LanguageNegotiator
     {
         $matches = $this->getMatchesFromAcceptedLanguages();
         foreach ($matches as $key => $q) {
+
+            $key = ($this->configRepository->get('laravellocalization.localesMapping')[$key]) ?? $key;
+
             if (!empty($this->supportedLanguages[$key])) {
                 return $key;
             }
@@ -149,7 +173,7 @@ class LanguageNegotiator
                 }
                 // Unweighted values, get high weight by their position in the
                 // list
-                $q = isset($q) ? $q : 1000 - count($matches);
+                $q = $q ?? 1000 - \count($matches);
                 $matches[$l] = $q;
 
                 //If for some reason the Accept-Language header only sends language with country
