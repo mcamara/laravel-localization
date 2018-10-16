@@ -702,6 +702,7 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
      * @dataProvider accept_language_variations_data
      */
     public function testLanguageNegotiation($accept_string, $must_resolve_to, $asd = null) {
+
         $full_config = include __DIR__ . '/full-config/config.php';
 
         $request = $this->createMock(\Illuminate\Http\Request::class);
@@ -717,8 +718,10 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
 
         $language = $negotiator->negotiateLanguage();
 
+
         $this->assertEquals($must_resolve_to, $language);
     }
+
 
     public function accept_language_variations_data() {
         $variations = [
@@ -730,7 +733,7 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             ['fr-CA,fr;q=0.8', 'fr-CA'],
             ['fr-150', 'fr'],
             ['zh-Hant-cn', 'zh-Hant'],
-            ['zh-cn', 'zh']
+            ['zh-cn', 'zh'],
         ];
 
         $dataset = [];
@@ -740,4 +743,37 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
 
         return $dataset;
     }
+
+    public function testLanguageNegotiationWithMapping() {
+
+        $accept_string = 'en-GB';
+        $must_resolve_to = 'uk';
+
+        $mapping = [
+            $accept_string => $must_resolve_to
+        ];
+
+        $full_config = include __DIR__ . '/full-config/config.php';
+
+        $full_config['supportedLocales']['uk'] = $full_config['supportedLocales']['en-GB'];
+        unset($full_config['supportedLocales']['en-GB']);
+
+        app('config')->set('laravellocalization.localesMapping', $mapping);
+
+        $request = $this->createMock(\Illuminate\Http\Request::class);
+        $request->expects($this->any())->method('header')->with('Accept-Language')->willReturn($accept_string);
+
+        $negotiator = app(\Mcamara\LaravelLocalization\LanguageNegotiator::class,
+            [
+                'defaultLocale' => 'wrong',
+                'supportedLanguages' => $full_config['supportedLocales'],
+                'request' => $request
+            ]
+        );
+
+        $language = $negotiator->negotiateLanguage();
+
+        $this->assertEquals($must_resolve_to, $language);
+    }
+
 }

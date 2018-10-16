@@ -22,6 +22,9 @@
     "suggest": {
         "ext-intl": "*"
     },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
     "autoload": {
         "classmap": [
         ],
