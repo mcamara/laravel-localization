@@ -72,6 +72,10 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
                 return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
             }, ]);
         });
+
+        app('router')->get('/skipped', ['as'=> 'skipped', function () {
+            return Request::url();
+        }, ]);
     }
 
     /**
@@ -276,7 +280,7 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         );
     }
 
-        /**
+    /**
      * @param string $path
      * @param string|bool $expectedRouteName
      *
@@ -307,6 +311,23 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             [$this->test_url.'manage/0',            'LaravelLocalization::routes.manage'],
             [$this->test_url.'manage/0?ex=2&ex2=a', 'LaravelLocalization::routes.manage'],
         ];
+    }
+
+    public function testGetLocalizedUrlForIgnoredUrls() {
+        $crawler = $this->call(
+            'GET',
+            $this->test_url2.'/skipped',
+            [],
+            [],
+            [],
+            ['HTTP_ACCEPT_LANGUAGE' => 'en,es']
+        );
+
+        $this->assertResponseOk();
+        $this->assertEquals(
+            $this->test_url2.'/skipped',
+            $crawler->getContent()
+        );
     }
 
     /**
