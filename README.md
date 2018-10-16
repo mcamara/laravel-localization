@@ -206,7 +206,7 @@ In order to activate it, you just have to attach this middleware to the routes y
 
 If you want to hide the default locale but always show other locales in the url, switch the `hideDefaultLocaleInURL` config value to true. Once it's true, if the default locale is en (english) all URLs containing /en/ would be redirected to the same url without this fragment '/' but maintaining the locale as en (English).
 
-**IMPORTANT** - When `hideDefaultLocaleInURL` is set to true, the unlocalized root is treated as the applications default locale `app.locale`.  Because of this language negotiation using the Accept-Language header will **NEVER** occur when `hideDefaultLocaleInURL` is true.
+When `hideDefaultLocaleInURL` and `useAcceptLanguageHeader` are both set to true,then the language negotiation using the Accept-Language header will only occur while the session('locale') is empty. After negotiation, the session('locale') will be set accordingly and will not be called again.
 
 ### Set current locale as view-base-path
 
@@ -218,7 +218,8 @@ Now you can wrap your views in language-based folders like the translation files
 
 ### Map your own custom lang url segments
 
-If you want to use custom lang url segments like 'uk' instead of 'en-GB', you can use the mapping ```localesMapping```key to allow the LanguageNegotiator to assign the desired locales based on HTTP Accept Language Header. Here is a quick example, how to map HTTP Accept Language Header 'en-GB' to url segment 'uk':
+As you can modify the supportedLocales even by renaming their keys, it is possible to use the string ```uk``` instead of ```en-GB``` to provide custom lang url segments. Of course, you need to prevent any collisions with already existing keys and should stick to the convention as long as possible. But if you are using such a custom key, you have to store your mapping to the ```localesMapping``` array. This ```
+localesMapping``` is needed to enable the LanguageNegotiator to correctly assign the desired locales based on HTTP Accept Language Header. Here is a quick example how to map HTTP Accept Language Header 'en-GB' to url segment 'uk':
 
 ```php
 // config/laravellocalization.php

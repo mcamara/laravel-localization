@@ -28,10 +28,10 @@ class LaravelLocalizationRedirectFilter extends LaravelLocalizationMiddlewareBas
         array_shift($params);
 
         if (\count($params) > 0) {
-            $localeCode = $params[0];
+            $locale = $params[0];
 
-            if (app('laravellocalization')->checkLocaleInSupportedLocales($localeCode)) {
-                if ($localeCode === app('laravellocalization')->getDefaultLocale() && app('laravellocalization')->hideDefaultLocaleInURL()) {
+            if (app('laravellocalization')->checkLocaleInSupportedLocales($locale)) {
+                if (app('laravellocalization')->isHiddenDefault($locale)) {
                     $redirection = app('laravellocalization')->getNonLocalizedURL();
 
                     // Save any flashed data for redirect

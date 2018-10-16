@@ -3,7 +3,7 @@
 use Closure;
 use Illuminate\Http\RedirectResponse;
 
-class LocaleCookieRedirect extends LaravelLocalizationMiddlewareBase 
+class LocaleCookieRedirect extends LaravelLocalizationMiddlewareBase
 {
 
     /**
@@ -27,7 +27,7 @@ class LocaleCookieRedirect extends LaravelLocalizationMiddlewareBase
             return $next($request)->withCookie(cookie()->forever('locale', $params[0]));
          }
 
-         if ($locale && app('laravellocalization')->checkLocaleInSupportedLocales($locale) && !(app('laravellocalization')->getDefaultLocale() === $locale && app('laravellocalization')->hideDefaultLocaleInURL())) {
+         if ($locale && app('laravellocalization')->checkLocaleInSupportedLocales($locale) && !(app('laravellocalization')->isHiddenDefault($locale))) {
            $redirection = app('laravellocalization')->getLocalizedURL($locale);
            $redirectResponse = new RedirectResponse($redirection, 302, ['Vary' => 'Accept-Language']);
 
