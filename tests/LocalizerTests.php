@@ -257,6 +257,11 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             app('laravellocalization')->getLocalizedURL('en', $this->test_url.'test')
         );
 
+        $this->assertEquals(
+            $this->test_url.'test?a=1',
+            app('laravellocalization')->getLocalizedURL('en', $this->test_url.'test?a=1')
+        );
+
         $crawler = $this->call(
             'GET',
             app('laravellocalization')->getLocalizedURL('en', $this->test_url.'test'),
@@ -277,6 +282,11 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         $this->assertEquals(
             $this->test_url.'es/test',
             app('laravellocalization')->getLocalizedURL('es', $this->test_url.'test')
+        );
+
+        $this->assertEquals(
+            $this->test_url.'es/test?a=1',
+            app('laravellocalization')->getLocalizedURL('es', $this->test_url.'test?a=1')
         );
     }
 

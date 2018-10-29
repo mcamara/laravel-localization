@@ -262,6 +262,7 @@ class LaravelLocalization
             $url = $this->request->fullUrl();
         } else {
             $url = $this->url->to($url);
+            $url = preg_replace('/'. preg_quote($urlQuery, '/') . '$/', '', $url);
         }
 
         if ($locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale)) {
