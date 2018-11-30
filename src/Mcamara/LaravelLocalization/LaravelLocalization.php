@@ -146,7 +146,7 @@ class LaravelLocalization
 
             // If the locale is determined by env, use that
             // Note that this is how per-locale route caching is performed.
-            if ( ! $locale) {
+            if (! $locale) {
                 $locale = $this->getForcedLocale();
             }
         }
@@ -174,6 +174,13 @@ class LaravelLocalization
         }
 
         $this->app->setLocale($this->currentLocale);
+
+        // Set locale in fallback_locale on config/app.php
+        config(['app.fallback_locale' => $this->currentLocale]);
+
+        // set locale in timezone on config/app.php
+        $timezone = config('laravellocalization.supportedLocales.' . $this->currentLocale . '.timezone', 'UTC');
+        config(['app.timezone' => $timezone]);
 
         // Regional locale such as de_DE, so formatLocalized works in Carbon
         $regional = $this->getCurrentLocaleRegional();
@@ -283,7 +290,7 @@ class LaravelLocalization
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation);
         }
 
-	    if (!empty($locale)) {
+        if (!empty($locale)) {
             if ($forceDefaultLocation || $locale != $this->getDefaultLocale() || !$this->hideDefaultLocaleInURL()) {
                 $parsed_url['path'] = $locale.'/'.ltrim($parsed_url['path'], '/');
             }
@@ -558,7 +565,7 @@ class LaravelLocalization
     protected function substituteAttributesInRoute($attributes, $route)
     {
         foreach ($attributes as $key => $value) {
-            if ($value instanceOf UrlRoutable) {
+            if ($value instanceof UrlRoutable) {
                 $value = $value->getRouteKey();
             }
             $route = str_replace(array('{'.$key.'}', '{'.$key.'?}'), $value, $route);
@@ -776,7 +783,7 @@ class LaravelLocalization
      */
     public function setSerializedTranslatedRoutes($serializedRoutes)
     {
-        if ( ! $serializedRoutes) {
+        if (! $serializedRoutes) {
             return;
         }
 
@@ -917,14 +924,14 @@ class LaravelLocalization
     * @param      array  $attributes  The attributes
     * @return     array  The normalized attributes
     */
-     protected function normalizeAttributes($attributes)
-     {
-         if (array_key_exists('data', $attributes) && \is_array($attributes['data']) && ! \count($attributes['data'])) {
-             $attributes['data'] = null;
-             return $attributes;
-         }
-         return $attributes;
-     }
+    protected function normalizeAttributes($attributes)
+    {
+        if (array_key_exists('data', $attributes) && \is_array($attributes['data']) && ! \count($attributes['data'])) {
+            $attributes['data'] = null;
+            return $attributes;
+        }
+        return $attributes;
+    }
 
     /**
      * Returns the forced environment set route locale.
