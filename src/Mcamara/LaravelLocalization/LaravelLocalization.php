@@ -105,6 +105,11 @@ class LaravelLocalization
      */
     protected $routeName;
 
+    /**
+     * An array that contains all translated routes by url
+     *
+     * @var array
+     */
     protected $cachedTranslatedRoutesByUrl = [];
 
     /**
