@@ -105,8 +105,6 @@ class LaravelLocalization
      */
     protected $routeName;
 
-    protected $cachedTranslatedRoutesByPath = [];
-
     protected $cachedTranslatedRoutesByUrl = [];
 
     /**
