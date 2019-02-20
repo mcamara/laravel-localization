@@ -106,6 +106,13 @@ class LaravelLocalization
     protected $routeName;
 
     /**
+     * An array that contains all translated routes by url
+     *
+     * @var array
+     */
+    protected $cachedTranslatedRoutesByUrl = [];
+
+    /**
      * Creates new instance.
      *
      * @throws UnsupportedLocaleException
@@ -683,17 +690,23 @@ class LaravelLocalization
         if (empty($url)) {
             return false;
         }
-
+    
+        if (isset($this->cachedTranslatedRoutesByUrl[$locale][$url])) {
+            return $this->cachedTranslatedRoutesByUrl[$locale][$url];
+        }
+    
         // check if this url is a translated url
         foreach ($this->translatedRoutes as $translatedRoute) {
             $routeName = $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
-
+    
             // We can ignore extra url parts and compare only their url_path (ignore arguments that are not attributes)
             if (parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH) == parse_url($this->getNonLocalizedURL($url), PHP_URL_PATH)) {
+                $this->cachedTranslatedRoutesByUrl[$locale][$url] = $translatedRoute;
+                
                 return $translatedRoute;
             }
         }
-
+    
         return false;
     }
 
