@@ -151,7 +151,7 @@ Template files and all locale files should follow the [Lang class](http://larave
 
 Moreover, this package includes a middleware object to redirect all "non-localized" routes to the corresponding "localized".
 
-So, if a user navigates to http://url-to-laravel/test and the system has this middleware active and 'en' as the current locale for this user, it would redirect (301) him automatically to http://url-to-laravel/en/test. This is mainly used to avoid duplicate content and improve SEO performance.
+So, if a user navigates to http://url-to-laravel/test and the system has this middleware active and 'en' as the current locale for this user, it would redirect (302) him automatically to http://url-to-laravel/en/test. This is mainly used to avoid duplicate content and improve SEO performance.
 
 To do so, you have to register the middleware in the `app/Http/Kernel.php` file like this:
 
