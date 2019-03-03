@@ -690,23 +690,23 @@ class LaravelLocalization
         if (empty($url)) {
             return false;
         }
-    
+
         if (isset($this->cachedTranslatedRoutesByUrl[$locale][$url])) {
             return $this->cachedTranslatedRoutesByUrl[$locale][$url];
         }
-    
+
         // check if this url is a translated url
         foreach ($this->translatedRoutes as $translatedRoute) {
             $routeName = $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
-    
+
             // We can ignore extra url parts and compare only their url_path (ignore arguments that are not attributes)
             if (parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH) == parse_url($this->getNonLocalizedURL($url), PHP_URL_PATH)) {
                 $this->cachedTranslatedRoutesByUrl[$locale][$url] = $translatedRoute;
-                
+
                 return $translatedRoute;
             }
         }
-    
+
         return false;
     }
 
@@ -976,6 +976,12 @@ class LaravelLocalization
      */
     protected function getForcedLocale()
     {
-        return env(static::ENV_ROUTE_KEY);
+        return env(static::ENV_ROUTE_KEY, function () {
+            $value = getenv(static::ENV_ROUTE_KEY);
+
+            if ($value !== false) {
+                return $value;
+            }
+        });
     }
 }
