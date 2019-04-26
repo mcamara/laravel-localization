@@ -786,4 +786,19 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         $this->assertEquals($must_resolve_to, $language);
     }
 
+    public function testSetLocaleWithMapping()
+    {
+        app('config')->set('laravellocalization.localesMapping', [
+            'en' => 'custom',
+        ]);
+
+        $this->assertEquals('custom', app('laravellocalization')->setLocale('custom'));
+        $this->assertEquals('en', app('laravellocalization')->getCurrentLocale());
+
+        $this->assertTrue(app('laravellocalization')->checkLocaleInSupportedLocales('en'));
+        $this->assertTrue(app('laravellocalization')->checkLocaleInSupportedLocales('custom'));
+
+        $this->assertEquals('http://localhost/custom/some-route', app('laravellocalization')->localizeURL('some-route', 'en'));
+        $this->assertEquals('http://localhost/custom/some-route', app('laravellocalization')->localizeURL('some-route', 'custom'));
+    }
 }
