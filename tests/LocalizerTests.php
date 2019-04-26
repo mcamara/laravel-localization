@@ -800,5 +800,6 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
 
         $this->assertEquals('http://localhost/custom/some-route', app('laravellocalization')->localizeURL('some-route', 'en'));
         $this->assertEquals('http://localhost/custom/some-route', app('laravellocalization')->localizeURL('some-route', 'custom'));
+        $this->assertEquals('http://localhost/custom', app('laravellocalization')->localizeURL('http://localhost/custom', 'en'));
     }
 }
