@@ -25,7 +25,7 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         ];
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
     }
