@@ -190,7 +190,7 @@ class LaravelLocalization
             setlocale(LC_MONETARY, $regional . $suffix);
         }
 
-        return $locale;
+        return $this->currentLocale;
     }
 
     /**
