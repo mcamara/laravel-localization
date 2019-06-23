@@ -6,6 +6,7 @@ use Illuminate\Config\Repository;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
 use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
+use App\Models\Category;
 
 class LaravelLocalization
 {
@@ -261,6 +262,8 @@ class LaravelLocalization
         $urlQuery = parse_url($url, PHP_URL_QUERY);
         $urlQuery = $urlQuery ? '?'.$urlQuery : '';
 
+        
+        
         if (empty($url)) {
             if (!empty($this->routeName)) {
                 return $this->getURLFromRouteNameTranslated($locale, $this->routeName, $attributes, $forceDefaultLocation);
@@ -272,9 +275,13 @@ class LaravelLocalization
             $url = preg_replace('/'. preg_quote($urlQuery, '/') . '$/', '', $url);
         }
 
+        
+        
         if ($locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale)) {
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).$urlQuery;
         }
+
+        
 
         $base_path = $this->request->getBaseUrl();
         $parsed_url = parse_url($url);
@@ -303,6 +310,7 @@ class LaravelLocalization
         $parsed_url['path'] = ltrim($parsed_url['path'], '/');
 
         if ($translatedRoute = $this->findTranslatedRouteByPath($parsed_url['path'], $url_locale)) {
+            
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).$urlQuery;
         }
 
@@ -350,6 +358,20 @@ class LaravelLocalization
 
         if (!\is_string($locale)) {
             $locale = $this->getDefaultLocale();
+        }
+
+        if (array_key_exists('sublevels', $attributes)) {
+            $slug = Category::where('slug', $attributes['sublevels'])
+                ->orWhere('slug_it', $attributes['sublevels'])
+                ->orWhere('slug_en', $attributes['sublevels'])->first();
+
+            if(!$slug) {
+                $slug = Article::where('slug', $attributes['sublevels'])
+                    ->orWhere('slug_it', $attributes['sublevels'])
+                    ->orWhere('slug_en', $attributes['sublevels'])->first();
+            }
+
+            $attributes['sublevels'] = $slug[$locale == 'sr' ? 'slug' : 'slug_'.$locale];
         }
 
         $route = '';
