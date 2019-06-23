@@ -6,7 +6,6 @@ use Illuminate\Config\Repository;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
 use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
-use App\Models\Category;
 
 class LaravelLocalization
 {
