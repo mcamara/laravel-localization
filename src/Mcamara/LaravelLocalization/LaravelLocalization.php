@@ -360,18 +360,14 @@ class LaravelLocalization
             $locale = $this->getDefaultLocale();
         }
 
-        if (array_key_exists('sublevels', $attributes)) {
-            $slug = Category::where('slug', $attributes['sublevels'])
-                ->orWhere('slug_it', $attributes['sublevels'])
-                ->orWhere('slug_en', $attributes['sublevels'])->first();
+        $response = event('routes.translation', [$locale, $attributes]);
 
-            if(!$slug) {
-                $slug = Article::where('slug', $attributes['sublevels'])
-                    ->orWhere('slug_it', $attributes['sublevels'])
-                    ->orWhere('slug_en', $attributes['sublevels'])->first();
-            }
+        if (!empty($response)) {
+            $response = array_shift($response);
+        }
 
-            $attributes['sublevels'] = $slug[$locale == 'sr' ? 'slug' : 'slug_'.$locale];
+        if (\is_array($response)) {
+            $attributes = array_merge($attributes, $response);
         }
 
         $route = '';
@@ -929,15 +925,7 @@ class LaravelLocalization
             }
 
             $attributes = $this->normalizeAttributes($this->router->current()->parameters());
-            $response = event('routes.translation', [$locale, $attributes]);
-
-            if (!empty($response)) {
-                $response = array_shift($response);
-            }
-
-            if (\is_array($response)) {
-                $attributes = array_merge($attributes, $response);
-            }
+            
         }
 
         return $attributes;
