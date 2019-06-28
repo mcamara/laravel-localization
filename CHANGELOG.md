@@ -1,5 +1,8 @@
+### 1.3.20
+- Respect locales mapping ([#631](https://github.com/mcamara/laravel-localization/pull/631))
+
 ### 1.3.11
-- Merged in solution for caching translated and localized routes (originally in separate package [czim/laravel-localization-route-cache](https://github.com/czim/laravel-localization-route-cache)) by [CZim](https://github.com/czim).  
+- Merged in solution for caching translated and localized routes (originally in separate package [czim/laravel-localization-route-cache](https://github.com/czim/laravel-localization-route-cache)) by [CZim](https://github.com/czim).
     If you used this package, be sure to remove it when upgrading to this version.
 - Added `'utf8suffix' => env('LARAVELLOCALIZATION_UTF8SUFFIX', '.UTF-8')` to config file.
 

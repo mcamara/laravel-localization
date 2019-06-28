@@ -85,6 +85,13 @@ class LaravelLocalization
     protected $supportedLocales;
 
     /**
+     * Locales mapping.
+     *
+     * @var array
+     */
+    protected $localesMapping;
+
+    /**
      * Current locale.
      *
      * @var string
@@ -158,6 +165,8 @@ class LaravelLocalization
             }
         }
 
+        $locale = $this->getInversedLocaleFromMapping($locale);
+
         if (!empty($this->supportedLocales[$locale])) {
             $this->currentLocale = $locale;
         } else {
@@ -190,7 +199,7 @@ class LaravelLocalization
             setlocale(LC_MONETARY, $regional . $suffix);
         }
 
-        return $locale;
+        return $this->getLocaleFromMapping($locale);
     }
 
     /**
@@ -286,6 +295,8 @@ class LaravelLocalization
             $parsed_url['path'] = str_replace($base_path, '', '/'.ltrim($parsed_url['path'], '/'));
             $path = $parsed_url['path'];
             foreach ($this->getSupportedLocales() as $localeCode => $lang) {
+                $localeCode = $this->getLocaleFromMapping($localeCode);
+
                 $parsed_url['path'] = preg_replace('%^/?'.$localeCode.'/%', '$1', $parsed_url['path']);
                 if ($parsed_url['path'] !== $path) {
                     $url_locale = $localeCode;
@@ -306,7 +317,9 @@ class LaravelLocalization
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).$urlQuery;
         }
 
-	    if (!empty($locale)) {
+        $locale = $this->getLocaleFromMapping($locale);
+
+        if (!empty($locale)) {
             if ($forceDefaultLocation || $locale != $this->getDefaultLocale() || !$this->hideDefaultLocaleInURL()) {
                 $parsed_url['path'] = $locale.'/'.ltrim($parsed_url['path'], '/');
             }
@@ -393,6 +406,44 @@ class LaravelLocalization
     public function getDefaultLocale()
     {
         return $this->defaultLocale;
+    }
+
+    /**
+     * Return locales mapping.
+     *
+     * @return array
+     */
+    public function getLocalesMapping()
+    {
+        if (empty($this->localesMapping)) {
+            $this->localesMapping = $this->configRepository->get('laravellocalization.localesMapping');
+        }
+
+        return $this->localesMapping;
+    }
+
+    /**
+     * Returns a locale from the mapping.
+     *
+     * @param string|null $locale
+     *
+     * @return string|null
+     */
+    public function getLocaleFromMapping($locale)
+    {
+        return $this->getLocalesMapping()[$locale] ?? $locale;
+    }
+
+    /**
+     * Returns inversed locale from the mapping.
+     *
+     * @param string|null $locale
+     *
+     * @return string|null
+     */
+    public function getInversedLocaleFromMapping($locale)
+    {
+        return \array_flip($this->getLocalesMapping())[$locale] ?? $locale;
     }
 
     /**
@@ -562,8 +613,9 @@ class LaravelLocalization
      */
     public function checkLocaleInSupportedLocales($locale)
     {
+        $inversedLocale = $this->getInversedLocaleFromMapping($locale);
         $locales = $this->getSupportedLocales();
-        if ($locale !== false && empty($locales[$locale])) {
+        if ($locale !== false && empty($locales[$locale]) && empty($locales[$inversedLocale])) {
             return false;
         }
 

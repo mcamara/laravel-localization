@@ -230,6 +230,13 @@ localesMapping``` is needed to enable the LanguageNegotiator to correctly assign
 ],
 ```
 
+After that ```http://url-to-laravel/en-GB/a/b/c``` becomes ```http://url-to-laravel/uk/a/b/c```.
+
+```php
+LaravelLocalization::getLocalizedURL('en-GB', 'a/b/c'); // http://url-to-laravel/uk/a/b/c
+LaravelLocalization::getLocalizedURL('uk', 'a/b/c'); // http://url-to-laravel/uk/a/b/c
+```
+
 ## Helpers
 
 This package comes with some useful functions, like:
