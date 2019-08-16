@@ -2,14 +2,12 @@
 
 namespace Mcamara\LaravelLocalization\Commands;
 
+use Illuminate\Foundation\Console\RouteCacheCommand;
 use Mcamara\LaravelLocalization\LaravelLocalization;
 use Mcamara\LaravelLocalization\Traits\TranslatedRouteCommandContext;
-use Illuminate\Console\Command;
-use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
 
-class RouteTranslationsCacheCommand extends Command
+class RouteTranslationsCacheCommand extends RouteCacheCommand
 {
     use TranslatedRouteCommandContext;
 
@@ -23,24 +21,6 @@ class RouteTranslationsCacheCommand extends Command
      */
     protected $description = 'Create a route cache file for faster route registration for all locales';
 
-    /**
-     * The filesystem instance.
-     *
-     * @var Filesystem
-     */
-    protected $files;
-
-    /**
-     * Create a new route command instance.
-     *
-     * @param Filesystem  $files
-     */
-    public function __construct(Filesystem $files)
-    {
-        parent::__construct();
-
-        $this->files = $files;
-    }
 
     /**
      * Execute the console command.
@@ -67,7 +47,7 @@ class RouteTranslationsCacheCommand extends Command
 
         foreach ($allLocales as $locale) {
 
-            $routes = $this->getFreshApplicationRoutes($locale);
+            $routes = $this->getFreshApplicationRoutesForLocale($locale);
 
             if (count($routes) == 0) {
                 $this->error("Your application doesn't have any routes.");
@@ -85,31 +65,27 @@ class RouteTranslationsCacheCommand extends Command
     }
 
     /**
-     * Boot a fresh copy of the application and get the routes.
+     * Boot a fresh copy of the application and get the routes for a given locale.
      *
      * @param string|null $locale
      * @return \Illuminate\Routing\RouteCollection
      */
-    protected function getFreshApplicationRoutes($locale = null)
+    protected function getFreshApplicationRoutesForLocale($locale = null)
     {
-        $app = require $this->getBootstrapPath() . '/app.php';
-
-        if (null !== $locale) {
-
-            $key = LaravelLocalization::ENV_ROUTE_KEY;
-
-            putenv("{$key}={$locale}");
-
-            $app->make(Kernel::class)->bootstrap();
-
-            putenv("{$key}=");
-
-        } else {
-
-            $app->make(Kernel::class)->bootstrap();
+        if ($locale === null) {
+            return $this->getFreshApplicationRoutes();
         }
 
-        return $app['router']->getRoutes();
+
+        $key = LaravelLocalization::ENV_ROUTE_KEY;
+
+        putenv("{$key}={$locale}");
+
+        $routes = $this->getFreshApplicationRoutes();
+
+        putenv("{$key}=");
+
+        return $routes;
     }
 
     /**
