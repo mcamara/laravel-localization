@@ -58,8 +58,12 @@ trait LoadsTranslatedCachedRoutes
     {
         $path = $this->getDefaultCachedRoutePath();
 
-        $localeSegment = request()->segment(1);
-        if ( ! $localeSegment || ! in_array($localeSegment, $localeKeys)) {
+        // If we have no specifically forced locale, use default or let the request determine it.
+        if ($locale === null) {
+            $locale = $this->getLocaleFromRequest();
+        }
+
+        if ( ! $locale || ! in_array($locale, $localeKeys)) {
             return $path;
         }
 
@@ -74,6 +78,14 @@ trait LoadsTranslatedCachedRoutes
     protected function getDefaultCachedRoutePath()
     {
         return $this->app->getCachedRoutesPath();
+    }
+
+    /**
+     * @return string|null
+     */
+    protected function getLocaleFromRequest()
+    {
+        return request()->segment(1);
     }
 
     /**
