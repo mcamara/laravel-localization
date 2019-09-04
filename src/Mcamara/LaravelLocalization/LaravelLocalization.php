@@ -4,6 +4,7 @@ namespace Mcamara\LaravelLocalization;
 
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Support\Str;
 use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
 use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 
@@ -327,7 +328,7 @@ class LaravelLocalization
         $parsed_url['path'] = ltrim(ltrim($base_path, '/').'/'.$parsed_url['path'], '/');
 
         //Make sure that the pass path is returned with a leading slash only if it come in with one.
-        if (starts_with($path, '/') === true) {
+        if (Str::startsWith($path, '/') === true) {
             $parsed_url['path'] = '/'.$parsed_url['path'];
         }
         $parsed_url['path'] = rtrim($parsed_url['path'], '/');
