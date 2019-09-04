@@ -371,7 +371,7 @@ class LaravelLocalization
             $route = '/'.$locale;
         }
         if (\is_string($locale) && $this->translator->has($transKeyName, $locale)) {
-            $translation = $this->translator->trans($transKeyName, [], $locale);
+            $translation = $this->translator->get($transKeyName, [], $locale);
             $route .= '/'.$translation;
 
             $route = $this->substituteAttributesInRoute($attributes, $route);
@@ -678,7 +678,7 @@ class LaravelLocalization
             $this->translatedRoutes[] = $routeName;
         }
 
-        return $this->translator->trans($routeName);
+        return $this->translator->get($routeName);
     }
 
     /**
@@ -696,7 +696,7 @@ class LaravelLocalization
         $path = trim(str_replace('/'.$this->currentLocale.'/', '', $path), "/");
 
         foreach ($this->translatedRoutes as $route) {
-            if (trim($this->substituteAttributesInRoute($attributes, $this->translator->trans($route)), '/') === $path) {
+            if (trim($this->substituteAttributesInRoute($attributes, $this->translator->get($route)), '/') === $path) {
                 return $route;
             }
         }
@@ -716,7 +716,7 @@ class LaravelLocalization
     {
         // check if this url is a translated url
         foreach ($this->translatedRoutes as $translatedRoute) {
-            if ($this->translator->trans($translatedRoute, [], $url_locale) == rawurldecode($path)) {
+            if ($this->translator->get($translatedRoute, [], $url_locale) == rawurldecode($path)) {
                 return $translatedRoute;
             }
         }
