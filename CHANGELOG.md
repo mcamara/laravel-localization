@@ -1,3 +1,6 @@
+### 1.4.0
+- Added compatibility with Laravel 6
+
 ### 1.3.20
 - Respect locales mapping ([#631](https://github.com/mcamara/laravel-localization/pull/631))
 
