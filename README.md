@@ -448,7 +448,7 @@ This function will return the [ISO 15924](http://www.unicode.org/iso15924) code 
 
 If you're supporting multiple locales in your project you will probably want to provide the users with a way to change language. Below is a simple example of blade template code you can use to create your own language selector.
 
-```
+```blade
 <ul>
     @foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
         <li>
