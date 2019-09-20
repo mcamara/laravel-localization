@@ -24,6 +24,7 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
     - <a href="#route-model-binding">Route Model Binding</a>
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#caching-routes">Caching routes</a>
+- <a href="#testing">Testing</a>
 - <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
 
@@ -556,6 +557,35 @@ Be sure to pass the locale and the attributes as parameters to the closure. You 
 More information on support on [cached (translated) routes here](CACHING.md).
 
 Note that the separate [czim/laravel-localization-route-cache](https://github.com/czim/laravel-localization-route-cache) package is no longer required.
+
+## Testing
+
+During the test setup, the called route is not yet known. This means no language can be set.
+When a request is made during a test, this results in a 404 - without the prefix set the localised route does not seem to exist.
+
+To fix this, you can use this function to manually set the language prefix:
+```php
+// TestCase.php
+protected function refreshApplicationWithLocale($locale)
+{
+    self::tearDown();
+    putenv(LaravelLocalization::ENV_ROUTE_KEY . '=' . $locale);
+    self::setUp();
+}
+
+protected function tearDown()
+{
+    putenv(LaravelLocalization::ENV_ROUTE_KEY);
+    parent::tearDown();
+}
+
+// YourTest.php
+public function testBasicTest()
+{
+    $this->refreshApplicationWithLocale('en');
+    // Testing code
+}
+```
 
 ## Changelog
 
