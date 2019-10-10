@@ -162,17 +162,17 @@ Whenever a locale is present in the url, it will be stored in the session by thi
 
 In there is no locale present in the url, then this middleware will check the following
 
- - If no locale is saved in session and `useAcceptLanguageHeader` is set to true, compute locale from browser and redirect to url with locale
+ - If no locale is saved in session and `useAcceptLanguageHeader` is set to true, compute locale from browser and redirect to url with locale.
  - If a locale is saved in session redirect to url with locale, unless its the default locale and `hideDefaultLocaleInURL` is set to true.
 
-For example, if a user navigates to http://url-to-laravel/test  and 'en' is the current locale, it would redirect him automatically to http://url-to-laravel/en/test.
+For example, if a user navigates to http://url-to-laravel/test  and `en` is the current locale, it would redirect him automatically to http://url-to-laravel/en/test.
 
 #### LaravelLocalizationRedirectFilter
 
-When the default locale is present in the url and `hideDefaultLocaleInURL` is set to true, then the middleware redirects to the url without locale, but maintaining the locale.
+When the default locale is present in the url and `hideDefaultLocaleInURL` is set to true, then the middleware redirects to the url without locale.
 
-For example, if `es` is the default locale, then http://url-to-laravel/es/test would be redirected to http://url-to-laravel/test and the page would have default locale `es`
-although its not in the url.
+For example, if `es` is the default locale, then http://url-to-laravel/es/test would be redirected to http://url-to-laravel/test and the`App::getLocale()` would be
+set to `es`.
 
 #### LaravelLocalizationViewPath
 
