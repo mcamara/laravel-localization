@@ -176,7 +176,7 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
 
         app()['request'] = $this->createRequest(
-            $uri = '/en/test',
+            $uri = '/en/test'
         );
 
         $laravelLocalization = new \Mcamara\LaravelLocalization\LaravelLocalization();
