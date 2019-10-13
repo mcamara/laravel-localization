@@ -170,11 +170,6 @@ class LaravelLocalization
 
         if (!empty($this->supportedLocales[$locale])) {
             $this->currentLocale = $locale;
-
-            if ($locale === $this->defaultLocale && $this->hideDefaultLocaleInURL()) {
-                $locale = null;
-            }
-            
         } else {
             // if the first segment/locale passed is not valid
             // the system would ask which locale have to take
