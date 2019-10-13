@@ -8,8 +8,10 @@
 
 Easy i18n localization for Laravel, an useful tool to combine with Laravel localization classes.
 
-## Collaborators (ask me if you want your name here!)
-- [iwasherefirst2](https://github.com/iwasherefirst2)
+## Collaborators
+Ask [mcamara](https://github.com/mcamara) if you want to be one of them!
+
+- [Adam Nielsen](https://github.com/iwasherefirst2)
 
 ## Table of Contents
 
