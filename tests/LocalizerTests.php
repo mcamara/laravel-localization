@@ -25,11 +25,6 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         ];
     }
 
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     /**
      * Set routes for testing.
      *
@@ -90,6 +85,41 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
     }
 
     /**
+     * Create fake request
+     * @param  [type] $method     [description]
+     * @param  [type] $content    [description]
+     * @param  string $uri        [description]
+     * @param  array  $server     [description]
+     * @param  array  $parameters [description]
+     * @param  array  $cookies    [description]
+     * @param  array  $files      [description]
+     * @return [type]             [description]
+     */
+    protected function createRequest(
+        $uri = '/test',
+        $method = 'GET',
+        $parameters = [],
+        $cookies = [],
+        $files = [],
+        $server = ['CONTENT_TYPE' => 'application/json'],
+        $content = null
+    )
+    {
+        $request = new \Illuminate\Http\Request;
+        return $request->createFromBase(
+            \Symfony\Component\HttpFoundation\Request::create(
+                $uri,
+                $method,
+                $parameters,
+                $cookies,
+                $files,
+                $server,
+                $content
+            )
+        );
+    }
+
+    /**
      * Define environment setup.
      *
      * @param Illuminate\Foundation\Application $app
@@ -136,6 +166,22 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
 
         $this->assertNull(app('laravellocalization')->setLocale('de'));
         $this->assertEquals('en', app('laravellocalization')->getCurrentLocale());
+    }
+
+    // LaravelLocalization setLocale method should return the locale of
+    // the request uri (if any). This behavior should be independet
+    // of the `hideDefaultLocaleInURL` setting
+    public function testHideDefaultLocaleInUrlShouldNotChangeSetLocaleBehaviour()
+    {
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
+
+        app()['request'] = $this->createRequest(
+            $uri = '/en/test'
+        );
+
+        $laravelLocalization = new \Mcamara\LaravelLocalization\LaravelLocalization();
+
+        $this->assertEquals('en', $laravelLocalization->setLocale());
     }
 
     public function testLocalizeURL()
