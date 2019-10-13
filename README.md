@@ -44,7 +44,9 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
 
 Install the package via composer: `composer require mcamara/laravel-localization`
 
-In Laravel 5.5, the service provider and facade will automatically get registered. For older versions of the framework, follow the steps below:
+### For Laravel 5.4 and below:
+
+For older versions of the framework, follow the steps below:
 
 Register the service provider in `config/app.php`
 
@@ -151,11 +153,38 @@ Template files and all locale files should follow the [Lang class](http://larave
 
 ### Middleware
 
-Moreover, this package includes a middleware object to redirect all "non-localized" routes to the corresponding "localized".
+The packages ships with useful middleware. The behavior depends on the settings of `hideDefaultLocaleInURL`
+and `useAcceptLanguageHeader` in `config/laravellocalization.php`:
 
-So, if a user navigates to http://url-to-laravel/test and the system has this middleware active and 'en' as the current locale for this user, it would redirect (302) him automatically to http://url-to-laravel/en/test. This is mainly used to avoid duplicate content and improve SEO performance.
+#### LocaleSessionRedirect
 
-To do so, you have to register the middleware in the `app/Http/Kernel.php` file like this:
+Whenever a locale is present in the url, it will be stored in the session by this middleware.
+
+In there is no locale present in the url, then this middleware will check the following
+
+ - If no locale is saved in session and `useAcceptLanguageHeader` is set to true, compute locale from browser and redirect to url with locale.
+ - If a locale is saved in session redirect to url with locale, unless its the default locale and `hideDefaultLocaleInURL` is set to true.
+
+For example, if a user navigates to http://url-to-laravel/test  and `en` is the current locale, it would redirect him automatically to http://url-to-laravel/en/test.
+
+#### LaravelLocalizationRedirectFilter
+
+When the default locale is present in the url and `hideDefaultLocaleInURL` is set to true, then the middleware redirects to the url without locale.
+
+For example, if `es` is the default locale, then http://url-to-laravel/es/test would be redirected to http://url-to-laravel/test and the`App::getLocale()` would be
+set to `es`.
+
+#### LaravelLocalizationViewPath
+
+Register this middleware to set current locale as view-base-path.
+
+Now you can wrap your views in language-based folders like the translation files.
+
+`resources/views/en/`, `resources/views/fr`, ...
+
+#### Register Middleware
+
+You may register the above middleware in the `app/Http/Kernel.php` file and in the `Route:group` like this:
 
 ```php
 <?php namespace App\Http;
@@ -170,18 +199,16 @@ class Kernel extends HttpKernel {
 	 */
 	protected $routeMiddleware = [
 		/**** OTHER MIDDLEWARE ****/
-		'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
-		'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
-		'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
-                'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class
-		// REDIRECTION MIDDLEWARE
+		'localize'                => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+		'localizationRedirect'    => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
+		'localeSessionRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
+        'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class
 	];
 }
 ```
 
-
 ```php
-// app/Http/routes.php
+// routes/web.php
 
 Route::group(
 [
@@ -190,34 +217,12 @@ Route::group(
 ],
 function()
 {
-	/** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
-	Route::get('/', function()
-	{
-		return View::make('hello');
-	});
-
-	Route::get('test',function(){
-		return View::make('test');
-	});
+	//...
 });
 
 /** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
 
 ```
-
-In order to activate it, you just have to attach this middleware to the routes you want to be accessible localized.
-
-If you want to hide the default locale but always show other locales in the url, switch the `hideDefaultLocaleInURL` config value to true. Once it's true, if the default locale is en (english) all URLs containing /en/ would be redirected to the same url without this fragment '/' but maintaining the locale as en (English).
-
-When `hideDefaultLocaleInURL` and `useAcceptLanguageHeader` are both set to true,then the language negotiation using the Accept-Language header will only occur while the session('locale') is empty. After negotiation, the session('locale') will be set accordingly and will not be called again.
-
-### Set current locale as view-base-path
-
-To set the current locale as view-base-path, simply register the localeViewPath-middlware in your Kernel.php, like it is descriped above.
-
-Now you can wrap your views in language-based folders like the translation files.
-
-`resources/views/en/`, `resources/views/fr`, ...
 
 ### Map your own custom lang url segments
 
