@@ -11,7 +11,7 @@ Easy i18n localization for Laravel, an useful tool to combine with Laravel local
 ## Collaborators
 Ask [mcamara](https://github.com/mcamara) if you want to be one of them!
 
-- [Adam Nielsen](https://github.com/iwasherefirst2)
+- [Adam Nielsen (iwasherefirst2)](https://github.com/iwasherefirst2)
 
 ## Table of Contents
 
