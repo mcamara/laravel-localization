@@ -252,29 +252,31 @@ LaravelLocalization::getLocalizedURL('uk', 'a/b/c'); // http://url-to-laravel/uk
 
 This package comes with some useful functions, like:
 
-### Get URL for an specific locale
+
+### Get localized url
 
 ```php
-/**
- * Returns an URL adapted to $locale
- *
- * @param  string|boolean 	$locale	   	Locale to adapt, false to remove locale
- * @param  string|false		$url		URL to adapt in the current language. If not passed, the current url would be taken.
- * @param  array 		$attributes	Attributes to add to the route, if empty, the system would try to extract them from the url.
- *
- * @throws UnsupportedLocaleException
- *
- * @return string|false				URL translated, False if url does not exist
- */
-public function getLocalizedURL($locale = null, $url = null, $attributes = array())
-
-//Should be called in a view like this:
-{{ LaravelLocalization::getLocalizedURL(optional string $locale, optional string $url, optional array $attributes) }}
+    /**
+     * Returns an URL adapted to $locale or current locale.
+     *
+     * @param string      $url    URL to adapt. If not passed, the current url would be taken.
+     * @param string|bool $locale Locale to adapt, false to remove locale
+     *
+     * @throws UnsupportedLocaleException
+     *
+     * @return string URL translated
+     */
+    public function localizeURL($url = null, $locale = null)
 ```
 
-It returns a URL localized to the desired locale.
+//Should be called in a view like this:
+{{ LaravelLocalization::localizeURL('/about') }}
 
-##### Route Model Binding
+
+It returns a URL localized to the desired locale (if no locale is given, it uses current locale).
+
+
+#### Route Model Binding
 
 Note that [route model binding]([https://laravel.com/docs/master/routing#route-model-binding]) is taken into account when generating the localized route.
 
@@ -293,7 +295,7 @@ Note that [route model binding]([https://laravel.com/docs/master/routing#route-m
 public function getNonLocalizedURL($url = null)
 
 //Should be called in a view like this:
-{{ LaravelLocalization::getNonLocalizedURL(optional string $url) }}
+{{ LaravelLocalization::getNonLocalizedURL('/es/about') }}
 ```
 
 It returns a URL clean of any localization.
@@ -315,7 +317,7 @@ It returns a URL clean of any localization.
 public function getURLFromRouteNameTranslated($locale, $transKeyName, $attributes = array())
 
 //Should be called in a view like this:
-{{ LaravelLocalization::getURLFromRouteNameTranslated(string $locale, optional array $transKeyNames, optional array $attributes) }}
+{{ LaravelLocalization::getURLFromRouteNameTranslated('es', 'routes.about') }}
 ```
 
 It returns a route, localized to the desired locale using the locale passed. If the translation key does not exist in the locale given, this function will return false.
@@ -566,6 +568,32 @@ Be sure to pass the locale and the attributes as parameters to the closure. You 
 More information on support on [cached (translated) routes here](CACHING.md).
 
 Note that the separate [czim/laravel-localization-route-cache](https://github.com/czim/laravel-localization-route-cache) package is no longer required.
+
+## Common Issues
+
+### POST is not working
+
+This may happen if you do not localize your action route. This may cause a redirect, which
+then changes the post request into a get request. Do prevent that, simply use the [localize helper](#get-localized-url).
+
+For example, if you use `Auth::routes()` and put them into your `Route::group` Then
+
+```
+<form action="/logout" method="POST">
+<button>Logout</button>
+</form>
+```
+
+will not work. Instead, one has to use
+
+```php
+<form action="{{  \LaravelLocalization::localizeURL('/logout') }} " method="POST">
+<button>Logout</button>
+</form>
+```
+
+Alternativly, one may simple put the `post` route outside the `Route::group`
+
 
 ## Testing
 
