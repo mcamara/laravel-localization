@@ -28,8 +28,12 @@ Ask [mcamara](https://github.com/mcamara) if you want to be one of them!
     - <a href="#route-model-binding">Route Model Binding</a>
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#caching-routes">Caching routes</a>
-- <a href="#testing">Testing</a>
 - <a href="#changelog">Changelog</a>
+- <a href="#testing">Testing</a>
+- <a href="#common-issues">Common Issues</a>
+    - <a href="#post-is-not-working">POST is not working</a>
+    - <a href="#methodnotallowedhttpexception">MethodNotAllowedHttpException</a>
+    - <a href="#validation-message-is-only-in-default-locale">Validation message is always in default locale</a>
 - <a href="#license">License</a>
 
 ## Laravel compatibility
@@ -594,6 +598,20 @@ will not work. Instead, one has to use
 
 Alternativly, one may simple put the `post` route outside the `Route::group`
 
+### MethodNotAllowedHttpException
+
+If you do not localize your post url, then it gets redirected as a get request.
+If you have not defined such a get route, you will cause this exception.
+
+To localize your post url see [POST is not working](#post-is-not-working)
+
+### Validation message is only in default locale
+
+This also happens if you did not localuze your post url.
+If you don't localize your post url, the default locale is set while validating,
+and when returning it shows the validation message in default locale.
+
+To localize your post url see [POST is not working](#post-is-not-working)
 
 ## Testing
 
