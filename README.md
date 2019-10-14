@@ -577,8 +577,9 @@ Note that the separate [czim/laravel-localization-route-cache](https://github.co
 
 ### POST is not working
 
-This may happen if you do not localize your action route. This may cause a redirect, which
-then changes the post request into a get request. Do prevent that, simply use the [localize helper](#get-localized-url).
+This may happen if you do not localize your action route that is inside your `Routes::group`.
+This may cause a redirect, which then changes the post request into a get request.
+To prevent that, simply use the [localize helper](#get-localized-url).
 
 For example, if you use `Auth::routes()` and put them into your `Route::group` Then
 
@@ -596,27 +597,26 @@ will not work. Instead, one has to use
 </form>
 ```
 
-Alternativly, one may simple put the `post` route outside the `Route::group`
-
 ### MethodNotAllowedHttpException
 
-If you do not localize your post url, then it gets redirected as a get request.
+If you do not localize your post url and use a redirect middleware,
+then the post request gets redirected as a get request.
 If you have not defined such a get route, you will cause this exception.
 
-To localize your post url see [POST is not working](#post-is-not-working)
+To localize your post url see the example in [POST is not working](#post-is-not-working).
 
 ### Validation message is only in default locale
 
-This also happens if you did not localuze your post url.
+This also happens if you did not localize your post url.
 If you don't localize your post url, the default locale is set while validating,
-and when returning it shows the validation message in default locale.
+and when returning to `back()` it shows the validation message in default locale.
 
-To localize your post url see [POST is not working](#post-is-not-working)
+To localize your post url see the example in [POST is not working](#post-is-not-working).
 
 ## Testing
 
 During the test setup, the called route is not yet known. This means no language can be set.
-When a request is made during a test, this results in a 404 - without the prefix set the localised route does not seem to exist.
+When a request is made during a test, this results in a 404 - without the prefix set the localized route does not seem to exist.
 
 To fix this, you can use this function to manually set the language prefix:
 ```php
