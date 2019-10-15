@@ -112,15 +112,15 @@ http://url-to-laravel
 http://url-to-laravel/test
 ```
 
-    ***Note***: It is **strongly** recommended to use a redirecting middleware (see next section).
-    Otherwise, when search engine robots crawl
+***Note***: It is **strongly** recommended to use a redirecting middleware (see next section).
+Otherwise, when search engine robots crawl
 
-        http://url-to-laravel
-        http://url-to-laravel/test
+    http://url-to-laravel
+    http://url-to-laravel/test
 
-    They may get different language content, which creates a duplicate-content issue. Therefore, to improve your SEO
-    it is recommended to redirect to `http://url-to-laravel/es` or `http://url-to-laravel/en` after the language
-    has been detected.
+They may get different language content, which creates a duplicate-content issue. Therefore, to improve your SEO
+it is recommended to redirect to `http://url-to-laravel/es` or `http://url-to-laravel/en` after the language
+has been detected.
 
 The package sets your current locale (`App::getLocale()`) according to your url. You may translate your files as explained in [Laravel Localization docs](http://laravel.com/docs/localization).
 
