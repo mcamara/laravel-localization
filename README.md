@@ -479,7 +479,7 @@ Note that the separate [czim/laravel-localization-route-cache](https://github.co
 ## Testing
 
 During the test setup, the called route is not yet known. This means no language can be set.
-When a request is made during a test, this results in a 404 - without the prefix set the localised route does not seem to exist.
+When a request is made during a test, this results in a 404 - without the prefix set the localized route does not seem to exist.
 
 To fix this, you can use this function to manually set the language prefix:
 ```php
