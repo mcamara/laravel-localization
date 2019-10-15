@@ -91,11 +91,10 @@ class Kernel extends HttpKernel {
 		'localize'                => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
 		'localizationRedirect'    => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
 		'localeSessionRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
-        'localeCookieRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
+        'localeCookieRedirect'    => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
         'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class
 	];
 }
-
 ```
 
 ## Usage
@@ -146,17 +145,18 @@ You may add
 ### Recommendations
 
 ***1.***: It is **strongly** recommended to use a [redirecting middleware](#redirect-middleware).
+Urls without locale should only be used to determine browser/default locale and to redirect to the [localized url](#localized-urls).
 Otherwise, when search engine robots crawl for example `http://url-to-laravel/test` they may get different language content for each visit.
 Also having multiple urls for the same content creates a SEO duplicate-content issue.
 
-***2.***: It is **strongly** recommended to localize all of your links, even if you use a redirect middleware.
+***2.***: It is **strongly** recommended to [localize your links](#localized-urls), even if you use a redirect middleware.
 Otherwise, you will cause at least one redirect each time a user clicks on a link.
-Also, any action url from a post form must be localized, otherwise you will run into many [issues]().
+Also, any action url from a post form must be localized, to prevent that it gets redirected to a get request.
 
 
 ### Redirect Middleware
 
-The packages ships with useful middleware. The behavior depends on the settings of `hideDefaultLocaleInURL`
+The following redirection middleware depends on the settings of `hideDefaultLocaleInURL`
 and `useAcceptLanguageHeader` in `config/laravellocalization.php`:
 
 #### LocaleSessionRedirect
@@ -208,12 +208,12 @@ LaravelLocalization::getLocalizedURL('en-GB', 'a/b/c'); // http://url-to-laravel
 LaravelLocalization::getLocalizedURL('uk', 'a/b/c'); // http://url-to-laravel/uk/a/b/c
 ```
 
-## Localized URLs
+### Localized URLs
 Localized URLS  taken into account [route model binding]([https://laravel.com/docs/master/routing#route-model-binding]) when generating the localized route,
 aswell as the `hideDefaultLocaleInURL` and [Translated Routes](#translated-routes) settings.
 
 
-### Get localized URL
+#### Get localized URL
 
 ```php
 // If current locale is Spanish, it returns `/es/test`
@@ -231,7 +231,7 @@ A form may be localized like this:
         // ...
     </form>
 
-### Get localized URL for an specific locale
+#### Get localized URL for an specific locale
 Get current URL in specific locale:
 
 ```php
