@@ -71,6 +71,33 @@ The configuration options are:
  - **utf8suffix** Allow changing utf8suffix for CentOS etc.
  - **urlsIgnored** Ignore specific urls.
 
+### Register Middleware
+
+You may register the package middleware in the `app/Http/Kernel.php` file:
+
+```php
+<?php namespace App\Http;
+
+use Illuminate\Foundation\Http\Kernel as HttpKernel;
+
+class Kernel extends HttpKernel {
+	/**
+	 * The application's route middleware.
+	 *
+	 * @var array
+	 */
+	protected $routeMiddleware = [
+		/**** OTHER MIDDLEWARE ****/
+		'localize'                => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+		'localizationRedirect'    => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
+		'localeSessionRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
+        'localeCookieRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
+        'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class
+	];
+}
+
+```
+
 ## Usage
 
 Add the following to your routes file:
@@ -114,13 +141,18 @@ http://url-to-laravel/test
 ```
 The package sets your application locale `App::getLocale()` according to your url. You may translate your files as explained in [Laravel Localization docs](http://laravel.com/docs/localization).
 
-***Note***: It is **strongly** recommended to use a [redirecting middleware](#redirect-middleware).
-Otherwise, when search engine robots crawl
+You may add
 
-    http://url-to-laravel
-    http://url-to-laravel/test
+### Recommendations
 
-they may get different language content for each visit. Also having multiple urls for the same content creates a SEO duplicate-content issue.
+***1.***: It is **strongly** recommended to use a [redirecting middleware](#redirect-middleware).
+Otherwise, when search engine robots crawl for example `http://url-to-laravel/test` they may get different language content for each visit.
+Also having multiple urls for the same content creates a SEO duplicate-content issue.
+
+***2.***: It is **strongly** recommended to localize all of your links, even if you use a redirect middleware.
+Otherwise, you will cause at least one redirect each time a user clicks on a link.
+Also, any action url from a post form must be localized, otherwise you will run into many [issues]().
+
 
 ### Redirect Middleware
 
@@ -145,66 +177,7 @@ When the default locale is present in the url and `hideDefaultLocaleInURL` is se
 For example, if `es` is the default locale, then http://url-to-laravel/es/test would be redirected to http://url-to-laravel/test and the`App::getLocale()` would be
 set to `es`.
 
-#### Register Middleware
 
-You may register the above middleware in the `app/Http/Kernel.php` file and in the `Route:group` like this:
-
-```php
-<?php namespace App\Http;
-
-use Illuminate\Foundation\Http\Kernel as HttpKernel;
-
-class Kernel extends HttpKernel {
-	/**
-	 * The application's route middleware.
-	 *
-	 * @var array
-	 */
-	protected $routeMiddleware = [
-		/**** OTHER MIDDLEWARE ****/
-		'localize'                => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
-		'localizationRedirect'    => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
-		'localeSessionRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
-        'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class
-	];
-}
-```
-
-```php
-// routes/web.php
-
-Route::group(
-[
-	'prefix' => LaravelLocalization::setLocale(),
-	'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ]
-],
-function()
-{
-	//...
-});
-
-/** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
-
-```
-
-### Localize links
-
-It is **strongly** recommended to localize all of your links, even if you use redirect middleware.
-Otherwise, you will cause at least one redirect each time a user clicks on a link.
-
-Any action url from a post form has to be localized, otherwise you will run into different [issues]().
-
-You may localize your link like this:
-
-    {{ LaravelLocalization::localizeUrl('(/test)') }}
-    // returns /es/test if locale is Spanish etc.
-
-So for a form you would use it like this:
-
-    <form action="{{ LaravelLocalization::localizeUrl('(/update)') }}" method="POST">
-        @csrf
-        // ...
-    </form>
 
 ### Set view-base-path to current locale
 
@@ -235,36 +208,40 @@ LaravelLocalization::getLocalizedURL('en-GB', 'a/b/c'); // http://url-to-laravel
 LaravelLocalization::getLocalizedURL('uk', 'a/b/c'); // http://url-to-laravel/uk/a/b/c
 ```
 
-## Helpers
+## Localized URLs
+Localized URLS  taken into account [route model binding]([https://laravel.com/docs/master/routing#route-model-binding]) when generating the localized route,
+aswell as the `hideDefaultLocaleInURL` and [Translated Routes](#translated-routes) settings.
 
-This package comes with some useful functions, like:
 
-
-
-### Get localized url
-The method `localizedUrl` returns the localized URL according to the `hideDefaultLocaleInURL` and [Translated Routes](#translated-routes) settings.
-
-The parameter is the `URL` that should be localized.
+### Get localized URL
 
 ```php
 // If current locale is Spanish, it returns `/es/test`
 {{ LaravelLocalization::localizeURL('/test') }}#
 ```
 
-### Get URL for an specific locale
-The method `getLocalizedURL` returns the localized URL according to the `hideDefaultLocaleInURL` and [Translated Routes](#translated-routes) settings.
+Links may be localized like this:
 
-First parameter is the locale. Second parameter is a URL (if not passed its using current URL).
+    <a href="{{ LaravelLocalization::localizeUrl('(/test)') }}">@lang('Follow this link')</a>
+
+A form may be localized like this:
+
+    <form action="{{ LaravelLocalization::localizeUrl('(/update)') }}" method="POST">
+        @csrf
+        // ...
+    </form>
+
+### Get localized URL for an specific locale
+Get current URL in specific locale:
 
 ```php
 // Returns localized url of `test` for English locale.
-{{ LaravelLocalization::getLocalizedURL('en', 'test') }}
+{{ LaravelLocalization::getLocalizedURL('en') }}
 ```
 
-#### Route Model Binding
+## Helpers
 
-Note that [route model binding]([https://laravel.com/docs/master/routing#route-model-binding]) is taken into account when generating the localized route.
-
+This package comes with a bunch of helpers.
 
 ### Get Clean routes
 
