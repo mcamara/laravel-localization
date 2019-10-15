@@ -93,7 +93,7 @@ class Kernel extends HttpKernel {
         'localeSessionRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
         'localeCookieRedirect'    => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
         'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class
-	];
+    ];
 }
 ```
 
@@ -140,7 +140,16 @@ http://url-to-laravel/test
 ```
 The package sets your application locale `App::getLocale()` according to your url. You may translate your files as explained in [Laravel Localization docs](http://laravel.com/docs/localization).
 
-You may add
+You may add middleware to your group like this:
+
+```php
+Route::group(
+[
+	'prefix' => LaravelLocalization::setLocale(),
+	'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ]
+], function(){ //...
+});
+```
 
 ### Recommendations
 
