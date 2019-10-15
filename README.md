@@ -175,6 +175,20 @@ In there is no locale present in the url, then this middleware will check the fo
 
 For example, if a user navigates to http://url-to-laravel/test  and `en` is the current locale, it would redirect him automatically to http://url-to-laravel/en/test.
 
+#### LocaleCookieRedirect
+
+Similar to LocaleSessionRedirect, but it stores value in a cookie instead of a session.
+
+Whenever a locale is present in the url, it will be stored in the session by this middleware.
+
+In there is no locale present in the url, then this middleware will check the following
+
+ - If no locale is saved in cookie and `useAcceptLanguageHeader` is set to true, compute locale from browser and redirect to url with locale.
+ - If a locale is saved in cookie redirect to url with locale, unless its the default locale and `hideDefaultLocaleInURL` is set to true.
+
+For example, if a user navigates to http://url-to-laravel/test  and `de` is the current locale, it would redirect him automatically to http://url-to-laravel/de/test.
+
+
 #### LaravelLocalizationRedirectFilter
 
 When the default locale is present in the url and `hideDefaultLocaleInURL` is set to true, then the middleware redirects to the url without locale.
