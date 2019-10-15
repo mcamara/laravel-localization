@@ -268,15 +268,18 @@ class LaravelLocalization
         if (empty($attributes)) {
             $attributes = $this->extractAttributes($url, $locale);
         }
+
         $urlQuery = parse_url($url, PHP_URL_QUERY);
         $urlQuery = $urlQuery ? '?'.$urlQuery : '';
 
         if (empty($url)) {
-            if (!empty($this->routeName)) {
-                return $this->getURLFromRouteNameTranslated($locale, $this->routeName, $attributes, $forceDefaultLocation);
-            }
-
             $url = $this->request->fullUrl();
+            $urlQuery = parse_url($url, PHP_URL_QUERY);
+            $urlQuery = $urlQuery ? '?'.$urlQuery : '';
+
+            if (!empty($this->routeName)) {
+                return $this->getURLFromRouteNameTranslated($locale, $this->routeName, $attributes, $forceDefaultLocation) . $urlQuery;
+            }
         } else {
             $url = $this->url->to($url);
             $url = preg_replace('/'. preg_quote($urlQuery, '/') . '$/', '', $url);

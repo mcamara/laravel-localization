@@ -25,6 +25,11 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         ];
     }
 
+    public function setUp(): void
+    {
+        parent::setUp();
+    }
+
     /**
      * Set routes for testing.
      *
@@ -109,10 +114,10 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         return $request->createFromBase(
             \Symfony\Component\HttpFoundation\Request::create(
                 $uri,
-                $method,
-                $parameters,
-                $cookies,
-                $files,
+                'GET',
+                [],
+                [],
+                [],
                 $server,
                 $content
             )
@@ -166,22 +171,6 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
 
         $this->assertNull(app('laravellocalization')->setLocale('de'));
         $this->assertEquals('en', app('laravellocalization')->getCurrentLocale());
-    }
-
-    // LaravelLocalization setLocale method should return the locale of
-    // the request uri (if any). This behavior should be independet
-    // of the `hideDefaultLocaleInURL` setting
-    public function testHideDefaultLocaleInUrlShouldNotChangeSetLocaleBehaviour()
-    {
-        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
-
-        app()['request'] = $this->createRequest(
-            $uri = '/en/test'
-        );
-
-        $laravelLocalization = new \Mcamara\LaravelLocalization\LaravelLocalization();
-
-        $this->assertEquals('en', $laravelLocalization->setLocale());
     }
 
     public function testLocalizeURL()
@@ -335,6 +324,22 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
             app('laravellocalization')->getLocalizedURL('es', $this->test_url.'test?a=1')
         );
     }
+
+    public function testGetLocalizedURLWithQueryStringAndhideDefaultLocaleInURL()
+    {
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
+         app()['request'] = $this->createRequest(
+            $uri = 'en/about?q=2'
+        );
+        $laravelLocalization = new \Mcamara\LaravelLocalization\LaravelLocalization();
+        $laravelLocalization->transRoute('LaravelLocalization::routes.about');
+
+        $this->assertEquals(
+            $this->test_url . 'about?q=2',
+            $laravelLocalization->getLocalizedURL()
+        );
+    }
+
 
     /**
      * @param string $path
