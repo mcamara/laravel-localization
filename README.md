@@ -22,7 +22,8 @@ The package offers the following:
 
 - <a href="#installation">Installation</a>
 - <a href="#usage">Usage</a>
-    - <a href="#middleware">Middleware</a>
+    - <a href="#redirect-middleware">Redirect Middleware</a>
+    - <a href="#localize-links">Localize links</a>
 - <a href="#helpers">Helpers</a>
     - <a href="#route-model-binding">Route Model Binding</a>
 - <a href="#translated-routes">Translated Routes</a>
@@ -111,23 +112,15 @@ http://url-to-laravel/es/test
 http://url-to-laravel
 http://url-to-laravel/test
 ```
+The package sets your application locale `App::getLocale()` according to your url. You may translate your files as explained in [Laravel Localization docs](http://laravel.com/docs/localization).
 
-***Note***: It is **strongly** recommended to use a redirecting middleware (see next section).
+***Note***: It is **strongly** recommended to use a [redirecting middleware](#redirect-middleware).
 Otherwise, when search engine robots crawl
 
     http://url-to-laravel
     http://url-to-laravel/test
 
-They may get different language content, which creates a duplicate-content issue. Therefore, to improve your SEO
-it is recommended to redirect to `http://url-to-laravel/es` or `http://url-to-laravel/en` after the language
-has been detected.
-
-The package sets your current locale (`App::getLocale()`) according to your url. You may translate your files as explained in [Laravel Localization docs](http://laravel.com/docs/localization).
-
-### Localize Links
-
-To keep the locale all urls from your page should be localized using the [localize-url-helper](). It may be convenient to not localize all urls and use the redirect middleware.
-However, this will cause a redirect everytime the users opens a link. Also even with redirect middleware, you must localize your post routes to prevent [commen issues]().
+they may get different language content for each visit. Also having multiple urls for the same content creates a SEO duplicate-content issue.
 
 ### Redirect Middleware
 
@@ -151,14 +144,6 @@ When the default locale is present in the url and `hideDefaultLocaleInURL` is se
 
 For example, if `es` is the default locale, then http://url-to-laravel/es/test would be redirected to http://url-to-laravel/test and the`App::getLocale()` would be
 set to `es`.
-
-#### LaravelLocalizationViewPath
-
-Register this middleware to set current locale as view-base-path.
-
-Now you can wrap your views in language-based folders like the translation files.
-
-`resources/views/en/`, `resources/views/fr`, ...
 
 #### Register Middleware
 
@@ -202,6 +187,34 @@ function()
 
 ```
 
+### Localize links
+
+It is **strongly** recommended to localize all of your links, even if you use redirect middleware.
+Otherwise, you will cause at least one redirect each time a user clicks on a link.
+
+Any action url from a post form has to be localized, otherwise you will run into different [issues]().
+
+You may localize your link like this:
+
+    {{ LaravelLocalization::localizeUrl('(/test)') }}
+    // returns /es/test if locale is Spanish etc.
+
+So for a form you would use it like this:
+
+    <form action="{{ LaravelLocalization::localizeUrl('(/update)') }}" method="POST">
+        @csrf
+        // ...
+    </form>
+
+### Set view-base-path to current locale
+
+Register the middleware `LaravelLocalizationViewPath` to set current locale as view-base-path.
+
+Now you can wrap your views in language-based folders like the translation files.
+
+`resources/views/en/`, `resources/views/fr`, ...
+
+
 ### Map your own custom lang url segments
 
 As you can modify the supportedLocales even by renaming their keys, it is possible to use the string ```uk``` instead of ```en-GB``` to provide custom lang url segments. Of course, you need to prevent any collisions with already existing keys and should stick to the convention as long as possible. But if you are using such a custom key, you have to store your mapping to the ```localesMapping``` array. This ```
@@ -226,51 +239,41 @@ LaravelLocalization::getLocalizedURL('uk', 'a/b/c'); // http://url-to-laravel/uk
 
 This package comes with some useful functions, like:
 
-### Get URL for an specific locale
+
+
+### Get localized url
+The method `localizedUrl` returns the localized URL according to the `hideDefaultLocaleInURL` and [Translated Routes](#translated-routes) settings.
+
+The parameter is the `URL` that should be localized.
 
 ```php
-/**
- * Returns an URL adapted to $locale
- *
- * @param  string|boolean 	$locale	   	Locale to adapt, false to remove locale
- * @param  string|false		$url		URL to adapt in the current language. If not passed, the current url would be taken.
- * @param  array 		$attributes	Attributes to add to the route, if empty, the system would try to extract them from the url.
- *
- * @throws UnsupportedLocaleException
- *
- * @return string|false				URL translated, False if url does not exist
- */
-public function getLocalizedURL($locale = null, $url = null, $attributes = array())
-
-//Should be called in a view like this:
-{{ LaravelLocalization::getLocalizedURL(optional string $locale, optional string $url, optional array $attributes) }}
+// If current locale is Spanish, it returns `/es/test`
+{{ LaravelLocalization::localizeURL('/test') }}#
 ```
 
-It returns a URL localized to the desired locale.
+### Get URL for an specific locale
+The method `getLocalizedURL` returns the localized URL according to the `hideDefaultLocaleInURL` and [Translated Routes](#translated-routes) settings.
 
-##### Route Model Binding
+First parameter is the locale. Second parameter is a URL (if not passed its using current URL).
+
+```php
+// Returns localized url of `test` for English locale.
+{{ LaravelLocalization::getLocalizedURL('en', 'test') }}
+```
+
+#### Route Model Binding
 
 Note that [route model binding]([https://laravel.com/docs/master/routing#route-model-binding]) is taken into account when generating the localized route.
 
 
 ### Get Clean routes
 
+Returns a URL clean of any localization.
+
 ```php
-/**
- * It returns an URL without locale (if it has it)
- * Convenience function wrapping getLocalizedURL(false)
- *
- * @param  string|false 	$url	  URL to clean, if false, current url would be taken
- *
- * @return stringURL 			  with no locale in path
- */
-public function getNonLocalizedURL($url = null)
-
-//Should be called in a view like this:
-{{ LaravelLocalization::getNonLocalizedURL(optional string $url) }}
+// Returns `/test`
+{{ LaravelLocalization::getNonLocalizedURL('/es/test') }}
 ```
-
-It returns a URL clean of any localization.
 
 ### Get URL for an specific translation key
 
@@ -312,121 +315,53 @@ This function will return all supported locales and their properties as an array
 
 ### Get Supported Locales Custom Order
 
-```php
-/**
- * Return an array of all supported Locales but in the order the user
- * has specified in the config file. Useful for the language selector.
- *
- * @return array
- */
-public function getLocalesOrder()
+This function will return all supported locales but in the order specified in the configuration file. You can use this function to print locales in the language selector.
 
-//Should be called like this:
+```php
 {{ LaravelLocalization::getLocalesOrder() }}
 ```
 
-This function will return all supported locales but in the order specified in the configuration file. You can use this function to print locales in the language selector.
-
 ### Get Supported Locales Keys
-
-```php
-/**
- * Returns supported languages language key
- *
- * @return array 	keys of supported languages
- */
-public function getSupportedLanguagesKeys()
-
-//Should be called like this:
-{{ LaravelLocalization::getSupportedLanguagesKeys() }}
-```
 
 This function will return an array with all the keys for the supported locales.
 
-### Set Locale
-
 ```php
-/**
- * Set and return current locale
- *
- * @param  string $locale	        Locale to set the App to (optional)
- *
- * @return string 			Returns locale (if route has any) or null (if route does not have a locale)
- */
-public function setLocale($locale = null)
-
-//Should be called in a view like this:
-{{ LaravelLocalization::setLocale(optional string $locale) }}
+{{ LaravelLocalization::getSupportedLanguagesKeys() }}
 ```
-
-This function will change the application's current locale.
-If the locale is not passed, the locale will be determined via a cookie (if stored previously), the session (if stored previously), browser Accept-Language header or the default application locale (depending on your config file).
-
-The function has to be called in the prefix of any route that should be translated (see Filters sections for further information).
 
 ### Get Current Locale
 
-```php
-/**
- * Returns current language
- *
- * @return string current language
- */
-public function getCurrentLocale()
+This function will return the key of the current locale.
 
-//Should be called in a view like this:
+```php
 {{ LaravelLocalization::getCurrentLocale() }}
 ```
 
-This function will return the key of the current locale.
-
 ### Get Current Locale Name
+This function will return current locale's name as string (English/Spanish/Arabic/ ..etc).
 
 ```php
-/**
- * Returns current locale name
- *
- * @return string current locale name
- */
-public function getCurrentLocaleName()
-
-//Should be called in a view like this:
 {{ LaravelLocalization::getCurrentLocaleName() }}
 ```
 
-This function will return current locale's name as string (English/Spanish/Arabic/ ..etc).
-
 ### Get Current Locale Direction
-
-```php
-/**
- * Returns current locale direction
- *
- * @return string current locale direction
- */
-public function getCurrentLocaleDirection()
-
-//Should be called in a view like this:
-{{ LaravelLocalization::getCurrentLocaleDirection() }}
-```
 
 This function will return current locale's direction as string (ltr/rtl).
 
-### Get Current Locale Script
 
 ```php
-/**
- * Returns current locale script
- *
- * @return string current locale script
- */
-public function getCurrentLocaleScript()
+{{ LaravelLocalization::getCurrentLocaleDirection() }}
+```
 
-//Should be called in a view like this:
+
+
+### Get Current Locale Script
+This function will return the [ISO 15924](http://www.unicode.org/iso15924) code for the current locale script as a string; "Latn", "Cyrl", "Arab", etc.
+
+```php
 {{ LaravelLocalization::getCurrentLocaleScript() }}
 ```
 
-This function will return the [ISO 15924](http://www.unicode.org/iso15924) code for the current locale script as a string; "Latn", "Cyrl", "Arab", etc.
 
 ## Creating a language selector
 
