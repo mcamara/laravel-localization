@@ -8,10 +8,15 @@
 
 Easy i18n localization for Laravel, an useful tool to combine with Laravel localization classes.
 
-## Collaborators
-- [Adam Nielsen (iwasherefirst2)](https://github.com/iwasherefirst2)
+The package offers the following:
 
-Ask [mcamara](https://github.com/mcamara) if you want to be one of them!
+ - Detect language from browser
+ - Smart redirects (Save locale in session/cookie)
+ - Smart routing (Define your routes only once, no matter how many languages you use)
+ - Translatable Routes
+ - Supports caching & testing
+ - Option to hide default locale (for SEO)
+
 
 ## Table of Contents
 
@@ -29,6 +34,7 @@ Ask [mcamara](https://github.com/mcamara) if you want to be one of them!
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#caching-routes">Caching routes</a>
 - <a href="#testing">Testing</a>
+- <a href="#collaborators">Collaborators</a>
 - <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
 
@@ -48,27 +54,7 @@ Ask [mcamara](https://github.com/mcamara) if you want to be one of them!
 
 Install the package via composer: `composer require mcamara/laravel-localization`
 
-### For Laravel 5.4 and below:
-
-For older versions of the framework, follow the steps below:
-
-Register the service provider in `config/app.php`
-
-```php
-        'providers' => [
-		// [...]
-                Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider::class,
-        ],
-```
-
-You may also register the `LaravelLocalization` facade:
-
-```php
-        'aliases' => [
-		// [...]
-                'LaravelLocalization' => Mcamara\LaravelLocalization\Facades\LaravelLocalization::class,
-        ],
-```
+For Laravel 5.4 and below it necessary to [register the service provider](/ADDITIONS.md#for-laravel-5.4-and-below).
 
 ## Config
 
@@ -595,6 +581,11 @@ public function testBasicTest()
     // Testing code
 }
 ```
+
+## Collaborators
+- [Adam Nielsen (iwasherefirst2)](https://github.com/iwasherefirst2)
+
+Ask [mcamara](https://github.com/mcamara) if you want to be one of them!
 
 ## Changelog
 
