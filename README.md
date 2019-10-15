@@ -25,7 +25,6 @@ The package offers the following:
     - <a href="#redirect-middleware">Redirect Middleware</a>
     - <a href="#localize-links">Localize links</a>
 - <a href="#helpers">Helpers</a>
-    - <a href="#route-model-binding">Route Model Binding</a>
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#caching-routes">Caching routes</a>
 - <a href="#testing">Testing</a>
