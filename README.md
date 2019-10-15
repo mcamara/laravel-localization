@@ -98,24 +98,38 @@ Once this route group is added to the routes file, a user can access all locales
 For example, the above route file creates the following addresses:
 
 ```
-// English localized urls
-http://url-to-laravel/en/test
-http://url-to-laravel/test
+// Set application language to English
 http://url-to-laravel/en
-http://url-to-laravel
+http://url-to-laravel/en/test
 
-// Spanish localized urls
+// Set application language to Spanish
 http://url-to-laravel/es
 http://url-to-laravel/es/test
+
+// Set application language to English or Spanish (depending on browsers default locales)
+// if nothing found set to default locale
+http://url-to-laravel
+http://url-to-laravel/test
 ```
 
-If the locale is not present in the url or it is not defined in `supportedLocales`, the system will use the application default locale or the user's browser default locale (if defined in config file).
+    ***Note***: It is **strongly** recommended to use a redirecting middleware (see next section).
+    Otherwise, when search engine robots crawl
 
-Once the locale is defined, the locale variable will be stored in a session (if the middleware is enabled), so it is not necessary to write the /lang/ section in the url after defining it once, using the last known locale for the user. If the user accesses to a different locale this session value would be changed, translating any other page he visits with the last chosen locale.
+        http://url-to-laravel
+        http://url-to-laravel/test
+
+    They may get different language content, which creates a duplicate-content issue. Therefore, to improve your SEO
+    it is recommended to redirect to `http://url-to-laravel/es` or `http://url-to-laravel/en` after the language
+    has been detected.
 
 The package sets your current locale (`App::getLocale()`) according to your url. You may translate your files as explained in [Laravel Localization docs](http://laravel.com/docs/localization).
 
-### Middleware
+### Localize Links
+
+To keep the locale all urls from your page should be localized using the [localize-url-helper](). It may be convenient to not localize all urls and use the redirect middleware.
+However, this will cause a redirect everytime the users opens a link. Also even with redirect middleware, you must localize your post routes to prevent [commen issues]().
+
+### Redirect Middleware
 
 The packages ships with useful middleware. The behavior depends on the settings of `hideDefaultLocaleInURL`
 and `useAcceptLanguageHeader` in `config/laravellocalization.php`:
