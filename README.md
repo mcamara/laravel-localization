@@ -185,6 +185,36 @@ When the default locale is present in the url and `hideDefaultLocaleInURL` is se
 For example, if `es` is the default locale, then http://url-to-laravel/es/test would be redirected to http://url-to-laravel/test and the`App::getLocale()` would be
 set to `es`.
 
+### Localized URLs
+Localized URLS  taken into account [route model binding]([https://laravel.com/docs/master/routing#route-model-binding]) when generating the localized route,
+aswell as the `hideDefaultLocaleInURL` and [Translated Routes](#translated-routes) settings.
+
+
+#### Get localized URL
+
+```php
+// If current locale is Spanish, it returns `/es/test`
+{{ LaravelLocalization::localizeURL('/test') }}#
+```
+
+Links may be localized like this:
+
+    <a href="{{ LaravelLocalization::localizeUrl('(/test)') }}">@lang('Follow this link')</a>
+
+A form may be localized like this:
+
+    <form action="{{ LaravelLocalization::localizeUrl('(/update)') }}" method="POST">
+        @csrf
+        // ...
+    </form>
+
+#### Get localized URL for an specific locale
+Get current URL in specific locale:
+
+```php
+// Returns localized url of `test` for English locale.
+{{ LaravelLocalization::getLocalizedURL('en') }}
+```
 
 
 ### Set view-base-path to current locale
@@ -216,36 +246,7 @@ LaravelLocalization::getLocalizedURL('en-GB', 'a/b/c'); // http://url-to-laravel
 LaravelLocalization::getLocalizedURL('uk', 'a/b/c'); // http://url-to-laravel/uk/a/b/c
 ```
 
-### Localized URLs
-Localized URLS  taken into account [route model binding]([https://laravel.com/docs/master/routing#route-model-binding]) when generating the localized route,
-aswell as the `hideDefaultLocaleInURL` and [Translated Routes](#translated-routes) settings.
 
-
-#### Get localized URL
-
-```php
-// If current locale is Spanish, it returns `/es/test`
-{{ LaravelLocalization::localizeURL('/test') }}#
-```
-
-Links may be localized like this:
-
-    <a href="{{ LaravelLocalization::localizeUrl('(/test)') }}">@lang('Follow this link')</a>
-
-A form may be localized like this:
-
-    <form action="{{ LaravelLocalization::localizeUrl('(/update)') }}" method="POST">
-        @csrf
-        // ...
-    </form>
-
-#### Get localized URL for an specific locale
-Get current URL in specific locale:
-
-```php
-// Returns localized url of `test` for English locale.
-{{ LaravelLocalization::getLocalizedURL('en') }}
-```
 
 ## Helpers
 
