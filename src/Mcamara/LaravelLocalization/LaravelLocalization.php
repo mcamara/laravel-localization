@@ -272,6 +272,8 @@ class LaravelLocalization
         $urlQuery = parse_url($url, PHP_URL_QUERY);
         $urlQuery = $urlQuery ? '?'.$urlQuery : '';
 
+        
+        
         if (empty($url)) {
             $url = $this->request->fullUrl();
             $urlQuery = parse_url($url, PHP_URL_QUERY);
@@ -285,9 +287,13 @@ class LaravelLocalization
             $url = preg_replace('/'. preg_quote($urlQuery, '/') . '$/', '', $url);
         }
 
+        
+        
         if ($locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale)) {
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).$urlQuery;
         }
+
+        
 
         $base_path = $this->request->getBaseUrl();
         $parsed_url = parse_url($url);
@@ -318,6 +324,7 @@ class LaravelLocalization
         $parsed_url['path'] = ltrim($parsed_url['path'], '/');
 
         if ($translatedRoute = $this->findTranslatedRouteByPath($parsed_url['path'], $url_locale)) {
+            
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).$urlQuery;
         }
 
@@ -367,6 +374,16 @@ class LaravelLocalization
 
         if (!\is_string($locale)) {
             $locale = $this->getDefaultLocale();
+        }
+
+        $response = event('routes.translation', [$locale, $attributes]);
+
+        if (!empty($response)) {
+            $response = array_shift($response);
+        }
+
+        if (\is_array($response)) {
+            $attributes = array_merge($attributes, $response);
         }
 
         $route = '';
@@ -963,15 +980,7 @@ class LaravelLocalization
             }
 
             $attributes = $this->normalizeAttributes($this->router->current()->parameters());
-            $response = event('routes.translation', [$locale, $attributes]);
-
-            if (!empty($response)) {
-                $response = array_shift($response);
-            }
-
-            if (\is_array($response)) {
-                $attributes = array_merge($attributes, $response);
-            }
+            
         }
 
         return $attributes;
