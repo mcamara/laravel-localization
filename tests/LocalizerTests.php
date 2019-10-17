@@ -340,6 +340,18 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         );
     }
 
+    public function testGetLocalizedURLWithQueryStringAndNotTranslatedRoute()
+    {
+         app()['request'] = $this->createRequest(
+            $uri = 'en/about?q=2'
+        );
+        $laravelLocalization = new \Mcamara\LaravelLocalization\LaravelLocalization();
+
+        $this->assertEquals(
+            $this->test_url . 'en/about?q=2',
+            $laravelLocalization->getLocalizedURL()
+        );
+    }
 
     /**
      * @param string $path
