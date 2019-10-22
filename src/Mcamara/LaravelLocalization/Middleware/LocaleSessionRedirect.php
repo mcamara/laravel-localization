@@ -5,7 +5,6 @@ namespace Mcamara\LaravelLocalization\Middleware;
 use Closure;
 use Illuminate\Http\RedirectResponse;
 use Mcamara\LaravelLocalization\LanguageNegotiator;
-use Mcamara\LaravelLocalization\LaravelLocalization;
 
 class LocaleSessionRedirect extends LaravelLocalizationMiddlewareBase
 {
@@ -32,21 +31,30 @@ class LocaleSessionRedirect extends LaravelLocalizationMiddlewareBase
 
             return $next($request);
         }
-        elseif(empty($locale) && app('laravellocalization')->hideUrlAndAcceptHeader()){
-          // When default locale is hidden and accept language header is true,
-          // then compute browser language when no session has been set.
-          // Once the session has been set, there is no need
-          // to negotiate language from browser again.
-          $negotiator = new LanguageNegotiator(app('laravellocalization')->getDefaultLocale(), app('laravellocalization')->getSupportedLocales(), $request);
-          $locale     = $negotiator->negotiateLanguage();
-          session(['locale' => $locale]);
+
+        if (empty($locale) && app('laravellocalization')->hideUrlAndAcceptHeader()){
+            // When default locale is hidden and accept language header is true,
+            // then compute browser language when no session has been set.
+            // Once the session has been set, there is no need
+            // to negotiate language from browser again.
+            $negotiator = new LanguageNegotiator(
+                app('laravellocalization')->getDefaultLocale(),
+                app('laravellocalization')->getSupportedLocales(),
+                $request
+            );
+            $locale = $negotiator->negotiateLanguage();
+            session(['locale' => $locale]);
         }
 
-        if($locale === false){
-          $locale = app('laravellocalization')->getCurrentLocale();
+        if ($locale === false){
+            $locale = app('laravellocalization')->getCurrentLocale();
         }
 
-        if ($locale && app('laravellocalization')->checkLocaleInSupportedLocales($locale) && !(app('laravellocalization')->isHiddenDefault($locale))) {
+        if (
+            $locale &&
+            app('laravellocalization')->checkLocaleInSupportedLocales($locale) &&
+            !(app('laravellocalization')->isHiddenDefault($locale))
+        ) {
             app('session')->reflash();
             $redirection = app('laravellocalization')->getLocalizedURL($locale);
 
