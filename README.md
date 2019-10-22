@@ -262,17 +262,17 @@ This package comes with a bunch of helpers.
 Returns a URL clean of any localization.
 
 ```php
-//Should be called in a view like this:
+// Returns /about
 {{ LaravelLocalization::getNonLocalizedURL('/es/about') }}
 ```
 
 ### Get URL for an specific translation key
 
-Returns a route, localized to the desired locale using the locale passed. If the translation key does not exist in the locale given, this function will return false.
+Returns a route, [localized](#translated-routes) to the desired locale. If the translation key does not exist in the locale given, this function will return false.
 
 
 ```php
-//Should be called in a view like this:
+// Returns /es/acerca
 {{ LaravelLocalization::getURLFromRouteNameTranslated('es', 'routes.about') }}
 ```
 
@@ -282,8 +282,6 @@ Returns a route, localized to the desired locale using the locale passed. If the
 Return all supported locales and their properties as an array.
 
 ```php
-
-//Should be called like this:
 {{ LaravelLocalization::getSupportedLocales() }}
 ```
 
