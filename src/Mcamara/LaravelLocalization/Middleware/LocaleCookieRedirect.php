@@ -2,6 +2,7 @@
 
 use Closure;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cookie;
 
 class LocaleCookieRedirect extends LaravelLocalizationMiddlewareBase
 {
@@ -25,6 +26,19 @@ class LocaleCookieRedirect extends LaravelLocalizationMiddlewareBase
 
          if (\count($params) > 0 && app('laravellocalization')->checkLocaleInSupportedLocales($params[0])) {
             return $next($request)->withCookie(cookie()->forever('locale', $params[0]));
+         }
+         elseif(empty($locale) && app('laravellocalization')->hideUrlAndAcceptHeader()){
+           // When default locale is hidden and accept language header is true,
+           // then compute browser language when no session has been set.
+           // Once the session has been set, there is no need
+           // to negotiate language from browser again.
+           $negotiator = new LanguageNegotiator(app('laravellocalization')->getDefaultLocale(), app('laravellocalization')->getSupportedLocales(), $request);
+           $locale     = $negotiator->negotiateLanguage();
+           Cookie::queue(Cookie::forever('locale', $locale));
+         }
+
+         if($locale === false){
+           $locale = app('laravellocalization')->getCurrentLocale();
          }
 
          if ($locale && app('laravellocalization')->checkLocaleInSupportedLocales($locale) && !(app('laravellocalization')->isHiddenDefault($locale))) {

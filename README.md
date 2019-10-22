@@ -27,9 +27,17 @@ The package offers the following:
 - <a href="#helpers">Helpers</a>
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#caching-routes">Caching routes</a>
+<<<<<<< HEAD
 - <a href="#testing">Testing</a>
 - <a href="#collaborators">Collaborators</a>
+=======
+>>>>>>> master
 - <a href="#changelog">Changelog</a>
+- <a href="#testing">Testing</a>
+- <a href="#common-issues">Common Issues</a>
+    - <a href="#post-is-not-working">POST is not working</a>
+    - <a href="#methodnotallowedhttpexception">MethodNotAllowedHttpException</a>
+    - <a href="#validation-message-is-only-in-default-locale">Validation message is always in default locale</a>
 - <a href="#license">License</a>
 
 ## Laravel compatibility
@@ -178,6 +186,20 @@ In there is no locale present in the url, then this middleware will check the fo
 
 For example, if a user navigates to http://url-to-laravel/test  and `en` is the current locale, it would redirect him automatically to http://url-to-laravel/en/test.
 
+#### LocaleCookieRedirect
+
+Similar to LocaleSessionRedirect, but it stores value in a cookie instead of a session.
+
+Whenever a locale is present in the url, it will be stored in the session by this middleware.
+
+In there is no locale present in the url, then this middleware will check the following
+
+ - If no locale is saved in cookie and `useAcceptLanguageHeader` is set to true, compute locale from browser and redirect to url with locale.
+ - If a locale is saved in cookie redirect to url with locale, unless its the default locale and `hideDefaultLocaleInURL` is set to true.
+
+For example, if a user navigates to http://url-to-laravel/test  and `de` is the current locale, it would redirect him automatically to http://url-to-laravel/de/test.
+
+
 #### LaravelLocalizationRedirectFilter
 
 When the default locale is present in the url and `hideDefaultLocaleInURL` is set to true, then the middleware redirects to the url without locale.
@@ -246,7 +268,39 @@ LaravelLocalization::getLocalizedURL('en-GB', 'a/b/c'); // http://url-to-laravel
 LaravelLocalization::getLocalizedURL('uk', 'a/b/c'); // http://url-to-laravel/uk/a/b/c
 ```
 
+<<<<<<< HEAD
 
+=======
+## Helpers
+
+This package comes with some useful functions, like:
+
+
+### Get localized url
+
+```php
+    /**
+     * Returns an URL adapted to $locale or current locale.
+     *
+     * @param string      $url    URL to adapt. If not passed, the current url would be taken.
+     * @param string|bool $locale Locale to adapt, false to remove locale
+     *
+     * @throws UnsupportedLocaleException
+     *
+     * @return string URL translated
+     */
+    public function localizeURL($url = null, $locale = null)
+```
+
+//Should be called in a view like this:
+{{ LaravelLocalization::localizeURL('/about') }}
+
+
+It returns a URL localized to the desired locale (if no locale is given, it uses current locale).
+
+
+#### Route Model Binding
+>>>>>>> master
 
 ## Helpers
 
@@ -256,9 +310,14 @@ This package comes with a bunch of helpers.
 
 Returns a URL clean of any localization.
 
+<<<<<<< HEAD
 ```php
 // Returns `/test`
 {{ LaravelLocalization::getNonLocalizedURL('/es/test') }}
+=======
+//Should be called in a view like this:
+{{ LaravelLocalization::getNonLocalizedURL('/es/about') }}
+>>>>>>> master
 ```
 
 ### Get URL for an specific translation key
@@ -278,7 +337,7 @@ Returns a URL clean of any localization.
 public function getURLFromRouteNameTranslated($locale, $transKeyName, $attributes = array())
 
 //Should be called in a view like this:
-{{ LaravelLocalization::getURLFromRouteNameTranslated(string $locale, optional array $transKeyNames, optional array $attributes) }}
+{{ LaravelLocalization::getURLFromRouteNameTranslated('es', 'routes.about') }}
 ```
 
 It returns a route, localized to the desired locale using the locale passed. If the translation key does not exist in the locale given, this function will return false.
@@ -461,6 +520,46 @@ Be sure to pass the locale and the attributes as parameters to the closure. You 
 More information on support on [cached (translated) routes here](CACHING.md).
 
 Note that the separate [czim/laravel-localization-route-cache](https://github.com/czim/laravel-localization-route-cache) package is no longer required.
+
+## Common Issues
+
+### POST is not working
+
+This may happen if you do not localize your action route that is inside your `Routes::group`.
+This may cause a redirect, which then changes the post request into a get request.
+To prevent that, simply use the [localize helper](#get-localized-url).
+
+For example, if you use `Auth::routes()` and put them into your `Route::group` Then
+
+```
+<form action="/logout" method="POST">
+<button>Logout</button>
+</form>
+```
+
+will not work. Instead, one has to use
+
+```php
+<form action="{{  \LaravelLocalization::localizeURL('/logout') }} " method="POST">
+<button>Logout</button>
+</form>
+```
+
+### MethodNotAllowedHttpException
+
+If you do not localize your post url and use a redirect middleware,
+then the post request gets redirected as a get request.
+If you have not defined such a get route, you will cause this exception.
+
+To localize your post url see the example in [POST is not working](#post-is-not-working).
+
+### Validation message is only in default locale
+
+This also happens if you did not localize your post url.
+If you don't localize your post url, the default locale is set while validating,
+and when returning to `back()` it shows the validation message in default locale.
+
+To localize your post url see the example in [POST is not working](#post-is-not-working).
 
 ## Testing
 
