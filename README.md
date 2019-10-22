@@ -22,18 +22,17 @@ The package offers the following:
 
 - <a href="#installation">Installation</a>
 - <a href="#usage">Usage</a>
-    - <a href="#redirect-middleware">Redirect Middleware</a>
+- <a href="#redirect-middleware">Redirect Middleware</a>
 - <a href="#helpers">Helpers</a>
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#caching-routes">Caching routes</a>
-- <a href="#testing">Testing</a>
-- <a href="#collaborators">Collaborators</a>
-- <a href="#changelog">Changelog</a>
 - <a href="#testing">Testing</a>
 - <a href="#common-issues">Common Issues</a>
     - <a href="#post-is-not-working">POST is not working</a>
     - <a href="#methodnotallowedhttpexception">MethodNotAllowedHttpException</a>
     - <a href="#validation-message-is-only-in-default-locale">Validation message is always in default locale</a>
+- <a href="#collaborators">Collaborators</a>
+- <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
 
 ## Laravel compatibility
@@ -166,12 +165,12 @@ Otherwise, you will cause at least one redirect each time a user clicks on a lin
 Also, any action url from a post form must be localized, to prevent that it gets redirected to a get request.
 
 
-### Redirect Middleware
+## Redirect Middleware
 
 The following redirection middleware depends on the settings of `hideDefaultLocaleInURL`
 and `useAcceptLanguageHeader` in `config/laravellocalization.php`:
 
-#### LocaleSessionRedirect
+### LocaleSessionRedirect
 
 Whenever a locale is present in the url, it will be stored in the session by this middleware.
 
@@ -182,7 +181,7 @@ In there is no locale present in the url, then this middleware will check the fo
 
 For example, if a user navigates to http://url-to-laravel/test  and `en` is the current locale, it would redirect him automatically to http://url-to-laravel/en/test.
 
-#### LocaleCookieRedirect
+### LocaleCookieRedirect
 
 Similar to LocaleSessionRedirect, but it stores value in a cookie instead of a session.
 
@@ -196,7 +195,7 @@ In there is no locale present in the url, then this middleware will check the fo
 For example, if a user navigates to http://url-to-laravel/test  and `de` is the current locale, it would redirect him automatically to http://url-to-laravel/de/test.
 
 
-#### LaravelLocalizationRedirectFilter
+### LaravelLocalizationRedirectFilter
 
 When the default locale is present in the url and `hideDefaultLocaleInURL` is set to true, then the middleware redirects to the url without locale.
 
