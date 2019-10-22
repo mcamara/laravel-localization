@@ -23,7 +23,6 @@ The package offers the following:
 - <a href="#installation">Installation</a>
 - <a href="#usage">Usage</a>
     - <a href="#redirect-middleware">Redirect Middleware</a>
-    - <a href="#localize-links">Localize links</a>
 - <a href="#helpers">Helpers</a>
 - <a href="#translated-routes">Translated Routes</a>
 - <a href="#caching-routes">Caching routes</a>
@@ -204,6 +203,11 @@ When the default locale is present in the url and `hideDefaultLocaleInURL` is se
 For example, if `es` is the default locale, then http://url-to-laravel/es/test would be redirected to http://url-to-laravel/test and the`App::getLocale()` would be
 set to `es`.
 
+
+## Helpers
+
+This package comes with a bunch of helpers.
+
 ### Localized URLs
 Localized URLS  taken into account [route model binding]([https://laravel.com/docs/master/routing#route-model-binding]) when generating the localized route,
 aswell as the `hideDefaultLocaleInURL` and [Translated Routes](#translated-routes) settings.
@@ -223,39 +227,6 @@ Get current URL in specific locale:
 // Returns current url with English locale.
 {{ LaravelLocalization::getLocalizedURL('en') }}
 ```
-
-### Set view-base-path to current locale
-
-Register the middleware `LaravelLocalizationViewPath` to set current locale as view-base-path.
-
-Now you can wrap your views in language-based folders like the translation files.
-
-`resources/views/en/`, `resources/views/fr`, ...
-
-
-### Map your own custom lang url segments
-
-As you can modify the supportedLocales even by renaming their keys, it is possible to use the string ```uk``` instead of ```en-GB``` to provide custom lang url segments. Of course, you need to prevent any collisions with already existing keys and should stick to the convention as long as possible. But if you are using such a custom key, you have to store your mapping to the ```localesMapping``` array. This ```
-localesMapping``` is needed to enable the LanguageNegotiator to correctly assign the desired locales based on HTTP Accept Language Header. Here is a quick example how to map HTTP Accept Language Header 'en-GB' to url segment 'uk':
-
-```php
-// config/laravellocalization.php
-
-'localesMapping' => [
-	'en-GB' => 'uk'
-],
-```
-
-After that ```http://url-to-laravel/en-GB/a/b/c``` becomes ```http://url-to-laravel/uk/a/b/c```.
-
-```php
-LaravelLocalization::getLocalizedURL('en-GB', 'a/b/c'); // http://url-to-laravel/uk/a/b/c
-LaravelLocalization::getLocalizedURL('uk', 'a/b/c'); // http://url-to-laravel/uk/a/b/c
-```
-
-## Helpers
-
-This package comes with a bunch of helpers.
 
 ### Get Clean routes
 
@@ -336,6 +307,34 @@ Return the [ISO 15924](http://www.unicode.org/iso15924) code for the current loc
 {{ LaravelLocalization::getCurrentLocaleScript() }}
 ```
 
+### Set view-base-path to current locale
+
+Register the middleware `LaravelLocalizationViewPath` to set current locale as view-base-path.
+
+Now you can wrap your views in language-based folders like the translation files.
+
+`resources/views/en/`, `resources/views/fr`, ...
+
+
+### Map your own custom lang url segments
+
+As you can modify the supportedLocales even by renaming their keys, it is possible to use the string ```uk``` instead of ```en-GB``` to provide custom lang url segments. Of course, you need to prevent any collisions with already existing keys and should stick to the convention as long as possible. But if you are using such a custom key, you have to store your mapping to the ```localesMapping``` array. This ```
+localesMapping``` is needed to enable the LanguageNegotiator to correctly assign the desired locales based on HTTP Accept Language Header. Here is a quick example how to map HTTP Accept Language Header 'en-GB' to url segment 'uk':
+
+```php
+// config/laravellocalization.php
+
+'localesMapping' => [
+	'en-GB' => 'uk'
+],
+```
+
+After that ```http://url-to-laravel/en-GB/a/b/c``` becomes ```http://url-to-laravel/uk/a/b/c```.
+
+```php
+LaravelLocalization::getLocalizedURL('en-GB', 'a/b/c'); // http://url-to-laravel/uk/a/b/c
+LaravelLocalization::getLocalizedURL('uk', 'a/b/c'); // http://url-to-laravel/uk/a/b/c
+```
 
 ## Creating a language selector
 
