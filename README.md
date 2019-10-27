@@ -583,9 +583,16 @@ Be sure to pass the locale and the attributes as parameters to the closure. You 
 
 ## Caching routes
 
-More information on support on [cached (translated) routes here](CACHING.md).
+To cache your routes, use:
 
-Note that the separate [czim/laravel-localization-route-cache](https://github.com/czim/laravel-localization-route-cache) package is no longer required.
+``` bash
+php artisan route:trans:cache
+```
+
+... instead of the normal `route:cache` command.
+
+
+For more details see [here](CACHING.md).
 
 ## Common Issues
 

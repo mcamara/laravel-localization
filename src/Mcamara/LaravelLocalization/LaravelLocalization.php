@@ -379,7 +379,7 @@ class LaravelLocalization
             $translation = $this->translator->get($transKeyName, [], $locale);
             $route .= '/'.$translation;
 
-            $route = $this->substituteAttributesInRoute($attributes, $route);
+            $route = $this->substituteAttributesInRoute($attributes, $route, $locale);
         }
 
         if (empty($route)) {
@@ -635,10 +635,13 @@ class LaravelLocalization
      *
      * @return string route with attributes changed
      */
-    protected function substituteAttributesInRoute($attributes, $route)
+    protected function substituteAttributesInRoute($attributes, $route, $locale = null)
     {
         foreach ($attributes as $key => $value) {
-            if ($value instanceOf UrlRoutable) {
+            if ($value instanceOf Interfaces\LocalizedUrlRoutable) {
+                $value = $value->getLocalizedRouteKey($locale);
+            }
+            elseif ($value instanceOf UrlRoutable) {
                 $value = $value->getRouteKey();
             }
             $route = str_replace(array('{'.$key.'}', '{'.$key.'?}'), $value, $route);
@@ -701,7 +704,7 @@ class LaravelLocalization
         $path = trim(str_replace('/'.$this->currentLocale.'/', '', $path), "/");
 
         foreach ($this->translatedRoutes as $route) {
-            if (trim($this->substituteAttributesInRoute($attributes, $this->translator->get($route)), '/') === $path) {
+            if (trim($this->substituteAttributesInRoute($attributes, $this->translator->get($route), $this->currentLocale), '/') === $path) {
                 return $route;
             }
         }
