@@ -389,8 +389,13 @@ You may use translatable slugs for your model, for example like this:
     http://url/en/view/five
     http://url/es/ver/cinco
 
-For this, your model needs to implement `\Mcamara\LaravelLocalization\Interfaces` and implement
+It is required that your model implements `\Mcamara\LaravelLocalization\Interfaces` and implement
 a function `getLocalizedRouteKey($locale)` that gives for a given locale the translated slug.
+This is necessary so that your urls will be correctly [localized](#localized-urls).
+
+Also, to use [route-model-binding](https://laravel.com/docs/routing#route-model-binding), you should overwrite the function `resolveRouteBinding($value)`
+in your model. The function should return the model that belongs to the translated slug `$value`.
+
 
 ## Events
 
