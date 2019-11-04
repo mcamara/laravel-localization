@@ -592,6 +592,21 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         );
     }
 
+    public function testLocalizedParameterFromTranslateUrl()
+    {
+        $model = new ModelWithTranslatableRoutes();
+
+        $this->assertEquals(
+            $this->test_url.'en/view/company',
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view', ['id' => $model])
+        );
+
+        $this->assertEquals(
+            $this->test_url.'es/ver/empresa',
+            app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view', ['id' => $model])
+        );
+    }
+
     public function testGetNonLocalizedURL()
     {
         $this->assertEquals(

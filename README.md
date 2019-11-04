@@ -358,53 +358,8 @@ Note that Route Model Binding is supported.
 
 You can adapt your URLs depending on the language you want to show them. For example, http://url/en/about and http://url/es/acerca (acerca is about in spanish) or http://url/en/view/5 and http://url/es/ver/5 (view == ver in spanish) would be redirected to the same controller using the proper filter and setting up the translation files as follows:
 
-As it is a middleware, first you have to register in on your `app/Http/Kernel.php` file like this:
+It is necessary that the `localize` middleware in loaded in your `Route::group` middleware (See [installation instruction](#LaravelLocalizationRoutes)).
 
-```php
-<?php namespace App\Http;
-
-use Illuminate\Foundation\Http\Kernel as HttpKernel;
-
-class Kernel extends HttpKernel {
-	/**
-	 * The application's route middleware.
-	 *
-	 * @var array
-	 */
-	protected $routeMiddleware = [
-		/**** OTHER MIDDLEWARE ****/
-		'localize' => 'Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes',
-		// TRANSLATE ROUTES MIDDLEWARE
-	];
-}
-```
-
-```php
-// app/Http/routes.php
-
-Route::group(
-[
-	'prefix' => LaravelLocalization::setLocale(),
-	'middleware' => [ 'localize' ] // Route translate middleware
-],
-function() {
-	/** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
-	Route::get('/', function() {
-		// This routes is useless to translate
-		return View::make('hello');
-	});
-
-	Route::get(LaravelLocalization::transRoute('routes.about'), function() {
-		return View::make('about');
-	});
-
-	Route::get(LaravelLocalization::transRoute('routes.view'), function($id) {
-		return View::make('view',['id'=>$id]);
-	});
-});
-
-/** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
-```
 In the routes file you just have to add the `LaravelLocalizationRoutes` filter and the `LaravelLocalization::transRoute` function to every route you want to translate using the translation key.
 
 Then you have to create the translation files and add there every key you want to translate. I suggest to create a routes.php file inside your `resources/lang/language_abbreviation` folder. For the previous example, I have created two translations files, these two files would look like:
@@ -427,6 +382,30 @@ return [
 
 Once files are saved, you can access to http://url/en/about , http://url/es/acerca , http://url/en/view/5 and http://url/es/ver/5 without any problem.
 
+### Translatable route parameters
+
+You may use translatable slugs for your model, for example like this:
+
+    http://url/en/view/five
+    http://url/es/ver/cinco
+
+For this, your model needs to implement `\Mcamara\LaravelLocalization\Interfaces\LocalizedUrlRoutable`.
+The function `getLocalizedRouteKey($locale)` must return for a given locale the translated slug.
+This is necessary so that your urls will be correctly [localized](#localized-urls).
+
+Also, to use [route-model-binding](https://laravel.com/docs/routing#route-model-binding), you should overwrite the function `resolveRouteBinding($value)`
+in your model. The function should return the model that belongs to the translated slug `$value`. 
+For example:
+
+```php
+public function resolveRouteBinding($value)
+{
+        return static::findByLocalizedSlug($value)->first() ?? abort(404);
+}
+```
+
+
+
 ## Events
 
 You can capture the URL parameters during translation if you wish to translate them too. To do so, just create an event listener for the `routes.translation` event like so:
@@ -444,9 +423,16 @@ Be sure to pass the locale and the attributes as parameters to the closure. You 
 
 ## Caching routes
 
-More information on support on [cached (translated) routes here](CACHING.md).
+To cache your routes, use:
 
-Note that the separate [czim/laravel-localization-route-cache](https://github.com/czim/laravel-localization-route-cache) package is no longer required.
+``` bash
+php artisan route:trans:cache
+```
+
+... instead of the normal `route:cache` command.
+
+
+For more details see [here](CACHING.md).
 
 ## Common Issues
 
