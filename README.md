@@ -427,7 +427,7 @@ public function resolveRouteBinding($slug)
 }
 ```
 
-
+You may want to checkout this [video](https://youtu.be/B1AUqCdizgc) which demonstrates how one may set it up.
 
 ## Events
 
