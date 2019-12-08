@@ -17,6 +17,7 @@ The package offers the following:
  - Supports caching & testing
  - Option to hide default locale in url
  - Many snippets and helpers (like language selector)
+ - Something important
 
 ## Table of Contents
 
@@ -394,7 +395,7 @@ The function `getLocalizedRouteKey($locale)` must return for a given locale the 
 This is necessary so that your urls will be correctly [localized](#localized-urls).
 
 Also, to use [route-model-binding](https://laravel.com/docs/routing#route-model-binding), you should overwrite the function `resolveRouteBinding($value)`
-in your model. The function should return the model that belongs to the translated slug `$value`. 
+in your model. The function should return the model that belongs to the translated slug `$value`.
 For example:
 
 ```php
