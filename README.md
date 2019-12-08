@@ -17,7 +17,6 @@ The package offers the following:
  - Supports caching & testing
  - Option to hide default locale in url
  - Many snippets and helpers (like language selector)
- - Something important
 
 ## Table of Contents
 
@@ -357,31 +356,53 @@ Note that Route Model Binding is supported.
 
 ## Translated Routes
 
-You can adapt your URLs depending on the language you want to show them. For example, http://url/en/about and http://url/es/acerca (acerca is about in spanish) or http://url/en/view/5 and http://url/es/ver/5 (view == ver in spanish) would be redirected to the same controller using the proper filter and setting up the translation files as follows:
+You can adapt your URLs depending on the language you want to show them. For example, http://url/en/about and http://url/es/acerca (acerca is about in spanish) or http://url/en/article/5 and http://url/es/articulo/5 (view == ver in spanish) would be redirected to the same controller using the proper filter and setting up the translation files as follows:
 
 It is necessary that the `localize` middleware in loaded in your `Route::group` middleware (See [installation instruction](#LaravelLocalizationRoutes)).
 
-In the routes file you just have to add the `LaravelLocalizationRoutes` filter and the `LaravelLocalization::transRoute` function to every route you want to translate using the translation key.
+For each language, add a `routes.php` into `resources/lang/**/routes.php` folder.
+The file contains an array with all translatable routes. For example, like this:
 
-Then you have to create the translation files and add there every key you want to translate. I suggest to create a routes.php file inside your `resources/lang/language_abbreviation` folder. For the previous example, I have created two translations files, these two files would look like:
 ```php
+<?php
 // resources/lang/en/routes.php
 return [
 	"about" 	=> 	"about",
-	"view" 		=> 	"view/{id}", //we add a route parameter
+	"article" 		=> 	"article/{article}", //we add a route parameter
 	// other translated routes
 ];
 ```
 ```php
+<?php
 // resources/lang/es/routes.php
 return [
 	"about" 	=> 	"acerca",
-	"view" 		=> 	"ver/{id}", //we add a route parameter
+	"article" 		=> 	"articulo/{article}", //we add a route parameter
 	// other translated routes
 ];
 ```
 
-Once files are saved, you can access to http://url/en/about , http://url/es/acerca , http://url/en/view/5 and http://url/es/ver/5 without any problem.
+You may add the routes to in `routes/web.php` like this:
+
+```php
+Route::group(['prefix' => LaravelLocalization::setLocale(),
+              'middleware' => [ 'localize' ]], function () {
+
+    Route::get(LaravelLocalization::transRoute('routes.about'), function () {
+        return view('about');
+    });
+
+    Route::get(LaravelLocalization::transRoute('routes.article'), function (\App\Article $article) {
+        return $article;
+    });
+
+    //,...
+});
+```
+
+
+
+Once files are saved, you can access to http://url/en/about , http://url/es/acerca , http://url/en/article/5 and http://url/es/articulo/5 without any problem.
 
 ### Translatable route parameters
 
