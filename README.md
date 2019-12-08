@@ -356,7 +356,8 @@ Note that Route Model Binding is supported.
 
 ## Translated Routes
 
-You can adapt your URLs depending on the language you want to show them. For example, http://url/en/about and http://url/es/acerca (acerca is about in spanish) or http://url/en/article/5 and http://url/es/articulo/5 (view == ver in spanish) would be redirected to the same controller using the proper filter and setting up the translation files as follows:
+You can translate your URL. For example, http://url/en/about and http://url/es/acerca (acerca is about in spanish)
+or http://url/en/article/5 and http://url/es/articulo/5 (article is articulo in spanish) would be redirected to the same controller using the proper filter and setting up the translation files as follows:
 
 It is necessary that the `localize` middleware in loaded in your `Route::group` middleware (See [installation instruction](#LaravelLocalizationRoutes)).
 
@@ -408,21 +409,21 @@ Once files are saved, you can access to http://url/en/about , http://url/es/acer
 
 You may use translatable slugs for your model, for example like this:
 
-    http://url/en/view/five
-    http://url/es/ver/cinco
+    http://url/en/article/important-change
+    http://url/es/articulo/cambio-importante
 
 For this, your model needs to implement `\Mcamara\LaravelLocalization\Interfaces\LocalizedUrlRoutable`.
 The function `getLocalizedRouteKey($locale)` must return for a given locale the translated slug.
 This is necessary so that your urls will be correctly [localized](#localized-urls).
 
-Also, to use [route-model-binding](https://laravel.com/docs/routing#route-model-binding), you should overwrite the function `resolveRouteBinding($value)`
-in your model. The function should return the model that belongs to the translated slug `$value`.
+Also, to use [route-model-binding](https://laravel.com/docs/routing#route-model-binding), you should overwrite the function `resolveRouteBinding($slug)`
+in your model. The function should return the model that belongs to the translated slug `$slug`.
 For example:
 
 ```php
-public function resolveRouteBinding($value)
+public function resolveRouteBinding($slug)
 {
-        return static::findByLocalizedSlug($value)->first() ?? abort(404);
+        return static::findByLocalizedSlug($slug)->first() ?? abort(404);
 }
 ```
 
