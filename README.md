@@ -17,6 +17,7 @@ The package offers the following:
  - Supports caching & testing
  - Option to hide default locale in url
  - Many snippets and helpers (like language selector)
+ - Write something here
 
 ## Table of Contents
 
