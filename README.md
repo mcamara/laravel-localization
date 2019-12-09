@@ -413,12 +413,12 @@ It is possible to have translated slugs, for example like this:
     http://url/es/articulo/cambio-importante
 
 However, in order to do this, each article must have many slugs (one for each locale).
-Its up to you how you want to implement this relation. The only requirements for translatable route parameters is that the relevant model implements the interface `LocalizedUrlRoutable` and adjusts the route-model-binding.
+Its up to you how you want to implement this relation. The only requirement for translatable route parameters is, that the relevant model implements the interface `LocalizedUrlRoutable`.
 
 #### Implementing LocalizedUrlRoutable
 
 To implement `\Mcamara\LaravelLocalization\Interfaces\LocalizedUrlRoutable`,
-one has to create the function `getLocalizedRouteKey($locale)`, which must return for a given locale the translated slug. For example, in the above example, `getLocalizedRouteKey('en')` should return `important-change` and `getLocalizedRouteKey('es')` should return `cambio-importante`.
+one has to create the function `getLocalizedRouteKey($locale)`, which must return for a given locale the translated slug. In the above example, inside the model article, `getLocalizedRouteKey('en')` should return `important-change` and `getLocalizedRouteKey('es')` should return `cambio-importante`.
 
 #### Route Model Binding
 
@@ -433,7 +433,9 @@ public function resolveRouteBinding($slug)
 }
 ```
 
-You may want to checkout this [video](https://youtu.be/B1AUqCdizgc) which demonstrates how one may set it up.
+#### Tutorial Video
+
+You may want to checkout this [video](https://youtu.be/B1AUqCdizgc) which demonstrates how one may set up translatable route parameters.
 
 ## Events
 
