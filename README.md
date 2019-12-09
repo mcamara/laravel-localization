@@ -368,16 +368,16 @@ The file contains an array with all translatable routes. For example, like this:
 <?php
 // resources/lang/en/routes.php
 return [
-  "about"   =>  "about",
-  "article" =>  "article/{article}",
+    "about"    =>  "about",
+    "article"  =>  "article/{article}",
 ];
 ```
 ```php
 <?php
 // resources/lang/es/routes.php
 return [
-  "about"   =>  "acerca",
-  "article"	=>  "articulo/{article}",
+    "about"    =>  "acerca",
+    "article"  =>  "articulo/{article}",
 ];
 ```
 
