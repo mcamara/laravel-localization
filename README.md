@@ -356,55 +356,86 @@ Note that Route Model Binding is supported.
 
 ## Translated Routes
 
-You can adapt your URLs depending on the language you want to show them. For example, http://url/en/about and http://url/es/acerca (acerca is about in spanish) or http://url/en/view/5 and http://url/es/ver/5 (view == ver in spanish) would be redirected to the same controller using the proper filter and setting up the translation files as follows:
+You may translate your routes. For example, http://url/en/about and http://url/es/acerca (acerca is about in spanish)
+or http://url/en/article/important-article and http://url/es/articulo/important-article (article is articulo in spanish) would be redirected to the same controller/view as follows:
 
-It is necessary that the `localize` middleware in loaded in your `Route::group` middleware (See [installation instruction](#LaravelLocalizationRoutes)).
+It is necessary that at least the `localize` middleware in loaded in your `Route::group` middleware (See [installation instruction](#LaravelLocalizationRoutes)).
 
-In the routes file you just have to add the `LaravelLocalizationRoutes` filter and the `LaravelLocalization::transRoute` function to every route you want to translate using the translation key.
+For each language, add a `routes.php` into `resources/lang/**/routes.php` folder.
+The file contains an array with all translatable routes. For example, like this:
 
-Then you have to create the translation files and add there every key you want to translate. I suggest to create a routes.php file inside your `resources/lang/language_abbreviation` folder. For the previous example, I have created two translations files, these two files would look like:
 ```php
+<?php
 // resources/lang/en/routes.php
 return [
-	"about" 	=> 	"about",
-	"view" 		=> 	"view/{id}", //we add a route parameter
-	// other translated routes
+    "about"    =>  "about",
+    "article"  =>  "article/{article}",
 ];
 ```
 ```php
+<?php
 // resources/lang/es/routes.php
 return [
-	"about" 	=> 	"acerca",
-	"view" 		=> 	"ver/{id}", //we add a route parameter
-	// other translated routes
+    "about"    =>  "acerca",
+    "article"  =>  "articulo/{article}",
 ];
 ```
 
-Once files are saved, you can access to http://url/en/about , http://url/es/acerca , http://url/en/view/5 and http://url/es/ver/5 without any problem.
+You may add the routes in `routes/web.php` like this:
+
+```php
+Route::group(['prefix' => LaravelLocalization::setLocale(),
+              'middleware' => [ 'localize' ]], function () {
+
+    Route::get(LaravelLocalization::transRoute('routes.about'), function () {
+        return view('about');
+    });
+
+    Route::get(LaravelLocalization::transRoute('routes.article'), function (\App\Article $article) {
+        return $article;
+    });
+
+    //,...
+});
+```
+
+Once files are saved, you can access http://url/en/about , http://url/es/acerca , http://url/en/article/important-article and http://url/es/articulo/important-article without any problem.
 
 ### Translatable route parameters
 
-You may use translatable slugs for your model, for example like this:
+Maybe you noticed in the previous example the English slug in the Spanish url:
 
-    http://url/en/view/five
-    http://url/es/ver/cinco
+    http://url/es/articulo/important-article
 
-For this, your model needs to implement `\Mcamara\LaravelLocalization\Interfaces\LocalizedUrlRoutable`.
-The function `getLocalizedRouteKey($locale)` must return for a given locale the translated slug.
-This is necessary so that your urls will be correctly [localized](#localized-urls).
+It is possible to have translated slugs, for example like this:
 
-Also, to use [route-model-binding](https://laravel.com/docs/routing#route-model-binding), you should overwrite the function `resolveRouteBinding($value)`
-in your model. The function should return the model that belongs to the translated slug `$value`. 
+    http://url/en/article/important-change
+    http://url/es/articulo/cambio-importante
+
+However, in order to do this, each article must have many slugs (one for each locale).
+Its up to you how you want to implement this relation. The only requirement for translatable route parameters is, that the relevant model implements the interface `LocalizedUrlRoutable`.
+
+#### Implementing LocalizedUrlRoutable
+
+To implement `\Mcamara\LaravelLocalization\Interfaces\LocalizedUrlRoutable`,
+one has to create the function `getLocalizedRouteKey($locale)`, which must return for a given locale the translated slug. In the above example, inside the model article, `getLocalizedRouteKey('en')` should return `important-change` and `getLocalizedRouteKey('es')` should return `cambio-importante`.
+
+#### Route Model Binding
+
+To use [route-model-binding](https://laravel.com/docs/routing#route-model-binding), one  should overwrite the function `resolveRouteBinding($slug)`
+in the model. The function should return the model that belongs to the translated slug `$slug`.
 For example:
 
 ```php
-public function resolveRouteBinding($value)
+public function resolveRouteBinding($slug)
 {
-        return static::findByLocalizedSlug($value)->first() ?? abort(404);
+        return static::findByLocalizedSlug($slug)->first() ?? abort(404);
 }
 ```
 
+#### Tutorial Video
 
+You may want to checkout this [video](https://youtu.be/B1AUqCdizgc) which demonstrates how one may set up translatable route parameters.
 
 ## Events
 
