@@ -65,7 +65,7 @@ After that, `config/laravellocalization.php` will be created.
 
 The configuration options are:
 
- - **supportedLocales** Langauges of your app (Default: English & Spanish).
+ - **supportedLocales** Languages of your app (Default: English & Spanish).
  - **useAcceptLanguageHeader** If true, then automatically detect language from browser.
  - **hideDefaultLocaleInURL** If true, then do not show default locale in url.
  - **localesOrder** Sort languages in custom order.
