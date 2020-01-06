@@ -2,10 +2,25 @@
 
 namespace Mcamara\LaravelLocalization;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Mcamara\LaravelLocalization\Middleware as Mcamara;
 
 class LaravelLocalizationServiceProvider extends ServiceProvider
 {
+
+    /**
+     * Middlewares to Register
+     *
+     * @var array
+     */
+    protected $middlewareToAdd = [       
+        'localize' => Mcamara\LaravelLocalizationRoutes::class,
+        'localizationRedirect' => Mcamara\LaravelLocalizationRedirectFilter::class,
+        'localeSessionRedirect' => Mcamara\LocaleSessionRedirect::class,
+        'localeCookieRedirect'    =>Mcamara\LocaleCookieRedirect::class,
+        'localeViewPath' => Mcamara\LaravelLocalizationViewPath::class
+    ];
     /**
      * Bootstrap the application events.
      *
@@ -45,6 +60,17 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
 
         $this->registerCommands();
     }
+
+    /**
+     * register Middlewares
+     */
+    protected function registerMiddlewareGroups()
+    {
+        foreach ($this->middlewareToAdd as $name => $class) {
+            Route::aliasMiddleware($name, $class);
+        }
+    }
+
 
     /**
      * Registers app bindings and aliases.
