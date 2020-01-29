@@ -318,7 +318,7 @@ return [
     //
     // If in addition the middleware `LaravelLocalizationRedirectFilter` is active, then
     // every url with default locale is redirected to url without locale.
-    // For example, `/en/about` would be redirected to `/en`.
+    // For example, `/en/about` would be redirected to `/about`.
     // It is recommended to use `hideDefaultLocaleInURL` only in
     // combination with the middleware `LaravelLocalizationRedirectFilter`
     // to avoid duplicate content (SEO).
