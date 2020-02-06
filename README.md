@@ -73,31 +73,25 @@ The configuration options are:
  - **utf8suffix** Allow changing utf8suffix for CentOS etc.
  - **urlsIgnored** Ignore specific urls.
 
-### Register Middleware
+### Middleware Aliases
 
-You may register the package middleware in the `app/Http/Kernel.php` file:
+Package auto-registers the below middleware aliases which you can use 
 
 ```php
-<?php namespace App\Http;
 
-use Illuminate\Foundation\Http\Kernel as HttpKernel;
+    'localize'                => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+    'localizationRedirect'    => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
+    'localeSessionRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
+    'localeCookieRedirect'    => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
+    'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class
 
-class Kernel extends HttpKernel {
-    /**
-    * The application's route middleware.
-    *
-    * @var array
-    */
-    protected $routeMiddleware = [
-        /**** OTHER MIDDLEWARE ****/
-        'localize'                => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
-        'localizationRedirect'    => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
-        'localeSessionRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
-        'localeCookieRedirect'    => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
-        'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class
-    ];
-}
 ```
+* localize: 
+* [localizationRedirect](#LaravelLocalizationRedirectFilter)
+* [localeSessionRedirect](#LocaleSessionRedirect)
+* [localeCookieRedirect](#LocaleCookieRedirect)
+* localeViewPath:
+
 
 ## Usage
 

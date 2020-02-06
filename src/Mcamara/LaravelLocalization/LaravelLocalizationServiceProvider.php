@@ -14,13 +14,14 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $middlewareToAdd = [       
+    protected $middlewareToAdd = [
         'localize' => Mcamara\LaravelLocalizationRoutes::class,
         'localizationRedirect' => Mcamara\LaravelLocalizationRedirectFilter::class,
         'localeSessionRedirect' => Mcamara\LocaleSessionRedirect::class,
-        'localeCookieRedirect'    =>Mcamara\LocaleCookieRedirect::class,
+        'localeCookieRedirect' => Mcamara\LocaleCookieRedirect::class,
         'localeViewPath' => Mcamara\LaravelLocalizationViewPath::class
     ];
+
     /**
      * Bootstrap the application events.
      *
@@ -59,6 +60,8 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         $this->registerBindings();
 
         $this->registerCommands();
+
+        $this->registerMiddlewareGroups();
     }
 
     /**
@@ -66,8 +69,13 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
      */
     protected function registerMiddlewareGroups()
     {
+        $versionGreaterThan54 = version_compare(app()->version(), '5.4.0', '>=');
         foreach ($this->middlewareToAdd as $name => $class) {
-            Route::aliasMiddleware($name, $class);
+            if ($versionGreaterThan54) {
+                Route::aliasMiddleware($name, $class);
+            } else {
+                Route::middleware($name, $class);
+            }
         }
     }
 
