@@ -311,6 +311,14 @@ return [
     // If false, system will take app.php locale attribute
     'useAcceptLanguageHeader' => true,
 
+    // Handle the locale used when translation key don't match result at current locale
+    //
+    // Valid options are 
+    // - false (Not handle fallback locale and use app.fallback_locale)
+    // - 'related' (Use current locale without country code as fallback locale if it is in supported locales. e.g "en-US" will use "en", "pt-BR" will use "pt")
+    // - 'header' (Use the first language from browser as fallback locale if it is not equals the app locale, else use the second one)
+    'handleFallbackLocale' => false,
+
     // If `hideDefaultLocaleInURL` is true, then a url without locale
     // is identical with the same url with default locale.
     // For example, if `en` is default locale, then `/en/about` and `/about`
