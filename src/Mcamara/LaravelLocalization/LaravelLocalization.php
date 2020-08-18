@@ -4,6 +4,7 @@ namespace Mcamara\LaravelLocalization;
 
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
 use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
@@ -884,83 +885,93 @@ class LaravelLocalization
      */
     protected function extractAttributes($url = false, $locale = '')
     {
+        
         if (!empty($url)) {
-            $attributes = [];
-            $parse = parse_url($url);
-            if (isset($parse['path'])) {
-                $parse['path'] = trim(str_replace('/'.$this->currentLocale.'/', '', $parse['path']), "/");
-                $url = explode('/', trim($parse['path'], '/'));
-            } else {
-                $url = [];
-            }
-
-            foreach ($this->router->getRoutes() as $route) {
+            $cacheKey =  'laravellocalisation-ea-'.$locale.'-'.$url;
+            return Cache::remember($cacheKey, 30, function() use ($url, $locale) {
                 $attributes = [];
-                $path = method_exists($route, 'uri') ? $route->uri() : $route->getUri();
-
-                if (!preg_match("/{[\w]+\??}/", $path)) {
-                    continue;
+                $originalUrl = $url;
+                $parse = parse_url($url);
+                if (isset($parse['path'])) {
+                    $parse['path'] = trim(str_replace('/'.$this->currentLocale.'/', '', $parse['path']), "/");
+                    $url = explode('/', trim($parse['path'], '/'));
+                } else {
+                    $url = [];
                 }
-
-                $path = explode('/', $path);
-                $i = 0;
-
-                // The system's route can't be smaller
-                // only the $url can be missing segments (optional parameters)
-                // We can assume it's the wrong route
-                if (count($path) < count($url)) {
-                    continue;
-                }
-
-                $match = true;
-                foreach ($path as $j => $segment) {
-                    if (isset($url[$i])) {
-                        if ($segment === $url[$i]) {
-                            $i++;
-                            continue;
-                        } elseif (preg_match("/{[\w]+}/", $segment)) {
-                            // must-have parameters
-                            $attribute_name = preg_replace(['/}/', '/{/', "/\?/"], '', $segment);
-                            $attributes[$attribute_name] = $url[$i];
-                            $i++;
-                            continue;
-                        } elseif (preg_match("/{[\w]+\?}/", $segment)) {
-                            // optional parameters
-                            if (!isset($path[$j + 1]) || $path[$j + 1] !== $url[$i]) {
-                                // optional parameter taken
+    
+                foreach ($this->router->getRoutes() as $route) {
+                    $attributes = [];
+                    $path = method_exists($route, 'uri') ? $route->uri() : $route->getUri();
+    
+                    
+                    
+                    if (!preg_match("/{[\w]+\??}/", $path)) {
+                        continue;
+                    }
+                    $path = explode('/', $path);
+                    $i = 0;
+    
+                    // The system's route can't be smaller
+                    // only the $url can be missing segments (optional parameters)
+                    // We can assume it's the wrong route
+                    if (count($path) < count($url)) {
+                        continue;
+                    }
+                    
+    
+                    $match = true;
+                    foreach ($path as $j => $segment) {
+                        if (isset($url[$i])) {
+                            if ($segment === $url[$i]) {
+                                $i++;
+                                continue;
+                            } elseif (preg_match("/{[\w]+}/", $segment)) {
+                                // must-have parameters
                                 $attribute_name = preg_replace(['/}/', '/{/', "/\?/"], '', $segment);
                                 $attributes[$attribute_name] = $url[$i];
                                 $i++;
                                 continue;
+                            } elseif (preg_match("/{[\w]+\?}/", $segment)) {
+                                // optional parameters
+                                if (!isset($path[$j + 1]) || $path[$j + 1] !== $url[$i]) {
+                                    // optional parameter taken
+                                    $attribute_name = preg_replace(['/}/', '/{/', "/\?/"], '', $segment);
+                                    $attributes[$attribute_name] = $url[$i];
+                                    $i++;
+                                    continue;
+                                } else {
+                                    $match = false;
+                                    break;
+                                }
                             } else {
+                                // As soon as one segment doesn't match, then we have the wrong route
                                 $match = false;
                                 break;
                             }
+                        } elseif (preg_match("/{[\w]+\?}/", $segment)) {
+                            $attribute_name = preg_replace(['/}/', '/{/', "/\?/"], '', $segment);
+                            $attributes[$attribute_name] = null;
+                            $i++;
                         } else {
-                            // As soon as one segment doesn't match, then we have the wrong route
+                            // no optional parameters but no more $url given
+                            // this route does not match the url
                             $match = false;
                             break;
                         }
-                    } elseif (preg_match("/{[\w]+\?}/", $segment)) {
-                        $attribute_name = preg_replace(['/}/', '/{/', "/\?/"], '', $segment);
-                        $attributes[$attribute_name] = null;
-                        $i++;
-                    } else {
-                        // no optional parameters but no more $url given
-                        // this route does not match the url
+                    }
+    
+                    if (isset($url[$i + 1])) {
                         $match = false;
-                        break;
+                    }
+    
+                    if ($match) {
+                        if($route->matches(request()->create($originalUrl))) {
+                            return $attributes;
+                        }
                     }
                 }
-
-                if (isset($url[$i + 1])) {
-                    $match = false;
-                }
-
-                if ($match) {
-                    return $attributes;
-                }
-            }
+                return [];
+            });
         } else {
             if (!$this->router->current()) {
                 return [];
