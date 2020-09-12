@@ -5,6 +5,7 @@ namespace Mcamara\LaravelLocalization;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Str;
+use Illuminate\Support\Env;
 use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
 use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 
@@ -1036,7 +1037,7 @@ class LaravelLocalization
      */
     protected function getForcedLocale()
     {
-        return env(static::ENV_ROUTE_KEY, function () {
+        return Env::get(static::ENV_ROUTE_KEY, function () {
             $value = getenv(static::ENV_ROUTE_KEY);
 
             if ($value !== false) {
