@@ -461,7 +461,18 @@ To cache your routes, use:
 php artisan route:trans:cache
 ```
 
-... instead of the normal `route:cache` command.
+... instead of the normal `route:cache` command. Using `artisan route:cache` will **not** work correctly!
+
+For the route caching solution to work, it is required to make a minor adjustment to your application route provision.
+
+In your App's `RouteServiceProvider`, use the `LoadsTranslatedCachedRoutes` trait:
+
+```php
+<?php
+class RouteServiceProvider extends ServiceProvider
+{
+    use \Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
+```
 
 
 For more details see [here](CACHING.md).
