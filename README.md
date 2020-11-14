@@ -154,6 +154,17 @@ Route::group(
 });
 ```
 
+If you want to use the hostname and not a prefix to set your locale, you can set the relationship of `hostname => locale` in the array `localesMapping` in `config/laravellocalization.php` and  use `domain` instead of `prefix` like this:
+
+```php
+Route::group(
+[
+        'domain' => LaravelLocalization::setLocale(),
+	'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ]
+], function (){ //...
+});
+```
+
 ### Recommendations
 
 ***1.***: It is **strongly** recommended to use a [redirecting middleware](#redirect-middleware).
