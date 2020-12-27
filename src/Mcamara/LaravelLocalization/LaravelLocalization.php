@@ -274,7 +274,10 @@ class LaravelLocalization
         $urlQuery = $urlQuery ? '?'.$urlQuery : '';
 
         if (empty($url)) {
-            $url = $this->request->fullUrl();
+            $url = rawurldecode(
+                $this->request->fullUrl()
+            );
+            
             $urlQuery = parse_url($url, PHP_URL_QUERY);
             $urlQuery = $urlQuery ? '?'.$urlQuery : '';
 
