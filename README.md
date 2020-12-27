@@ -186,7 +186,7 @@ For example, if a user navigates to http://url-to-laravel/test  and `en` is the 
 
 Similar to LocaleSessionRedirect, but it stores value in a cookie instead of a session.
 
-Whenever a locale is present in the url, it will be stored in the session by this middleware.
+Whenever a locale is present in the url, it will be stored in the cookie by this middleware.
 
 In there is no locale present in the url, then this middleware will check the following
 
