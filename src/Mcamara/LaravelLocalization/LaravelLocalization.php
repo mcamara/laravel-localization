@@ -6,6 +6,7 @@ use Illuminate\Config\Repository;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Illuminate\Support\Env;
 use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
 use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 
@@ -1047,12 +1048,22 @@ class LaravelLocalization
      */
     protected function getForcedLocale()
     {
-        return env(static::ENV_ROUTE_KEY, function () {
-            $value = getenv(static::ENV_ROUTE_KEY);
+        if (version_compare($this->app->version(), '6') >= 0) {
+            return Env::get(static::ENV_ROUTE_KEY, function () {
+                $value = getenv(static::ENV_ROUTE_KEY);
 
-            if ($value !== false) {
-                return $value;
-            }
-        });
+                if ($value !== false) {
+                    return $value;
+                }
+            });
+        } else {
+            return env(static::ENV_ROUTE_KEY, function () {
+                $value = getenv(static::ENV_ROUTE_KEY);
+
+                if ($value !== false) {
+                    return $value;
+                }
+            });
+        }
     }
 }

@@ -46,7 +46,7 @@ The package offers the following:
  5.2.x-5.4.x (PHP 7 not required)  | 1.2.x
  5.2.x-5.8.x (PHP 7 required) | 1.3.x
  5.2.0-6.x (PHP 7 required) | 1.4.x
- 5.2.0-7.x (PHP 7 required) | 1.5.x
+ 5.2.0-8.x (PHP 7 required) | 1.6.x
 
 ## Installation
 
@@ -186,7 +186,7 @@ For example, if a user navigates to http://url-to-laravel/test  and `en` is the 
 
 Similar to LocaleSessionRedirect, but it stores value in a cookie instead of a session.
 
-Whenever a locale is present in the url, it will be stored in the session by this middleware.
+Whenever a locale is present in the url, it will be stored in the cookie by this middleware.
 
 In there is no locale present in the url, then this middleware will check the following
 
@@ -461,7 +461,18 @@ To cache your routes, use:
 php artisan route:trans:cache
 ```
 
-... instead of the normal `route:cache` command.
+... instead of the normal `route:cache` command. Using `artisan route:cache` will **not** work correctly!
+
+For the route caching solution to work, it is required to make a minor adjustment to your application route provision.
+
+In your App's `RouteServiceProvider`, use the `LoadsTranslatedCachedRoutes` trait:
+
+```php
+<?php
+class RouteServiceProvider extends ServiceProvider
+{
+    use \Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
+```
 
 
 For more details see [here](CACHING.md).
