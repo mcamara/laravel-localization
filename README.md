@@ -217,7 +217,7 @@ aswell as the `hideDefaultLocaleInURL` and [Translated Routes](#translated-route
 
 ```php
     // If current locale is Spanish, it returns `/es/test`
-    <a href="{{ LaravelLocalization::localizeUrl('(/test)') }}">@lang('Follow this link')</a>
+    <a href="{{ LaravelLocalization::localizeUrl('/test') }}">@lang('Follow this link')</a>
 ```
 
 #### Get localized URL for an specific locale
