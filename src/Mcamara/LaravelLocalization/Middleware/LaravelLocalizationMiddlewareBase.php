@@ -20,6 +20,9 @@ class LaravelLocalizationMiddlewareBase
      */
     protected function shouldIgnore($request)
     {
+        if (in_array($request->method(), config('laravellocalization.httpMethodsIgnored'))) {
+            return true;
+        }
         $this->except = $this->except ?? config('laravellocalization.urlsIgnored', []);
         foreach ($this->except as $except) {
             if ($except !== '/') {
