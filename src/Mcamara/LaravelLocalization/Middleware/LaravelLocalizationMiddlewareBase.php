@@ -33,4 +33,16 @@ class LaravelLocalizationMiddlewareBase
 
         return false;
     }
+
+    protected function shouldRedirectToLocalizedUrl($locale): bool
+    {
+        return app('laravellocalization')->checkLocaleInSupportedLocales($locale) &&
+            ! app('laravellocalization')->isHiddenDefault($locale);
+    }
+
+    protected function shouldRedirectToNonLocalizedUrl($locale): bool
+    {
+        return app('laravellocalization')->checkLocaleInSupportedLocales($locale) &&
+            app('laravellocalization')->isHiddenDefault($locale);
+    }
 }
