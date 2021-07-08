@@ -56,7 +56,7 @@ class LocaleCookieRedirect extends LaravelLocalizationMiddlewareBase
             $redirection = app('laravellocalization')->getLocalizedURL($locale);
             $redirectResponse = new RedirectResponse($redirection, 302, ['Vary' => 'Accept-Language']);
 
-            return $redirectResponse->withCookie(cookie()->forever('locale', $params[0]));
+            return $redirectResponse->withCookie(cookie()->forever('locale', $locale));
         }
 
         return $next($request);
