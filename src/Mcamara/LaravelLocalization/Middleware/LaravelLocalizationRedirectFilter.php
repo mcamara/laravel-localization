@@ -30,15 +30,13 @@ class LaravelLocalizationRedirectFilter extends LaravelLocalizationMiddlewareBas
         if (\count($params) > 0) {
             $locale = $params[0];
 
-            if (app('laravellocalization')->checkLocaleInSupportedLocales($locale)) {
-                if (app('laravellocalization')->isHiddenDefault($locale)) {
-                    $redirection = app('laravellocalization')->getNonLocalizedURL();
+            if ($this->shouldRedirectToNonLocalizedUrl($locale)) {
+                $redirection = app('laravellocalization')->getNonLocalizedURL();
 
-                    // Save any flashed data for redirect
-                    app('session')->reflash();
+                // Save any flashed data for redirect
+                app('session')->reflash();
 
-                    return new RedirectResponse($redirection, 302, ['Vary' => 'Accept-Language']);
-                }
+                return new RedirectResponse($redirection, 302, ['Vary' => 'Accept-Language']);
             }
         }
 
