@@ -4,8 +4,9 @@ namespace Mcamara\LaravelLocalization\Middleware;
 
 use Closure;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\App;
 
-class LaravelLocalizationRedirectFilter extends LaravelLocalizationMiddlewareBase
+class LaravelLocalizationDomainRedirectFilter extends LaravelLocalizationMiddlewareBase
 {
     /**
      * Handle an incoming request.
@@ -17,6 +18,10 @@ class LaravelLocalizationRedirectFilter extends LaravelLocalizationMiddlewareBas
      */
     public function handle($request, Closure $next)
     {
+        $localeByDomain = app('laravellocalization')->getLocaleByDomain();
+        $currentLocale = app('laravellocalization')->getCurrentLocale();
+        $host = parse_url(\request()->root(), PHP_URL_HOST);
+
         // If the URL of the request is in exceptions.
         if ($this->shouldIgnore($request)) {
             return $next($request);
@@ -26,18 +31,13 @@ class LaravelLocalizationRedirectFilter extends LaravelLocalizationMiddlewareBas
 
         // Dump the first element (empty string) as getPathInfo() always returns a leading slash
         array_shift($params);
+        if ($currentLocale != $localeByDomain) {
+            if (app('laravellocalization')->checkLocaleInSupportedLocales($currentLocale)) {
+                app('laravellocalization')->setLocale($localeByDomain);
+                app('session')->reflash();
 
-        if (\count($params) > 0) {
-            $locale = $params[0];
-
-            if (app('laravellocalization')->checkLocaleInSupportedLocales($locale)) {
-                if (app('laravellocalization')->isHiddenDefault($locale)) {
-                    // $url
-                    $redirection = app('laravellocalization')->getNonLocalizedURL($url);
-
-                    // Save any flashed data for redirect
-                    app('session')->reflash();
-
+                if (stripos($host, app('laravellocalization')->getDomainByLocale(App::getLocale())) === false) {
+                    $redirection = app('laravellocalization')->getLocalizedURL($localeByDomain);
                     return new RedirectResponse($redirection, 302, ['Vary' => 'Accept-Language']);
                 }
             }

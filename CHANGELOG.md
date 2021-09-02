@@ -1,3 +1,6 @@
+### 1.5.0
+- Support for localization switch by domain names
+
 ### 1.4.0
 - Added compatibility with Laravel 6
 

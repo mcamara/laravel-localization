@@ -1,13 +1,26 @@
 {
-    "name": "mcamara/laravel-localization",
-    "description": "Easy localization for Laravel",
-    "keywords": ["localization", "laravel", "php"],
-    "homepage": "https://github.com/mcamara/laravel-localization",
+    "name": "movemoveapp/laravel-localization",
+    "description": "Easy localization for Laravel with a support for localization switch by domain names.",
+    "keywords": [
+        "php",
+        "laravel",
+        "laravel-package",
+        "laravel-localization",
+        "language-selector",
+        "laravel-domains",
+        "laravel-domain-localization"
+    ],
+    "homepage": "https://github.com/movemoveapp/laravel-localization",
     "license": "MIT",
     "authors": [
         {
             "name": "Marc Cámara",
             "email": "mcamara88@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Dmitry Kovalev",
+            "email": "d.kovalev@movemove.io",
             "role": "Developer"
         }
     ],

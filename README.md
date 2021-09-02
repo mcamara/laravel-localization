@@ -1,10 +1,21 @@
 # Laravel Localization
 
-[![Join the chat at https://gitter.im/mcamara/laravel-localization](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mcamara/laravel-localization?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+## About Fork
+This package is a fork of [mcamara/laravel-localization](https://github.com/mcamara/laravel-localization) with a support for localization switch by domain names like to
 
-[![Latest Stable Version](https://poser.pugx.org/mcamara/laravel-localization/version.png)](https://packagist.org/packages/mcamara/laravel-localization) [![Total Downloads](https://poser.pugx.org/mcamara/laravel-localization/d/total.png)](https://packagist.org/packages/mcamara/laravel-localization) [![Build Status](https://travis-ci.org/mcamara/laravel-localization.png)](https://travis-ci.org/mcamara/laravel-localization)
-[![Open Source Helpers](https://www.codetriage.com/mcamara/laravel-localization/badges/users.svg)](https://www.codetriage.com/mcamara/laravel-localization)
-[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
+ - exmaple.com - english version
+ - example.es - versión en español
+ - example.ru - русская версия
+
+or
+
+ - en.exmaple.com - english version
+ - es.example.com - versión en español
+ - ru.example.com - русская версия
+ 
+Read a more information about new feature [Localization Switch By Domain Names](#localization-switch-by-domain-names)
+
+## Introduction
 
 Easy i18n localization for Laravel, an useful tool to combine with Laravel localization classes.
 
@@ -17,11 +28,14 @@ The package offers the following:
  - Supports caching & testing
  - Option to hide default locale in url
  - Many snippets and helpers (like language selector)
+ - **Smart redirects between domain names**
 
 ## Table of Contents
 
 - <a href="#installation">Installation</a>
-- <a href="#usage">Usage</a>
+- <a href="#one-domain-usage">One Domain Usage</a>
+- <a href="#localization-switch-by-domain-names">Localization Switch By Domain Names</a>
+    - <a href="#domains-env-properties">Domains .env properties</a>
 - <a href="#redirect-middleware">Redirect Middleware</a>
 - <a href="#helpers">Helpers</a>
 - <a href="#translated-routes">Translated Routes</a>
@@ -50,7 +64,7 @@ The package offers the following:
 
 ## Installation
 
-Install the package via composer: `composer require mcamara/laravel-localization`
+Install the package via composer: `composer require movemoveapp/laravel-localization`
 
 For Laravel 5.4 and below it necessary to [register the service provider](/ADDITIONS.md#for-laravel-5.4-and-below).
 
@@ -59,14 +73,14 @@ For Laravel 5.4 and below it necessary to [register the service provider](/ADDIT
 In order to edit the default configuration you may execute:
 
 ```
-php artisan vendor:publish --provider="Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider"
+php artisan vendor:publish --provider="MoveMoveIO\LaravelLocalization\LaravelLocalizationServiceProvider"
 ```
 
 After that, `config/laravellocalization.php` will be created.
 
 The configuration options are:
 
- - **supportedLocales** Languages of your app (Default: English & Spanish).
+ - **supportedLocales** Languages of your app (Default: English & Spanish) and localization domain name.
  - **useAcceptLanguageHeader** If true, then automatically detect language from browser.
  - **hideDefaultLocaleInURL** If true, then do not show default locale in url.
  - **localesOrder** Sort languages in custom order.
@@ -91,16 +105,18 @@ class Kernel extends HttpKernel {
     */
     protected $routeMiddleware = [
         /**** OTHER MIDDLEWARE ****/
-        'localize'                => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
-        'localizationRedirect'    => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
-        'localeSessionRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
-        'localeCookieRedirect'    => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
-        'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class
+        'localize'                      => \Move\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+        'localizationRedirect'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
+        'localeSessionRedirect'         => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
+        'localeCookieRedirect'          => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
+        'localeViewPath'                => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
+        /*** A new featrue with domain names ***/
+        'localizationDomainRedirect'    => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationDomainRedirectFilter::class,
     ];
 }
 ```
 
-## Usage
+## One Domain Usage
 
 Add the following to your routes file:
 
@@ -124,7 +140,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale()], function()
 
 ```
 
-Once this route group is added to the routes file, a user can access all locales added into `supportedLocales` (`en` and `es` by default).
+Once this route group is added to the routes file, a user can access all locales added into `supportedLocales` (`en`, `es` and `ru` by default).
 For example, the above route file creates the following addresses:
 
 ```
@@ -153,6 +169,72 @@ Route::group(
 ], function(){ //...
 });
 ```
+
+### Localization Switch By Domain Names
+A first step, you should set up domains. For example, your project suppored tree locales:
+ 
+- `en` is [example.com](https://example.com/) 
+- `es` is [example.es](https://example.es/)
+- `ru` is [example.ru](https://example.ru/)
+
+In your `.env` configuration files you should call about domains as:
+
+```php
+LOCALIZATION_DOMAIN_NAME_EN=example.com
+LOCALIZATION_DOMAIN_NAME_ES=example.es
+LOCALIZATION_DOMAIN_NAME_RU=example.ru
+```
+
+Don't forget uncommented your locales in the `config/laravellocalization.php` config file in `supportedLocales`.
+
+Add the following to your routes file:
+
+```php
+// routes/web.php
+
+Route::group([
+    'middleware' => [ 'localizationDomainRedirect' ]
+], function()
+{
+	/** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
+	Route::get('/', function()
+	{
+		return View::make('hello');
+	});
+
+	Route::get('test',function(){
+		return View::make('test');
+	});
+});
+
+/** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
+
+```
+
+For example, the above route file creates the following addresses:
+
+```
+// Set application language to English
+https://example.com/
+https://example.com/test
+
+// Set application language to Spanish
+https://example.es/
+https://example.es/test
+
+// Set application language to Russian
+https://example.ru/
+https://example.ru/test
+
+```
+
+#### Domains .env properties
+To declare a domain name for a special location, you must declare the variable as `LOCALIZATION_DOMAIN_NAME_` and the location in uppercase. If the location uses a dash, it must be replaced with an underscore.
+
+ - Locale `en` is declared as `LOCALIZATION_DOMAIN_NAME_EN`
+ - Locale `uz-Arab` is declared as `LOCALIZATION_DOMAIN_NAME_UZ_ARAB`
+ - Locale `ca-valencia` is declared as `LOCALIZATION_DOMAIN_NAME_CA_VALENCIA`
+ - etc...
 
 ### Recommendations
 

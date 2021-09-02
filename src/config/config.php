@@ -222,7 +222,7 @@ return [
         //'mk'          => ['name' => 'Macedonian',             'script' => 'Cyrl', 'native' => 'македонски', 'regional' => 'mk_MK', 'domain' => env('LOCALIZATION_DOMAIN_NAME_MK', null)],
         //'mn'          => ['name' => 'Mongolian (Cyrillic)',   'script' => 'Cyrl', 'native' => 'монгол', 'regional' => 'mn_MN', 'domain' => env('LOCALIZATION_DOMAIN_NAME_MN', null)],
         //'ce'          => ['name' => 'Chechen',                'script' => 'Cyrl', 'native' => 'нохчийн мотт', 'regional' => 'ce_RU', 'domain' => env('LOCALIZATION_DOMAIN_NAME_CE', null)],
-        //'ru'          => ['name' => 'Russian',                'script' => 'Cyrl', 'native' => 'русский', 'regional' => 'ru_RU', 'domain' => env('LOCALIZATION_DOMAIN_NAME_RU', null)],
+        'ru'          => ['name' => 'Russian',                'script' => 'Cyrl', 'native' => 'русский', 'regional' => 'ru_RU', 'domain' => env('LOCALIZATION_DOMAIN_NAME_RU', null)],
         //'sah'         => ['name' => 'Yakut',                  'script' => 'Cyrl', 'native' => 'саха тыла', 'regional' => '', 'domain' => env('LOCALIZATION_DOMAIN_NAME_SAH', null)],
         //'tt'          => ['name' => 'Tatar',                  'script' => 'Cyrl', 'native' => 'татар теле', 'regional' => 'tt_RU', 'domain' => env('LOCALIZATION_DOMAIN_NAME_TT', null)],
         //'tg'          => ['name' => 'Tajik (Cyrillic)',       'script' => 'Cyrl', 'native' => 'тоҷикӣ', 'regional' => 'tg_TJ', 'domain' => env('LOCALIZATION_DOMAIN_NAME_TG', null)],
