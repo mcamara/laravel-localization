@@ -1,5 +1,17 @@
-### 1.5.0
+### 1.7.0
 - Support for localization switch by domain names
+
+### 1.6.1
+- Support Laravel < 6 for Illuminate\Support\Env usage (#750): Use `Env::get` instead of `.env`
+- It conflicts with other `env()` global functions (such as CakePHP), and most of them don't handle closures.
+- Support Laravel < 6 for Illuminate\Support\Env usage
+- Fixed `env()` and `Illuminate\Support\Env` usage to support Laravel < 6
+
+### 1.6.0
+- Compatibility with Laravel 8
+
+### 1.5.0
+- Compatibility with Laravel 7.x
 
 ### 1.4.0
 - Added compatibility with Laravel 6

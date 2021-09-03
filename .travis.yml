@@ -6,7 +6,6 @@ dist: trusty
 
 php:
   - 7.1
-  - 7.2
   - 7.3
   - 7.4
 
@@ -14,7 +13,7 @@ before_script:
   - composer self-update
   - composer install --prefer-dist --no-interaction
 
-script: ./vendor/bin/phpunit
+script: ./vendor/bin/phpunit -d memory_limit=1024M
 
 matrix:
   fast_finish: true
