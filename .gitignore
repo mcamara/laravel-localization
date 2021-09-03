@@ -2,6 +2,7 @@
 /.project
 /.settings
 /vendor
+*.cache
 composer.lock
 composer.phar
 Thumbs.db
