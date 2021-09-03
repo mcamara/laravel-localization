@@ -756,7 +756,7 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
     public function testGetSupportedLanguagesKeys()
     {
         $this->assertEquals(
-            ['en', 'es'],
+            ['en', 'es', 'ru'],
             app('laravellocalization')->getSupportedLanguagesKeys()
         );
     }
