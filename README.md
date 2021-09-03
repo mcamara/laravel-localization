@@ -73,7 +73,7 @@ For Laravel 5.4 and below it necessary to [register the service provider](/ADDIT
 In order to edit the default configuration you may execute:
 
 ```
-php artisan vendor:publish --provider="MoveMoveIO\LaravelLocalization\LaravelLocalizationServiceProvider"
+php artisan vendor:publish --provider="Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider"
 ```
 
 After that, `config/laravellocalization.php` will be created.
@@ -105,7 +105,7 @@ class Kernel extends HttpKernel {
     */
     protected $routeMiddleware = [
         /**** OTHER MIDDLEWARE ****/
-        'localize'                      => \Move\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+        'localize'                      => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
         'localizationRedirect'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
         'localeSessionRedirect'         => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
         'localeCookieRedirect'          => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
