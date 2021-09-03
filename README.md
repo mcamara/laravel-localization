@@ -1,4 +1,9 @@
 # Laravel Localization
+[![Build Status](https://app.travis-ci.com/movemoveapp/laravel-localization.svg?branch=master)](https://app.travis-ci.com/movemoveapp/laravel-localization)
+[![Latest Stable Version](https://poser.pugx.org/movemoveapp/laravel-localization/v)](//packagist.org/packages/movemoveapp/laravel-localization)
+[![Total Downloads](https://poser.pugx.org/movemoveapp/laravel-localization/downloads)](//packagist.org/packages/movemoveapp/laravel-localization)
+[![License](https://poser.pugx.org/movemoveapp/laravel-localization/license)](//packagist.org/packages/movemoveapp/laravel-localization)
+
 
 ## About Fork
 This package is a fork of [mcamara/laravel-localization](https://github.com/mcamara/laravel-localization) with a support for localization switch by domain names like to
