@@ -41,6 +41,8 @@ class LaravelLocalizationDomainRedirectFilter extends LaravelLocalizationMiddlew
                     return new RedirectResponse($redirection, 302, ['Vary' => 'Accept-Language']);
                 }
             }
+        } else {
+            app('laravellocalization')->setLocale($localeByDomain);
         }
 
         return $next($request);
