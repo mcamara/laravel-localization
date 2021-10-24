@@ -508,6 +508,10 @@ will not work. Instead, one has to use
 </form>
 ```
 
+
+Another way to solve this is to put http method to config to 'laravellocalization.httpMethodsIgnored' 
+to prevent of processing this type of requests
+
 ### MethodNotAllowedHttpException
 
 If you do not localize your post url and use a redirect middleware,
