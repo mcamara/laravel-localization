@@ -151,11 +151,15 @@ class LaravelLocalization
      * Set and return current locale.
      *
      * @param string $locale Locale to set the App to (optional)
+     * @param bool $asDefault set as default locale
      *
      * @return string Returns locale (if route has any) or null (if route does not have a locale)
      */
-    public function setLocale($locale = null)
+    public function setLocale($locale = null, $asDefault = false)
     {
+        if($asDefault) {
+            $this->defaultLocale = $locale;
+        }
         if (empty($locale) || !\is_string($locale)) {
             // If the locale has not been passed through the function
             // it tries to get it from the first segment of the url
