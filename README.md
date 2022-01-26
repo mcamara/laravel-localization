@@ -46,7 +46,7 @@ The package offers the following:
  5.2.x-5.4.x (PHP 7 not required)  | 1.2.x
  5.2.x-5.8.x (PHP 7 required) | 1.3.x
  5.2.0-6.x (PHP 7 required) | 1.4.x
- 5.2.0-8.x (PHP 7 required) | 1.6.x
+ 5.2.0-9.x (PHP 7 required) | 1.6.x
 
 ## Installation
 
