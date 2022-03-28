@@ -175,7 +175,7 @@ and `useAcceptLanguageHeader` in `config/laravellocalization.php`:
 
 Whenever a locale is present in the url, it will be stored in the session by this middleware.
 
-In there is no locale present in the url, then this middleware will check the following
+If there is no locale present in the url, then this middleware will check the following
 
  - If no locale is saved in session and `useAcceptLanguageHeader` is set to true, compute locale from browser and redirect to url with locale.
  - If a locale is saved in session redirect to url with locale, unless its the default locale and `hideDefaultLocaleInURL` is set to true.
