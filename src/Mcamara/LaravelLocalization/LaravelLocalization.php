@@ -414,6 +414,7 @@ class LaravelLocalization
      *
      * @param $defaultLocale
      * @throws UnsupportedLocaleException
+     * @throws SupportedLocalesNotDefined
      */
     public function setDefaultLocale($defaultLocale)
     {
