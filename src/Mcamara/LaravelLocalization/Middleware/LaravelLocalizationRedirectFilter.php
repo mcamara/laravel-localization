@@ -33,11 +33,15 @@ class LaravelLocalizationRedirectFilter extends LaravelLocalizationMiddlewareBas
             if (app('laravellocalization')->checkLocaleInSupportedLocales($locale)) {
                 if (app('laravellocalization')->isHiddenDefault($locale)) {
                     $redirection = app('laravellocalization')->getNonLocalizedURL();
+                    $redirectResponse = new RedirectResponse($redirection, 301, ['Pragma' => 'no-cache']);
 
                     // Save any flashed data for redirect
                     app('session')->reflash();
 
-                    return new RedirectResponse($redirection, 302, ['Vary' => 'Accept-Language']);
+                    if ($request->hasCookie('locale') && $request->cookie('locale') != $locale)
+                        $redirectResponse->withCookie(cookie()->forever('locale', $locale));
+
+                    return $redirectResponse;
                 }
             }
         }
