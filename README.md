@@ -296,6 +296,13 @@ Return current locale's native name as string (English/Español/عربى/ ..etc)
 {{ LaravelLocalization::getCurrentLocaleNative() }}
 ```
 
+### Get Current Locale Regional Name
+Return current locale's regional name as string (en_GB/en_US/fr_FR/ ..etc).
+
+```php
+{{ LaravelLocalization::getCurrentLocaleRegional() }}
+```
+
 ### Get Current Locale Direction
 
 Return current locale's direction as string (ltr/rtl).
