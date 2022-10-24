@@ -550,7 +550,7 @@ protected function refreshApplicationWithLocale($locale)
     self::setUp();
 }
 
-protected function tearDown()
+protected function tearDown(): void
 {
     putenv(LaravelLocalization::ENV_ROUTE_KEY);
     parent::tearDown();
