@@ -550,7 +550,7 @@ protected function refreshApplicationWithLocale($locale)
     self::setUp();
 }
 
-protected function tearDown()
+protected function tearDown(): void
 {
     putenv(LaravelLocalization::ENV_ROUTE_KEY);
     parent::tearDown();
@@ -566,6 +566,7 @@ public function testBasicTest()
 
 ## Collaborators
 - [Adam Nielsen (iwasherefirst2)](https://github.com/iwasherefirst2)
+- [Julián Garcés (juliangarcess)](https://github.com/juliangarcess)
 
 Ask [mcamara](https://github.com/mcamara) if you want to be one of them!
 
