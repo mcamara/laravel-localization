@@ -44,9 +44,9 @@ The package offers the following:
  4.2.x        | 0.15.x
  5.0.x/5.1.x  | 1.0.x
  5.2.x-5.4.x (PHP 7 not required)  | 1.2.x
- 5.2.x-5.8.x (PHP 7 required) | 1.3.x
- 5.2.0-6.x (PHP 7 required) | 1.4.x
- 5.2.0-9.x (PHP 7 required) | 1.7.x
+ 5.2.x-5.8.x (PHP version >= 7 required) | 1.3.x
+ 5.2.0-6.x (PHP version >= 7 required) | 1.4.x
+ 5.2.0-9.x (PHP version >= 7 required) | 1.7.x
 
 ## Installation
 
@@ -516,7 +516,7 @@ will not work. Instead, one has to use
 ```
 
 
-Another way to solve this is to put http method to config to 'laravellocalization.httpMethodsIgnored' 
+Another way to solve this is to put http method to config to 'laravellocalization.httpMethodsIgnored'
 to prevent of processing this type of requests
 
 ### MethodNotAllowedHttpException
@@ -566,7 +566,6 @@ public function testBasicTest()
 
 ## Collaborators
 - [Adam Nielsen (iwasherefirst2)](https://github.com/iwasherefirst2)
-- [Julián Garcés (juliangarcess)](https://github.com/juliangarcess)
 
 Ask [mcamara](https://github.com/mcamara) if you want to be one of them!
 
