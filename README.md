@@ -43,10 +43,9 @@ The package offers the following:
  4.1.x        | 0.13.x
  4.2.x        | 0.15.x
  5.0.x/5.1.x  | 1.0.x
- 5.2.x-5.4.x (PHP 7 not required)  | 1.2.x
- 5.2.x-5.8.x (PHP version >= 7 required) | 1.3.x
+ 5.2.x-5.4.x (PHP 7 not required)  | 1.2.
  5.2.0-6.x (PHP version >= 7 required) | 1.4.x
- 5.2.0-10.x (PHP version >= 7 required) | 1.8.x
+ 6.x-10.x (PHP version >= 7 required) | 1.8.x
 
 ## Installation
 
