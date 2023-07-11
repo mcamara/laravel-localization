@@ -245,6 +245,13 @@ Returns a route, [localized](#translated-routes) to the desired locale. If the t
 // Returns /es/acerca
 {{ LaravelLocalization::getURLFromRouteNameTranslated('es', 'routes.about') }}
 ```
+**Example of a localized link using routes with attributes**
+
+```php
+// An array of attributes can be provided.
+// Returns /en/archive/ghosts, /fr/archive/fantômes, /pt/arquivo/fantasmas, etc.
+<a href="{{ LaravelLocalization::getURLFromRouteNameTranslated( App::currentLocale(), 'routes.archive', array('category' => 'ghosts')) }}">Ghost Stories</a>
+```
 
 
 ### Get Supported Locales
