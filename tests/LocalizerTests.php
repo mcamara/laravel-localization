@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Routing\Route;
+use Mcamara\LaravelLocalization\LaravelLocalization;
 
 class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
 {
@@ -328,10 +328,10 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
     public function testGetLocalizedURLWithQueryStringAndhideDefaultLocaleInURL()
     {
         app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
-         app()['request'] = $this->createRequest(
+        $request = $this->createRequest(
             $uri = 'en/about?q=2'
         );
-        $laravelLocalization = new \Mcamara\LaravelLocalization\LaravelLocalization();
+        $laravelLocalization = app(LaravelLocalization::class, ['request' => $request]);
         $laravelLocalization->transRoute('LaravelLocalization::routes.about');
 
         $this->assertEquals(
@@ -342,10 +342,10 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
 
     public function testGetLocalizedURLWithQueryStringAndNotTranslatedRoute()
     {
-         app()['request'] = $this->createRequest(
+        $request = $this->createRequest(
             $uri = 'en/about?q=2'
         );
-        $laravelLocalization = new \Mcamara\LaravelLocalization\LaravelLocalization();
+        $laravelLocalization = app(LaravelLocalization::class, ['request' => $request]);
 
         $this->assertEquals(
             $this->test_url . 'en/about?q=2',
