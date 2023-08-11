@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string getNonLocalizedURL(string|false $url = null)
  * @method static string getDefaultLocale()
  * @method static array getLocalesMapping()
- * @method static string|null getLocalesFromMapping(string|null $locale)
+ * @method static string|null getLocaleFromMapping(string|null $locale)
  * @method static string|null getInversedLocaleFromMapping(string|null $locale)
  * @method static array getSupportedLocales()
  * @method static array getLocalesOrder()
