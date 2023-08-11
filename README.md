@@ -88,7 +88,7 @@ class Kernel extends HttpKernel {
     *
     * @var array
     */
-    protected $routeMiddleware = [
+    protected $middlewareAliases = [
         /**** OTHER MIDDLEWARE ****/
         'localize'                => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
         'localizationRedirect'    => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
