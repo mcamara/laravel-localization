@@ -151,7 +151,7 @@ class LaravelLocalization
      *
      * @param string $locale Locale to set the App to (optional)
      *
-     * @return string Returns locale (if route has any) or null (if route does not have a locale)
+     * @return string|null Returns locale (if route has any) or null (if route does not have a locale)
      */
     public function setLocale($locale = null)
     {
