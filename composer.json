@@ -1,17 +1,23 @@
 {
     "name": "nuranto/laravel-localization",
     "description": "Easy localization for Laravel",
-    "keywords": ["localization", "laravel", "php"],
+    "keywords": [
+        "localization",
+        "laravel",
+        "php"
+    ],
     "homepage": "https://github.com/mcamara/laravel-localization",
     "license": "MIT",
-    "authors": [{
-        "name": "Marc Cámara",
-        "email": "mcamara88@gmail.com",
-        "role": "Developer"
-    }],
+    "authors": [
+        {
+            "name": "Marc Cámara",
+            "email": "mcamara88@gmail.com",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": ">=7.1.0",
-        "laravel/framework": "~5.2.0||~5.3.0||~5.4.0||~5.5.0||~5.6.0||~5.7.0||~5.8.0||^6.0||^7.0||^8.0"
+        "laravel/framework": "^8.0||^9.0"
     },
     "require-dev": {
         "orchestra/testbench-browser-kit": "~3.4|~3.8|~4.0",
