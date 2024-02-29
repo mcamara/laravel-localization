@@ -21,7 +21,7 @@
     },
     "require-dev": {
         "orchestra/testbench-browser-kit": "~3.4|~3.8|~4.0|^7.12",
-        "phpunit/phpunit": "6.0.*|^8.0|^9.5.10"
+        "phpunit/phpunit": "6.0.*|^8.0|^9.5.10|^10.0.7"
     },
     "suggest": {
         "ext-intl": "*"
