@@ -1,3 +1,8 @@
+### 2.0.0
+- Support [contextual binding](https://laravel.com/docs/container#contextual-binding) ([#879](https://github.com/mcamara/laravel-localization/pull/879))
+
+For guidance on the upgrade process, please refer to the [UPGRADING.md](/UPGRADING.md) file.
+
 ### 1.4.0
 - Added compatibility with Laravel 6
 
