@@ -100,6 +100,23 @@ class Kernel extends HttpKernel {
 }
 ```
 
+If you are using Laravel 11, you may register in `bootstrap/app.php` file in closure `withMiddleware`:
+
+```php
+return Application::configure(basePath: dirname(__DIR__))
+    // Other application configurations
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            /**** OTHER MIDDLEWARE ALIASES ****/
+            'localize'                => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+            'localizationRedirect'    => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
+            'localeSessionRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
+            'localeCookieRedirect'    => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
+            'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
+        ]);
+    })
+```
+
 ## Usage
 
 Add the following to your routes file:
@@ -385,6 +402,9 @@ It is necessary that at least the `localize` middleware in loaded in your `Route
 
 For each language, add a `routes.php` into `resources/lang/**/routes.php` folder.
 The file contains an array with all translatable routes. For example, like this:
+
+> Keep in mind: starting from [Laravel 9](https://laravel.com/docs/9.x/upgrade#the-lang-directory), the `resources/lang` folder is now located in the root project folder (`lang`).
+> If your project has `lang` folder in the root, you must add a `routes.php` into `lang/**/routes.php` folder.
 
 ```php
 <?php
