@@ -140,12 +140,7 @@ class LaravelLocalization
         $this->url = $url;
 
         // set default locale
-        $this->defaultLocale = $this->configRepository->get('app.locale');
-        $supportedLocales = $this->getSupportedLocales();
-
-        if (empty($supportedLocales[$this->defaultLocale])) {
-            throw new UnsupportedLocaleException('Laravel default locale is not in the supportedLocales array.');
-        }
+        $this->setDefaultLocale($this->configRepository->get('app.locale'));
     }
 
     /**
@@ -414,6 +409,22 @@ class LaravelLocalization
     public function getDefaultLocale()
     {
         return $this->defaultLocale;
+    }
+
+    /**
+     * Sets the default locale.
+     *
+     * @param $defaultLocale
+     * @throws UnsupportedLocaleException
+     * @throws SupportedLocalesNotDefined
+     */
+    public function setDefaultLocale($defaultLocale)
+    {
+        $supportedLocales = $this->getSupportedLocales();
+        if (empty($supportedLocales[$defaultLocale])) {
+            throw new UnsupportedLocaleException('Laravel default locale is not in the supportedLocales array.');
+        }
+        $this->defaultLocale = $defaultLocale;
     }
 
     /**

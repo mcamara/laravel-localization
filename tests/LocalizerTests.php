@@ -880,4 +880,46 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
         $this->assertEquals('http://localhost/custom/some-route', app('laravellocalization')->localizeURL('some-route', 'custom'));
         $this->assertEquals('http://localhost/custom', app('laravellocalization')->localizeURL('http://localhost/custom', 'en'));
     }
+
+    public function testSetDefaultLocale()
+    {
+        $this->assertEquals(
+            app('laravellocalization')->getDefaultLocale(), $this->defaultLocale
+        );
+
+        app('laravellocalization')->setDefaultLocale('es');
+
+        $this->assertEquals(
+            app('laravellocalization')->getDefaultLocale(), 'es'
+        );
+    }
+
+    public function testSetInvalidDefaultLocale()
+    {
+        $this->expectException(\Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException::class);
+        app('laravellocalization')->setDefaultLocale('sv');
+    }
+
+    public function testSetDefaultLocaleHiddenInUrl()
+    {
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
+
+        $this->assertEquals(
+            $this->test_url,
+            app('laravellocalization')->localizeURL('', $this->defaultLocale)
+        );
+
+        app('laravellocalization')->setDefaultLocale('es');
+
+        $this->assertNotEquals(
+            $this->test_url,
+            app('laravellocalization')->localizeURL('', $this->defaultLocale)
+        );
+
+        $this->assertEquals(
+            $this->test_url,
+            app('laravellocalization')->localizeURL('', 'es')
+        );
+
+    }
 }
