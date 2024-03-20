@@ -78,6 +78,13 @@ class LaravelLocalization
     protected $defaultLocale;
 
     /**
+     * Default fallback locale.
+     *
+     * @var string
+     */
+    protected $defaultFallbackLocale;
+
+    /**
      * Supported Locales.
      *
      * @var array
@@ -139,12 +146,18 @@ class LaravelLocalization
         $this->request = $request;
         $this->url = $url;
 
-        // set default locale
-        $this->defaultLocale = $this->configRepository->get('app.locale');
         $supportedLocales = $this->getSupportedLocales();
 
+        // set default locale
+        $this->defaultLocale = $this->configRepository->get('app.locale');
         if (empty($supportedLocales[$this->defaultLocale])) {
             throw new UnsupportedLocaleException('Laravel default locale is not in the supportedLocales array.');
+        }
+
+        // set default fallback locale
+        $this->defaultFallbackLocale = $this->configRepository->get('app.fallback_locale');
+        if (empty($supportedLocales[$this->defaultFallbackLocale])) {
+            throw new UnsupportedLocaleException('Laravel default fallback locale is not in the supportedLocales array.');
         }
     }
 
@@ -193,6 +206,14 @@ class LaravelLocalization
             }
         }
 
+        // Method available from laravel 7.21.0
+        if (method_exists($this->app, 'setFallbackLocale')) {
+            $this->app->setFallbackLocale($this->getCurrentFallbackLocale());
+        } else {
+            $this->configRepository->set('app.fallback_locale', $this->getCurrentFallbackLocale());
+            $this->app['translator']->setFallback($this->getCurrentFallbackLocale());
+        }
+        
         $this->app->setLocale($this->currentLocale);
 
         // Regional locale such as de_DE, so formatLocalized works in Carbon
@@ -417,6 +438,16 @@ class LaravelLocalization
     }
 
     /**
+     * Returns default fallback locale.
+     *
+     * @return string
+     */
+    public function getDefaultFallbackLocale()
+    {
+        return $this->defaultFallbackLocale;
+    }
+
+    /**
      * Return locales mapping.
      *
      * @return array
@@ -582,6 +613,28 @@ class LaravelLocalization
 
         // or get application default language
         return $this->configRepository->get('app.locale');
+    }
+
+    /**
+     * Returns current fallback language.
+     *
+     * @return string current fallback language
+     */
+    public function getCurrentFallbackLocale()
+    {
+        if ($this->configRepository->get('laravellocalization.handleFallbackLocale') == 'related'){
+            if($this->checkLocaleInSupportedLocales(explode('_', $this->getCurrentLocaleRegional())[0]))
+                return explode('_', $this->getCurrentLocaleRegional())[0];
+        }
+
+        if (($this->configRepository->get('laravellocalization.handleFallbackLocale') == 'header') && !$this->app->runningInConsole()) {
+            $negotiator = new LanguageNegotiator($this->getDefaultFallbackLocale(), $this->getSupportedLocales(), $this->request);
+
+            return $negotiator->negotiateLanguage([$this->getCurrentLocale()]);
+        }
+
+        // or get application default fallback language
+        return $this->configRepository->get('app.fallback_locale');
     }
 
     /**

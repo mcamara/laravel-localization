@@ -68,6 +68,7 @@ The configuration options are:
 
  - **supportedLocales** Languages of your app (Default: English & Spanish).
  - **useAcceptLanguageHeader** If true, then automatically detect language from browser.
+ - **handleFallbackLocale** Manage fallback language.
  - **hideDefaultLocaleInURL** If true, then do not show default locale in url.
  - **localesOrder** Sort languages in custom order.
  - **localesMapping** Rename url locales.
