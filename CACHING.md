@@ -22,13 +22,16 @@ In your App's `AppServiceProvider`, use the `CachedTranslatedRouteLoader` class 
 ```php
 <?php
 class AppServiceProvider extends ServiceProvider
-{
-    public function register(): void
+{  
+    use \Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
     {
+        RouteServiceProvider::loadCachedRoutesUsing(fn() => $this->loadCachedRoutes());
         ...
-        \Illuminate\Foundation\Support\Providers\RouteServiceProvider::loadCachedRoutesUsing(fn() => (new CachedTranslatedRouteLoader($this->app))());
-
-    }
+    }   
 ```
 
 ## Usage
