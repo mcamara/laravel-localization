@@ -6,9 +6,10 @@ If you want to cache the routes in all languages, you will need to use special A
 
 For the route caching solution to work, it is required to make a minor adjustment to your application route provision.
 
-In your App's `RouteServiceProvider`, use the `LoadsTranslatedCachedRoutes` trait:
 
 **before laravel 11**
+In your App's `RouteServiceProvider`, use the `LoadsTranslatedCachedRoutes` trait:
+
 ```php
 <?php
 class RouteServiceProvider extends ServiceProvider
@@ -16,6 +17,8 @@ class RouteServiceProvider extends ServiceProvider
     use \Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
 ```
 **after laravel 11** 
+In your App's `AppServiceProvider`, use the `CachedTranslatedRouteLoader` class in register method:
+
 ```php
 <?php
 class AppServiceProvider extends ServiceProvider
