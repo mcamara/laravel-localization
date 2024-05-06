@@ -488,12 +488,27 @@ For the route caching solution to work, it is required to make a minor adjustmen
 
 In your App's `RouteServiceProvider`, use the `LoadsTranslatedCachedRoutes` trait:
 
+**before laravel 11** 
 ```php
 <?php
 class RouteServiceProvider extends ServiceProvider
 {
     use \Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
 ```
+
+**after laravel 11** 
+```php
+<?php
+class AppServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        ...
+        \Illuminate\Foundation\Support\Providers\RouteServiceProvider::loadCachedRoutesUsing(fn() => (new CachedTranslatedRouteLoader($this->app))());
+
+    }
+```
+
 
 
 For more details see [here](CACHING.md).
