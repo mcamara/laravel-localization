@@ -506,6 +506,8 @@ php artisan route:trans:cache
 
 For the route caching solution to work, it is required to make a minor adjustment to your application route provision.
 
+**before laravel 11** 
+
 In your App's `RouteServiceProvider`, use the `LoadsTranslatedCachedRoutes` trait:
 
 ```php
@@ -514,6 +516,26 @@ class RouteServiceProvider extends ServiceProvider
 {
     use \Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
 ```
+
+**after laravel 11** 
+
+In your App's `AppServiceProvider`, use the `CachedTranslatedRouteLoader` class in register method:
+
+```php
+<?php
+class AppServiceProvider extends ServiceProvider
+{  
+    use \Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        RouteServiceProvider::loadCachedRoutesUsing(fn() => $this->loadCachedRoutes());
+        ...
+    }   
+```
+
 
 
 For more details see [here](CACHING.md).
