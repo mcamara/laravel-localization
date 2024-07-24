@@ -93,12 +93,15 @@ class LanguageNegotiator
      * Quality factors in the Accept-Language: header are supported, e.g.:
      *      Accept-Language: en-UK;q=0.7, en-US;q=0.6, no, dk;q=0.8
      *
+     * @param array $ignoreLanguages
+     * 
      * @return string The negotiated language result or app.locale.
      */
-    public function negotiateLanguage()
+    public function negotiateLanguage( $ignoreLanguages = [] )
     {
         $matches = $this->getMatchesFromAcceptedLanguages();
         foreach ($matches as $key => $q) {
+            if( in_array($key, $ignoreLanguages) ) continue;
 
             $key = ($this->configRepository->get('laravellocalization.localesMapping')[$key]) ?? $key;
 
@@ -113,6 +116,7 @@ class LanguageNegotiator
             // Search for acceptable locale by 'regional' => 'af_ZA' or 'lang' => 'af-ZA' match.
             foreach ( $this->supportedLanguages as $key_supported => $locale ) {
                 if ( (isset($locale['regional']) && $locale['regional'] == $key) || (isset($locale['lang']) && $locale['lang'] == $key) ) {
+                    if( in_array($key_supported, $ignoreLanguages) ) continue 2;
                     return $key_supported;
                 }
             }
@@ -120,6 +124,10 @@ class LanguageNegotiator
         // If any (i.e. "*") is acceptable, return the first supported format
         if (isset($matches['*'])) {
             reset($this->supportedLanguages);
+            
+            while ( in_array( key($this->supportedLanguages), $ignoreLanguages) ) {
+                next($this->supportedLanguages);
+            } 
 
             return key($this->supportedLanguages);
         }
@@ -127,7 +135,7 @@ class LanguageNegotiator
         if ($this->use_intl && !empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $http_accept_language = Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
 
-            if (!empty($this->supportedLanguages[$http_accept_language])) {
+            if (!empty($this->supportedLanguages[$http_accept_language]) && !in_array( $http_accept_language, $ignoreLanguages)) {
                 return $http_accept_language;
             }
         }
@@ -136,7 +144,7 @@ class LanguageNegotiator
             $remote_host = explode('.', $this->request->server('REMOTE_HOST'));
             $lang = strtolower(end($remote_host));
 
-            if (!empty($this->supportedLanguages[$lang])) {
+            if (!empty($this->supportedLanguages[$lang]) && !in_array( $lang, $ignoreLanguages)) {
                 return $lang;
             }
         }
