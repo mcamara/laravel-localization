@@ -1,7 +1,5 @@
 # Laravel Localization
 
-[![Join the chat at https://gitter.im/mcamara/laravel-localization](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mcamara/laravel-localization?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/mcamara/laravel-localization.svg?style=flat-square)](https://packagist.org/packages/mcamara/laravel-localization)
 [![Total Downloads](https://img.shields.io/packagist/dt/mcamara/laravel-localization.svg?style=flat-square)](https://packagist.org/packages/mcamara/laravel-localization)
 ![GitHub Actions](https://github.com/mcamara/laravel-localization/actions/workflows/run-tests.yml/badge.svg)
