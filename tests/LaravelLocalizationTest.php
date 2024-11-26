@@ -1,8 +1,11 @@
 <?php
 
+namespace Mcamara\LaravelLocalization\Tests;
+
+use Illuminate\Support\Facades\Request;
 use Mcamara\LaravelLocalization\LaravelLocalization;
 
-class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
+class LaravelLocalizationTest extends TestCase
 {
     protected $test_url = 'http://localhost/';
     protected $test_url2 = 'http://localhost';
@@ -10,25 +13,6 @@ class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase
     protected $supportedLocales = [];
 
     protected $defaultLocale = 'en';
-
-    protected function getPackageProviders($app)
-    {
-        return [
-            'Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider',
-        ];
-    }
-
-    protected function getPackageAliases($app)
-    {
-        return [
-            'LaravelLocalization' => 'Mcamara\LaravelLocalization\Facades\LaravelLocalization',
-        ];
-    }
-
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
 
     /**
      * Set routes for testing.
