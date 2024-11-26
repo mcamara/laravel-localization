@@ -6,3 +6,4 @@ composer.lock
 composer.phar
 Thumbs.db
 phpunit.xml
+.phpunit.cache

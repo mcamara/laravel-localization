@@ -5,7 +5,7 @@ namespace Mcamara\LaravelLocalization\Tests;
 use Illuminate\Support\Facades\Request;
 use Mcamara\LaravelLocalization\LaravelLocalization;
 
-class LocalizerTests extends TestCase
+class LaravelLocalizationTest extends TestCase
 {
     protected $test_url = 'http://localhost/';
     protected $test_url2 = 'http://localhost';
