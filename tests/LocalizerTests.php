@@ -1,5 +1,8 @@
 <?php
 
+namespace Mcamara\LaravelLocalization\Tests;
+
+use Illuminate\Support\Facades\Request;
 use Mcamara\LaravelLocalization\LaravelLocalization;
 
 class LocalizerTests extends \Orchestra\Testbench\BrowserKit\TestCase

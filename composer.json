@@ -35,6 +35,11 @@
             "Mcamara\\LaravelLocalization": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Mcamara\\LaravelLocalization\\Tests\\": "tests"
+        }
+    },
     "extra": {
         "laravel": {
             "providers": [
