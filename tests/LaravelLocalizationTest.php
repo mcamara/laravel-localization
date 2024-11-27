@@ -6,7 +6,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Illuminate\Support\Facades\Request;
 use Mcamara\LaravelLocalization\LaravelLocalization;
 
-class LaravelLocalizationTest extends TestCase
+final class LaravelLocalizationTest extends TestCase
 {
     protected $test_url = 'http://localhost/';
     protected $test_url2 = 'http://localhost';
