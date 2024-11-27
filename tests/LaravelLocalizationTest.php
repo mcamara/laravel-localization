@@ -351,7 +351,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function getRouteNameFromAPathDataProvider()
+    public static function getRouteNameFromAPathDataProvider()
     {
         return [
             [$this->test_url,                       false],
@@ -405,7 +405,7 @@ class LaravelLocalizationTest extends TestCase
 
     }
 
-    public function getLocalizedURLDataProvider()
+    public static function getLocalizedURLDataProvider()
     {
         return [
             // Do not hide default
@@ -792,7 +792,7 @@ class LaravelLocalizationTest extends TestCase
     }
 
 
-    public function accept_language_variations_data() {
+    public static function accept_language_variations_data() {
         $variations = [
             ['en-GB', 'en-GB'],
             ['en-US', 'en-US'],
