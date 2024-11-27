@@ -2,6 +2,7 @@
 
 namespace Mcamara\LaravelLocalization\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Illuminate\Support\Facades\Request;
 use Mcamara\LaravelLocalization\LaravelLocalization;
 
@@ -340,9 +341,8 @@ class LaravelLocalizationTest extends TestCase
     /**
      * @param string $path
      * @param string|bool $expectedRouteName
-     *
-     * @dataProvider getRouteNameFromAPathDataProvider
      */
+    #[DataProvider('getRouteNameFromAPathDataProvider')]
     public function testGetRouteNameFromAPath($path, $expectedRouteName)
     {
         $this->assertEquals(
@@ -393,9 +393,8 @@ class LaravelLocalizationTest extends TestCase
      * @param string $locale
      * @param string $path
      * @param string $expectedURL
-     *
-     * @dataProvider getLocalizedURLDataProvider
      */
+    #[DataProvider('getLocalizedURLDataProvider')]
     public function testGetLocalizedURLFormat($hideDefaultLocaleInURL, $forceDefault, $locale, $path, $expectedURL)
     {
         app('config')->set('laravellocalization.hideDefaultLocaleInURL', $hideDefaultLocaleInURL);
@@ -770,9 +769,7 @@ class LaravelLocalizationTest extends TestCase
     }
 
 
-    /**
-     * @dataProvider accept_language_variations_data
-     */
+    #[DataProvider('accept_language_variations_data')]
     public function testLanguageNegotiation($accept_string, $must_resolve_to, $asd = null) {
 
         $full_config = include __DIR__ . '/full-config/config.php';
