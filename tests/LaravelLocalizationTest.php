@@ -139,7 +139,7 @@ class LaravelLocalizationTest extends TestCase
         $this->setRoutes();
     }
 
-    public function testSetLocale()
+    public function testSetLocale(): void
     {
         $this->assertEquals(route('about'), 'http://localhost/about');
 
@@ -158,7 +158,7 @@ class LaravelLocalizationTest extends TestCase
         $this->assertEquals('en', app('laravellocalization')->getCurrentLocale());
     }
 
-    public function testLocalizeURL()
+    public function testLocalizeURL(): void
     {
         $this->assertEquals(
             $this->test_url.app('laravellocalization')->getCurrentLocale(),
@@ -214,7 +214,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetLocalizedURL()
+    public function testGetLocalizedURL(): void
     {
         $this->assertEquals(
             $this->test_url.app('laravellocalization')->getCurrentLocale(),
@@ -310,7 +310,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetLocalizedURLWithQueryStringAndhideDefaultLocaleInURL()
+    public function testGetLocalizedURLWithQueryStringAndhideDefaultLocaleInURL(): void
     {
         app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
         $request = $this->createRequest(
@@ -325,7 +325,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetLocalizedURLWithQueryStringAndNotTranslatedRoute()
+    public function testGetLocalizedURLWithQueryStringAndNotTranslatedRoute(): void
     {
         $request = $this->createRequest(
             $uri = 'en/about?q=2'
@@ -343,7 +343,7 @@ class LaravelLocalizationTest extends TestCase
      * @param string|bool $expectedRouteName
      */
     #[DataProvider('getRouteNameFromAPathDataProvider')]
-    public function testGetRouteNameFromAPath($path, $expectedRouteName)
+    public function testGetRouteNameFromAPath($path, $expectedRouteName): void
     {
         $this->assertEquals(
             $expectedRouteName,
@@ -351,7 +351,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public static function getRouteNameFromAPathDataProvider()
+    public static function getRouteNameFromAPathDataProvider(): array
     {
         return [
             [$this->test_url,                       false],
@@ -370,7 +370,7 @@ class LaravelLocalizationTest extends TestCase
         ];
     }
 
-    public function testGetLocalizedUrlForIgnoredUrls() {
+    public function testGetLocalizedUrlForIgnoredUrls(): void {
         $crawler = $this->call(
             'GET',
             $this->test_url2.'/skipped',
@@ -395,7 +395,7 @@ class LaravelLocalizationTest extends TestCase
      * @param string $expectedURL
      */
     #[DataProvider('getLocalizedURLDataProvider')]
-    public function testGetLocalizedURLFormat($hideDefaultLocaleInURL, $forceDefault, $locale, $path, $expectedURL)
+    public function testGetLocalizedURLFormat($hideDefaultLocaleInURL, $forceDefault, $locale, $path, $expectedURL): void
     {
         app('config')->set('laravellocalization.hideDefaultLocaleInURL', $hideDefaultLocaleInURL);
         $this->assertEquals(
@@ -405,7 +405,7 @@ class LaravelLocalizationTest extends TestCase
 
     }
 
-    public static function getLocalizedURLDataProvider()
+    public static function getLocalizedURLDataProvider(): array
     {
         return [
             // Do not hide default
@@ -518,7 +518,7 @@ class LaravelLocalizationTest extends TestCase
         ];
     }
 
-    public function testGetURLFromRouteNameTranslated()
+    public function testGetURLFromRouteNameTranslated(): void
     {
         $this->assertEquals(
             $this->test_url.'es/acerca',
@@ -575,7 +575,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testLocalizedParameterFromTranslateUrl()
+    public function testLocalizedParameterFromTranslateUrl(): void
     {
         $model = new ModelWithTranslatableRoutes();
 
@@ -590,7 +590,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetNonLocalizedURL()
+    public function testGetNonLocalizedURL(): void
     {
         $this->assertEquals(
             $this->test_url,
@@ -610,7 +610,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetDefaultLocale()
+    public function testGetDefaultLocale(): void
     {
         $this->assertEquals(
             'en',
@@ -626,7 +626,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetSupportedLocales()
+    public function testGetSupportedLocales(): void
     {
         $this->assertEquals(
             $this->supportedLocales,
@@ -634,7 +634,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetCurrentLocaleName()
+    public function testGetCurrentLocaleName(): void
     {
         $this->assertEquals(
             'English',
@@ -649,7 +649,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetCurrentLocaleRegional()
+    public function testGetCurrentLocaleRegional(): void
     {
         $this->assertEquals(
             'en_GB',
@@ -664,7 +664,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetCurrentLocaleDirection()
+    public function testGetCurrentLocaleDirection(): void
     {
         $this->assertEquals(
             'ltr',
@@ -680,7 +680,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetCurrentLocaleScript()
+    public function testGetCurrentLocaleScript(): void
     {
         app('laravellocalization')->setLocale('es');
         $this->refreshApplication('es');
@@ -699,7 +699,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetCurrentLocaleNativeReading()
+    public function testGetCurrentLocaleNativeReading(): void
     {
         $this->assertEquals(
             'English',
@@ -715,7 +715,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetCurrentLocale()
+    public function testGetCurrentLocale(): void
     {
         $this->assertEquals(
             'en',
@@ -736,7 +736,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetSupportedLanguagesKeys()
+    public function testGetSupportedLanguagesKeys(): void
     {
         $this->assertEquals(
             ['en', 'es'],
@@ -744,7 +744,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testGetConfigRepository()
+    public function testGetConfigRepository(): void
     {
         $this->assertEquals(
             app('config'),
@@ -752,7 +752,7 @@ class LaravelLocalizationTest extends TestCase
         );
     }
 
-    public function testCreateUrlFromUri()
+    public function testCreateUrlFromUri(): void
     {
         $this->assertEquals(
             'http://localhost/view/1',
@@ -770,7 +770,7 @@ class LaravelLocalizationTest extends TestCase
 
 
     #[DataProvider('accept_language_variations_data')]
-    public function testLanguageNegotiation($accept_string, $must_resolve_to, $asd = null) {
+    public function testLanguageNegotiation($accept_string, $must_resolve_to, $asd = null): void {
 
         $full_config = include __DIR__ . '/full-config/config.php';
 
@@ -792,7 +792,7 @@ class LaravelLocalizationTest extends TestCase
     }
 
 
-    public static function accept_language_variations_data() {
+    public static function accept_language_variations_data(): array {
         $variations = [
             ['en-GB', 'en-GB'],
             ['en-US', 'en-US'],
@@ -813,7 +813,7 @@ class LaravelLocalizationTest extends TestCase
         return $dataset;
     }
 
-    public function testLanguageNegotiationWithMapping() {
+    public function testLanguageNegotiationWithMapping(): void {
 
         $accept_string = 'en-GB';
         $must_resolve_to = 'uk';
@@ -845,7 +845,7 @@ class LaravelLocalizationTest extends TestCase
         $this->assertEquals($must_resolve_to, $language);
     }
 
-    public function testSetLocaleWithMapping()
+    public function testSetLocaleWithMapping(): void
     {
         app('config')->set('laravellocalization.localesMapping', [
             'en' => 'custom',
