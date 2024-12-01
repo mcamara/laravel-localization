@@ -861,4 +861,40 @@ final class LaravelLocalizationTest extends TestCase
         $this->assertEquals('http://localhost/custom/some-route', app('laravellocalization')->localizeURL('some-route', 'custom'));
         $this->assertEquals('http://localhost/custom', app('laravellocalization')->localizeURL('http://localhost/custom', 'en'));
     }
+
+
+
+    public function testRedirectWithHiddenDefaultLocaleInUrlAndSavedLocale()
+    {
+        app('router')->group([
+            'prefix'     => app('laravellocalization')->setLocale(),
+            'middleware' => [
+                'Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter',
+                'Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect',
+            ],
+        ], function (){
+            app('router')->get('/', ['as'=> 'index', function () {
+                return 'Index page';
+            }, ]);
+        });
+
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
+
+        $savedLocale = 'es';
+
+        $crawler = $this->call(
+            'GET',
+            self::$testUrl,
+            [],
+            ['locale' => $savedLocale],
+            [],
+            []
+        );
+
+        $this->assertResponseStatus(302);
+        $this->assertRedirectedTo(self::$testUrl . $savedLocale);
+
+        $localeCookie = $crawler->headers->getCookies()[0];
+        $this->assertEquals($savedLocale, $localeCookie->getValue());
+    }
 }
