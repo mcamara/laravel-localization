@@ -884,7 +884,7 @@ final class LaravelLocalizationTest extends TestCase
 
         $crawler = $this->call(
             'GET',
-            $this->test_url,
+            self::$testUrl,
             [],
             ['locale' => $savedLocale],
             [],
@@ -892,7 +892,7 @@ final class LaravelLocalizationTest extends TestCase
         );
 
         $this->assertResponseStatus(302);
-        $this->assertRedirectedTo($this->test_url . $savedLocale);
+        $this->assertRedirectedTo(self::$testUrl . $savedLocale);
 
         $localeCookie = $crawler->headers->getCookies()[0];
         $this->assertEquals($savedLocale, $localeCookie->getValue());
