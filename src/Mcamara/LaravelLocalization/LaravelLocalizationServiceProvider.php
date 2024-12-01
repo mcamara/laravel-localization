@@ -51,9 +51,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
      */
     protected function registerBindings()
     {
-        $this->app->singleton(LaravelLocalization::class, function () {
-            return new LaravelLocalization();
-        });
+        $this->app->singleton(LaravelLocalization::class);
 
         $this->app->alias(LaravelLocalization::class, 'laravellocalization');
     }

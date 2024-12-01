@@ -24,7 +24,9 @@ trait LoadsTranslatedCachedRoutes
 
         // compute $locale from url.
         // It is null if url does not contain locale.
-        $locale = $localization->setLocale();
+        $locale = $localization->getInversedLocaleFromMapping(
+            $localization->setLocale()
+        );
 
         $localeKeys = $localization->getSupportedLanguagesKeys();
 

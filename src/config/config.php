@@ -333,7 +333,9 @@ return [
     //Example: 'localesOrder' => ['es','en'],
     'localesOrder' => [],
 
-    //  If you want to use custom lang url segments like 'at' instead of 'de-AT', you can use the mapping to tallow the LanguageNegotiator to assign the descired locales based on HTTP Accept Language Header. For example you want ot use 'at', so map HTTP Accept Language Header 'de-AT' to 'at' (['de-AT' => 'at']).
+    // If you want to use custom language URL segments like 'at' instead of 'de-AT', you can map them to allow the
+    // LanguageNegotiator to assign the desired locales based on HTTP Accept Language Header. For example, if you want
+    // to use 'at' instead of 'de-AT', you would map 'de-AT' to 'at' (ie. ['de-AT' => 'at']).
     'localesMapping' => [],
 
     // Locale suffix for LC_TIME and LC_MONETARY
@@ -344,4 +346,5 @@ return [
     // Defaults to []
     'urlsIgnored' => ['/skipped'],
 
+    'httpMethodsIgnored' => ['POST', 'PUT', 'PATCH', 'DELETE'],
 ];
