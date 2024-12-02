@@ -9,7 +9,6 @@ use Mcamara\LaravelLocalization\LaravelLocalization;
 final class LaravelLocalizationTest extends TestCase
 {
     protected static string $testUrl = 'http://localhost/';
-    protected static string $testUrl2 = 'http://localhost';
 
     protected $supportedLocales = [];
 
@@ -167,7 +166,7 @@ final class LaravelLocalizationTest extends TestCase
 
         // Missing trailing slash in a URL
         $this->assertEquals(
-            self::$testUrl2.'/'.app('laravellocalization')->getCurrentLocale(),
+            self::$testUrl.app('laravellocalization')->getCurrentLocale(),
             app('laravellocalization')->localizeURL()
         );
 
@@ -373,7 +372,7 @@ final class LaravelLocalizationTest extends TestCase
     public function testGetLocalizedUrlForIgnoredUrls(): void {
         $crawler = $this->call(
             'GET',
-            self::$testUrl2.'/skipped',
+            self::$testUrl.'skipped',
             [],
             [],
             [],
@@ -382,7 +381,7 @@ final class LaravelLocalizationTest extends TestCase
 
         $this->assertResponseOk();
         $this->assertEquals(
-            self::$testUrl2.'/skipped',
+            self::$testUrl.'skipped',
             $crawler->getContent()
         );
     }
