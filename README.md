@@ -8,6 +8,10 @@
 
 Easy i18n localization for Laravel, an useful tool to combine with Laravel localization classes.
 
+This documentation covers version 3.x, compatible exclusively with Laravel 9 and later.
+We strongly recommend using this version, as it resolves numerous compatibility issues present in versions 1.x and 2.x, 
+and seamlessly integrates with Laravel's default caching. If you need to use an older version, please refer to [README_LEGACY.md](README_LEGACY.md).
+
 The package offers the following:
 
  - Detect language from browser
@@ -35,24 +39,17 @@ The package offers the following:
 - <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
 
-## Laravel compatibility
+## Laravel Compatibility
 
- Laravel      | laravel-localization
-:-------------|:----------
- 4.0.x        | 0.13.x
- 4.1.x        | 0.13.x
- 4.2.x        | 0.15.x
- 5.0.x/5.1.x  | 1.0.x
- 5.2.x-5.4.x (PHP 7 not required)  | 1.2.
- 5.2.0-6.x (PHP version >= 7 required) | 1.4.x
- 6.x-10.x (PHP version >= 7 required) | 1.8.x
- 10.x-11.x (PHP version >= 8.2 required) | 2.0.x
+| Laravel Version | laravel-localization Version | PHP Requirement         |
+|------------------|-----------------------------|--------------------------|
+| 9.x - 11.x       | 3.x                         | PHP >= 8.2               |
+
+For older versions (0.x to 2.x), refer to [README_LEGACY.md](README_LEGACY.md).
 
 ## Installation
 
 Install the package via composer: `composer require mcamara/laravel-localization`
-
-For Laravel 5.4 and below it necessary to [register the service provider](/ADDITIONS.md#for-laravel-5.4-and-below).
 
 ### Config Files
 
@@ -73,6 +70,8 @@ The configuration options are:
  - **localesMapping** Rename url locales.
  - **utf8suffix** Allow changing utf8suffix for CentOS etc.
  - **urlsIgnored** Ignore specific urls.
+
+
 
 ### Register Middleware
 
@@ -123,40 +122,41 @@ Add the following to your routes file:
 
 ```php
 // routes/web.php
-
-Route::group(['prefix' => LaravelLocalization::setLocale()], function()
-{
-	/** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
-	Route::get('/', function()
+Route::group([
+    'prefix' => '{locale?}', // Make the locale optional
+    'middleware' => ['setLocale'], // Minimal setup you likely want to add more middleware of this package
+    'where' => ['locale' => 'en|de|fr'] // Restrict locale to specific values
+], function () {
+    // First Example
+    Route::get('/', function()
 	{
-		return View::make('hello');
+		return __('test.hi')
 	});
 
 	Route::get('test',function(){
-		return View::make('test');
+		return return __('test.test')
 	});
 });
-
-/** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
-
 ```
+
+All routes in this group are localized.
 
 Once this route group is added to the routes file, a user can access all locales added into `supportedLocales` (`en` and `es` by default).
 For example, the above route file creates the following addresses:
 
 ```
 // Set application language to English
-http://url-to-laravel/en
-http://url-to-laravel/en/test
+localhost/en
+localhost/en/test
 
 // Set application language to Spanish
-http://url-to-laravel/es
-http://url-to-laravel/es/test
+localhost/es
+localhost/es/test
 
 // Set application language to English or Spanish (depending on browsers default locales)
 // if nothing found set to default locale
-http://url-to-laravel
-http://url-to-laravel/test
+localhost
+localhost/test
 ```
 The package sets your application locale `App::getLocale()` according to your url. The locale may then be used for [Laravel's localization features](http://laravel.com/docs/localization).
 
