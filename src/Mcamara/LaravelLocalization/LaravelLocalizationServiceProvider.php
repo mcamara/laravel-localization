@@ -61,19 +61,21 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
     {
         $localizationMacroName = config('laravellocalization.macro_name', 'localized');
 
-        if (! Route::hasMacro($localizationMacroName)) {
-            Route::macro($localizationMacroName, function (callable $routes, array $middleware = []) {
-                Route::middleware($middleware)->group(function () use ($routes) {
-                    // Default language group
-
-                    if (config('laravellocalization.hideDefaultLocaleInURL', false)) {
-                        Route::name('default_lang.')->group($routes);
-                    }
-
-                    // Localized group with a locale prefix
-                    Route::prefix('/{locale}')->group($routes);
-                });
-            });
+        if (Route::hasMacro($localizationMacroName)) {
+            return;
         }
+
+        Route::macro($localizationMacroName, function (callable $routes, array $middleware = []) {
+            Route::middleware($middleware)->group(function () use ($routes) {
+                Route::name('default_lang.')->group($routes);
+
+                $supportedLocales = array_keys(config('laravellocalization.supportedLocales', []));
+                $localesMapping = array_keys(config('laravellocalization.localesMapping', []));
+                $allowedLocales = implode('|', array_unique(array_merge($supportedLocales, $localesMapping)));
+                Route::prefix('/{locale}')
+                    ->where(['locale' => $allowedLocales])
+                    ->group($routes);
+            });
+        });
     }
 }
