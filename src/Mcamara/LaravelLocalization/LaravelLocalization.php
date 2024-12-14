@@ -17,11 +17,6 @@ use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 class LaravelLocalization
 {
     /**
-     * The env key that the forced locale for routing is stored in.
-     */
-    const ENV_ROUTE_KEY = 'ROUTING_LOCALE';
-
-    /**
      * Config repository.
      *
      * @var \Illuminate\Contracts\Config\Repository
@@ -161,12 +156,6 @@ class LaravelLocalization
             // If the locale has not been passed through the function
             // it tries to get it from the first segment of the url
             $locale = $this->request->segment(1);
-
-            // If the locale is determined by env, use that
-            // Note that this is how per-locale route caching is performed.
-            if ( ! $locale) {
-                $locale = $this->getForcedLocale();
-            }
         }
 
         $locale = $this->getInversedLocaleFromMapping($locale);
@@ -1032,30 +1021,4 @@ class LaravelLocalization
          }
          return $attributes;
      }
-
-    /**
-     * Returns the forced environment set route locale.
-     *
-     * @return string|null
-     */
-    protected function getForcedLocale()
-    {
-        if (version_compare($this->app->version(), '6') >= 0) {
-            return Env::get(static::ENV_ROUTE_KEY, function () {
-                $value = getenv(static::ENV_ROUTE_KEY);
-
-                if ($value !== false) {
-                    return $value;
-                }
-            });
-        } else {
-            return env(static::ENV_ROUTE_KEY, function () {
-                $value = getenv(static::ENV_ROUTE_KEY);
-
-                if ($value !== false) {
-                    return $value;
-                }
-            });
-        }
-    }
 }
