@@ -38,15 +38,15 @@ class LocaleSetLanguageMiddlewareTest extends TestCase
         }, [\Mcamara\LaravelLocalization\Middleware\LocaleSetLanguage::class]);
 
         $this->get('/en/about')
-            ->assertResponseOk()
-            ->see('Hello world');
+            ->assertStatus(200)
+            ->assertSee('Hello world');
 
         $this->assertEquals('en', App::getLocale());
 
         // Test Spanish locale
         $this->get('/es/about')
-            ->assertResponseOk()
-            ->see('Hola mundo');
+            ->assertStatus(200)
+            ->assertSee('Hola mundo');
 
         $this->assertEquals('es', App::getLocale());
     }
@@ -63,8 +63,8 @@ class LocaleSetLanguageMiddlewareTest extends TestCase
         }, [\Mcamara\LaravelLocalization\Middleware\LocaleSetLanguage::class]);
 
         $this->get('/about')
-            ->assertResponseOk()
-            ->see('Hello world');
+            ->assertStatus(200)
+            ->assertSee('Hello world');
 
         $this->assertEquals('en', App::getLocale());
     }
@@ -80,7 +80,7 @@ class LocaleSetLanguageMiddlewareTest extends TestCase
 
         // Access a route with an unsupported locale
         $this->get('/fr/about')
-            ->assertResponseStatus(404); // Middleware should reject unsupported locales
+            ->assertStatus(404); // Middleware should reject unsupported locales
     }
 
     /** @test */
@@ -94,8 +94,8 @@ class LocaleSetLanguageMiddlewareTest extends TestCase
         }, [\Mcamara\LaravelLocalization\Middleware\LocaleSetLanguage::class]);
 
         $this->get('/about', ['Accept-Language' => 'es'])
-            ->assertResponseOk()
-            ->see('Hola mundo');
+            ->assertStatus(200)
+            ->assertSee('Hola mundo');
 
         $this->assertEquals('es', App::getLocale());
     }
@@ -111,8 +111,8 @@ class LocaleSetLanguageMiddlewareTest extends TestCase
         }, [\Mcamara\LaravelLocalization\Middleware\LocaleSetLanguage::class]);
 
         $this->get('/about', ['Accept-Language' => 'en'])
-            ->assertResponseOk()
-            ->see('Hello world');
+            ->assertStatus(200)
+            ->assertSee('Hello world');
 
         $this->assertEquals('en', App::getLocale());
     }
