@@ -65,8 +65,6 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         );
 
         $this->registerBindings();
-
-        $this->registerCommands();
     }
 
     /**
@@ -79,19 +77,4 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         $this->app->alias(LaravelLocalization::class, 'laravellocalization');
     }
 
-    /**
-     * Registers route caching commands.
-     */
-    protected function registerCommands()
-    {
-        $this->app->singleton('laravellocalizationroutecache.cache', Commands\RouteTranslationsCacheCommand::class);
-        $this->app->singleton('laravellocalizationroutecache.clear', Commands\RouteTranslationsClearCommand::class);
-        $this->app->singleton('laravellocalizationroutecache.list', Commands\RouteTranslationsListCommand::class);
-
-        $this->commands([
-            'laravellocalizationroutecache.cache',
-            'laravellocalizationroutecache.clear',
-            'laravellocalizationroutecache.list',
-        ]);
-    }
 }
