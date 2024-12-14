@@ -2,10 +2,8 @@
 
 namespace Mcamara\LaravelLocalization;
 
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Mcamara\LaravelLocalization\Exceptions\LaravelLocalisationException;
 
 class LaravelLocalizationServiceProvider extends ServiceProvider
 {
@@ -14,31 +12,13 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot(ConfigRepository $config)
+    public function boot()
     {
         $this->publishes([
             __DIR__.'/../../config/config.php' => config_path('laravellocalization.php'),
         ], 'config');
 
-        // read macro name from config?
-        $localizationMacroName = $config->get('laravellocalization.macro_name', 'localized');
-
-        if (Route::hasMacro($localizationMacroName)) {
-            throw new LaravelLocalisationException("The macro '{$localizationMacroName}' is already defined. Please choose another name in your configuration file (macro_name).");
-        }
-
-        Route::macro($localizationMacroName, function (callable $routes, array $middleware = []) use($config) {
-            Route::middleware($middleware)->group(function () use ($routes, $config) {
-                // Default language group
-
-                if($config->get('laravellocalization.hideDefaultLocaleInURL', false)){
-                    Route::name('default_lang.')->group($routes);
-                }
-
-                // Localized group with a locale prefix
-                Route::prefix('/{locale}')->group($routes);
-            });
-        });
+        $this->registerMacros();
     }
 
     /**
@@ -77,4 +57,23 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         $this->app->alias(LaravelLocalization::class, 'laravellocalization');
     }
 
+    protected function registerMacros(): void
+    {
+        $localizationMacroName = config('laravellocalization.macro_name', 'localized');
+
+        if (! Route::hasMacro($localizationMacroName)) {
+            Route::macro($localizationMacroName, function (callable $routes, array $middleware = []) {
+                Route::middleware($middleware)->group(function () use ($routes) {
+                    // Default language group
+
+                    if (config('laravellocalization.hideDefaultLocaleInURL', false)) {
+                        Route::name('default_lang.')->group($routes);
+                    }
+
+                    // Localized group with a locale prefix
+                    Route::prefix('/{locale}')->group($routes);
+                });
+            });
+        }
+    }
 }
