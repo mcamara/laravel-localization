@@ -4,7 +4,7 @@ namespace Mcamara\LaravelLocalization\Tests;
 
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider;
-use Orchestra\Testbench\BrowserKit\TestCase as BaseTestCase;
+use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
