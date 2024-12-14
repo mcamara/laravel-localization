@@ -31,9 +31,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
             Route::middleware($middleware)->group(function () use ($routes, $config) {
                 // Default language group
 
-                if($config->get('laravellocalization.hideDefaultLocaleInURL', false)){
-                    Route::name('default_lang.')->group($routes);
-                }
+                Route::name('default_lang.')->group($routes);
 
                 // Localized group with a locale prefix
                 Route::prefix('/{locale}')->group($routes);
