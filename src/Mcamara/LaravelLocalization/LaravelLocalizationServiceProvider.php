@@ -29,12 +29,16 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
 
         Route::macro($localizationMacroName, function (callable $routes, array $middleware = []) use($config) {
             Route::middleware($middleware)->group(function () use ($routes, $config) {
-                // Default language group
-
                 Route::name('default_lang.')->group($routes);
 
-                // Localized group with a locale prefix
-                Route::prefix('/{locale}')->group($routes);
+
+
+                $supportedLocales = array_keys($config->get('laravellocalization.supportedLocales', []));
+                $localesMapping = array_keys($config->get('laravellocalization.localesMapping', []));
+                $allowedLocales = implode('|', array_unique(array_merge($supportedLocales, $localesMapping)));
+                Route::prefix('/{locale}')
+                    ->where(['locale' => $allowedLocales])
+                    ->group($routes);
             });
         });
     }
