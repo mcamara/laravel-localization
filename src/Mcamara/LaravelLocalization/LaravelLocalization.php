@@ -17,48 +17,6 @@ use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 class LaravelLocalization
 {
     /**
-     * Config repository.
-     *
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $configRepository;
-
-    /**
-     * Illuminate translator class.
-     *
-     * @var \Illuminate\Contracts\Translation\Translator
-     */
-    protected $translator;
-
-    /**
-     * Illuminate router class.
-     *
-     * @var \Illuminate\Routing\Router
-     */
-    protected $router;
-
-    /**
-     * Illuminate request class.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
-
-    /**
-     * Illuminate url class.
-     *
-     * @var \Illuminate\Contracts\Routing\UrlGenerator
-     */
-    protected $url;
-
-    /**
-     * Illuminate request class.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
-    /**
      * Illuminate request class.
      *
      * @var string
@@ -120,20 +78,13 @@ class LaravelLocalization
      * @throws UnsupportedLocaleException
      */
     public function __construct(
-        Application $app,
-        ConfigRepository $configRepository,
-        Translator $translator,
-        Router $router,
-        Request $request,
-        UrlGenerator $url
+        private readonly Application $app,
+        private readonly ConfigRepository $configRepository,
+        private readonly Translator $translator,
+        private readonly Router $router,
+        private readonly Request $request,
+        private readonly UrlGenerator $url
     ) {
-        $this->app = $app;
-        $this->configRepository = $configRepository;
-        $this->translator = $translator;
-        $this->router = $router;
-        $this->request = $request;
-        $this->url = $url;
-
         // set default locale
         $this->defaultLocale = $this->configRepository->get('app.locale');
         $supportedLocales = $this->getSupportedLocales();
