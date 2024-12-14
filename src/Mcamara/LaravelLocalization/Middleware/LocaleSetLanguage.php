@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
 use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 use Mcamara\LaravelLocalization\LanguageNegotiator;
+use Mcamara\LaravelLocalization\LaravelLocalization;
 
 class LocaleSetLanguage extends LaravelLocalizationMiddlewareBase
 {
@@ -18,6 +19,7 @@ class LocaleSetLanguage extends LaravelLocalizationMiddlewareBase
         private readonly ConfigRepository $configRepository,
         private readonly Application $app,
         private readonly Translator $translator,
+        private readonly LaravelLocalization $laravelLocalization,
     ){
     }
 
@@ -37,6 +39,7 @@ class LocaleSetLanguage extends LaravelLocalizationMiddlewareBase
 
         $this->app->setLocale($locale);
         $this->translator->setLocale($locale);
+        $this->laravelLocalization->setCurrentLocale($locale);
 
         // Regional locale such as de_DE, so formatLocalized works in Carbon
         $regional = $this->getLocaleRegional($locale);
