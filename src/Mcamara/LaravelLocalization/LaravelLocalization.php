@@ -452,6 +452,10 @@ class LaravelLocalization
         return $this->supportedLocales[$this->getCurrentLocale()]['native'];
     }
 
+    public function setCurrentLocale(string $locale): void {
+        $this->currentLocale = $locale;
+    }
+
     /**
      * Returns current language.
      *
