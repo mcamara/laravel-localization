@@ -35,7 +35,7 @@ class LocaleSetLanguageMiddlewareTest extends TestCase
             app('router')->get('/about', function () {
                 return __("LaravelLocalization::routes.hello");
             })->name('about');
-        }, [\Mcamara\LaravelLocalization\Middleware\LocaleSetLanguage::class]);
+        }, [\Mcamara\LaravelLocalization\Middleware\SetLocale::class]);
 
         $this->get('/en/about')
             ->assertStatus(200)
@@ -60,7 +60,7 @@ class LocaleSetLanguageMiddlewareTest extends TestCase
             app('router')->get('/about', function () {
                 return __("LaravelLocalization::routes.hello");
             })->name('about');
-        }, [\Mcamara\LaravelLocalization\Middleware\LocaleSetLanguage::class]);
+        }, [\Mcamara\LaravelLocalization\Middleware\SetLocale::class]);
 
         $this->get('/about')
             ->assertStatus(200)
@@ -76,7 +76,7 @@ class LocaleSetLanguageMiddlewareTest extends TestCase
             app('router')->get('/about', function () {
                 return __("LaravelLocalization::routes.hello");
             })->name('about');
-        }, [\Mcamara\LaravelLocalization\Middleware\LocaleSetLanguage::class]);
+        }, [\Mcamara\LaravelLocalization\Middleware\SetLocale::class]);
 
         // Access a route with an unsupported locale
         $this->get('/fr/about')
@@ -91,7 +91,7 @@ class LocaleSetLanguageMiddlewareTest extends TestCase
             app('router')->get('/about', function () {
                 return __("LaravelLocalization::routes.hello");
             })->name('about');
-        }, [\Mcamara\LaravelLocalization\Middleware\LocaleSetLanguage::class]);
+        }, [\Mcamara\LaravelLocalization\Middleware\SetLocale::class]);
 
         $this->get('/about', ['Accept-Language' => 'es'])
             ->assertStatus(200)
@@ -108,7 +108,7 @@ class LocaleSetLanguageMiddlewareTest extends TestCase
             app('router')->get('/about', function () {
                 return __("LaravelLocalization::routes.hello");
             })->name('about');
-        }, [\Mcamara\LaravelLocalization\Middleware\LocaleSetLanguage::class]);
+        }, [\Mcamara\LaravelLocalization\Middleware\SetLocale::class]);
 
         $this->get('/about', ['Accept-Language' => 'en'])
             ->assertStatus(200)

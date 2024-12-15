@@ -135,7 +135,7 @@ Route::localized(function () {
     {
         return __('test.color');
 	});   
-}, [\Mcamara\LaravelLocalization\Middleware\LocaleSetLanguage::class]);
+}, [\Mcamara\LaravelLocalization\Middleware\SetLocale::class]);
 ```
 All routes in this group are localized. The package sets your application locale `App::getLocale()` according to your url. The locale may then be used for [Laravel's localization features](http://laravel.com/docs/localization).
 

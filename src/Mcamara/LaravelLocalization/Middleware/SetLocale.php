@@ -13,7 +13,7 @@ use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 use Mcamara\LaravelLocalization\LanguageNegotiator;
 use Mcamara\LaravelLocalization\LaravelLocalization;
 
-class LocaleSetLanguage extends LaravelLocalizationMiddlewareBase
+class SetLocale extends LaravelLocalizationMiddlewareBase
 {
     public function __construct(
         private readonly ConfigRepository $configRepository,

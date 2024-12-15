@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\LaravelLocalization;
 use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter;
 use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes;
-use Mcamara\LaravelLocalization\Middleware\LocaleSetLanguage;
+use Mcamara\LaravelLocalization\Middleware\SetLocale;
 
 final class LaravelLocalizationTest extends TestCase
 {
@@ -53,7 +53,7 @@ final class LaravelLocalizationTest extends TestCase
                 return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
             }]);
         }, [
-            LocaleSetLanguage::class,
+            SetLocale::class,
             LaravelLocalizationRoutes::class,
             LaravelLocalizationRedirectFilter::class,
         ]);
