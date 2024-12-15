@@ -60,12 +60,12 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
         $defaultLocale = $this->configRepository->get('app.locale');
 
         // if we reached this point and hideDefaultLocaleInURL is true, take default
-        if ($this->hideDefaultLocaleInURL()) {
+        if ($this->laravelLocalization->hideDefaultLocaleInURL()) {
             return $defaultLocale;
         }
 
         // but if hideDefaultLocaleInURL is false, we may have to retrieve it from the browser...
-        if ($this->useAcceptLanguageHeader()) {
+        if ($this->laravelLocalization->useAcceptLanguageHeader()) {
             $negotiator = new LanguageNegotiator($defaultLocale, $this->getSupportedLocales(), $request);
 
             return $negotiator->negotiateLanguage();
@@ -74,26 +74,14 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
         return $defaultLocale;
     }
 
-
-    protected function hideDefaultLocaleInURL()
-    {
-        return $this->configRepository->get('laravellocalization.hideDefaultLocaleInURL');
-    }
-
-
-    protected function useAcceptLanguageHeader()
-    {
-        return $this->configRepository->get('laravellocalization.useAcceptLanguageHeader');
-    }
-
     protected function getLocaleRegional(string $locale): string|null
     {
         // need to check if it exists, since 'regional' has been added
         // after version 1.0.11 and existing users will not have it
-        if (!isset($this->getSupportedLocales()[$locale]['regional'])) {
+        if (!isset($this->laravelLocalization->getSupportedLocales()[$locale]['regional'])) {
             return null;
         }
 
-        return $this->getSupportedLocales()[$locale]['regional'];
+        return $this->laravelLocalization->getSupportedLocales()[$locale]['regional'];
     }
 }

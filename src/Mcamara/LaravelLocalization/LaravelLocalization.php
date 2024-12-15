@@ -677,7 +677,7 @@ class LaravelLocalization
      *
      * @return bool Returns value of useAcceptLanguageHeader in config.
      */
-    protected function useAcceptLanguageHeader()
+    public function useAcceptLanguageHeader()
     {
         return $this->configRepository->get('laravellocalization.useAcceptLanguageHeader');
     }
