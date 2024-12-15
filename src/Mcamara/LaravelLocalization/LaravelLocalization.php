@@ -478,6 +478,22 @@ class LaravelLocalization
     }
 
     /**
+     * Returns current regional.
+     *
+     * @return string current regional
+     */
+    public function getCurrentLocaleRegional(): string|null
+    {
+        // need to check if it exists, since 'regional' has been added
+        // after version 1.0.11 and existing users will not have it
+        if (!isset($this->supportedLocales[$this->getCurrentLocale()]['regional'])) {
+            return null;
+        }
+
+        return $this->supportedLocales[$this->getCurrentLocale()]['regional'];
+    }
+
+    /**
      * Returns supported languages language key.
      *
      * @return array keys of supported languages
