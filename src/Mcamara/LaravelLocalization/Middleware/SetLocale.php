@@ -25,8 +25,7 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
 
     public function handle(Request $request, Closure $next)
     {
-        // I am not 100% sure if we should skip setLang for
-        // ignored urls.
+        // @toDo I am not 100% sure if we should skip this url for ignored urls.
         if ($this->shouldIgnore($request)) {
             return $next($request);
         }
