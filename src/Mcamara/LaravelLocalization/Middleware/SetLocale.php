@@ -43,7 +43,7 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
         URL::defaults(['locale' => $locale]);
 
         // Regional locale such as de_DE, so formatLocalized works in Carbon
-        $regional = $this->getLocaleRegional($locale);
+        $regional = $this->laravelLocalization->getCurrentLocaleRegional();
         $suffix = $this->configRepository->get('laravellocalization.utf8suffix');
         if ($regional) {
             setlocale(LC_TIME, $regional . $suffix);
@@ -72,16 +72,5 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
         }
 
         return $defaultLocale;
-    }
-
-    protected function getLocaleRegional(string $locale): string|null
-    {
-        // need to check if it exists, since 'regional' has been added
-        // after version 1.0.11 and existing users will not have it
-        if (!isset($this->laravelLocalization->getSupportedLocales()[$locale]['regional'])) {
-            return null;
-        }
-
-        return $this->laravelLocalization->getSupportedLocales()[$locale]['regional'];
     }
 }
