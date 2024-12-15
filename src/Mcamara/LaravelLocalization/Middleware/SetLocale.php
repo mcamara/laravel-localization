@@ -17,10 +17,10 @@ use Mcamara\LaravelLocalization\LaravelLocalization;
 class SetLocale extends LaravelLocalizationMiddlewareBase
 {
     public function __construct(
-        private readonly ConfigRepository $configRepository,
-        private readonly Application $app,
-        private readonly Translator $translator,
-        private readonly LaravelLocalization $laravelLocalization,
+        protected readonly ConfigRepository $configRepository,
+        protected readonly Application $app,
+        protected readonly Translator $translator,
+        protected readonly LaravelLocalization $laravelLocalization,
     ){
     }
 
