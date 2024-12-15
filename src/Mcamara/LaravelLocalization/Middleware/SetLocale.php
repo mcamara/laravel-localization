@@ -33,7 +33,7 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
 
         $locale = $request->route('locale');
 
-        if($locale == null || empty($this->getSupportedLocales()[$locale])) {
+        if($locale == null || empty($this->laravelLocalization->getSupportedLocales()[$locale])) {
             $locale = $this->fallbackLocale($request);
         }
 
@@ -51,17 +51,6 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
         }
 
         return $next($request);
-    }
-
-    protected function getSupportedLocales()
-    {
-        $locales = $this->configRepository->get('laravellocalization.supportedLocales');
-
-        if (empty($locales) || !\is_array($locales)) {
-            throw new SupportedLocalesNotDefined();
-        }
-
-        return $locales;
     }
 
     // if the first segment/locale passed is not valid the system would either take default locale,
