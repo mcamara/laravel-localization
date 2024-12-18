@@ -66,7 +66,7 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
 
         // but if hideDefaultLocaleInURL is false, we may have to retrieve it from the browser...
         if ($this->laravelLocalization->useAcceptLanguageHeader()) {
-            $negotiator = new LanguageNegotiator($defaultLocale, $this->getSupportedLocales(), $request);
+            $negotiator = new LanguageNegotiator($defaultLocale, $this->laravelLocalization->getSupportedLocales(), $request);
 
             return $negotiator->negotiateLanguage();
         }
