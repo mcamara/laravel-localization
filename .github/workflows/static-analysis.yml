@@ -1,0 +1,27 @@
+name: static-analysis
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+        branches: [master]
+
+jobs:
+    phpstan:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.4
+                  extensions: intl
+                  coverage: none
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan --error-format=github
