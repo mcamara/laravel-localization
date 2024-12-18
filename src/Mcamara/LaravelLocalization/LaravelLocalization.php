@@ -17,12 +17,9 @@ use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 class LaravelLocalization
 {
     /**
-     * Illuminate request class.
-     *
-     * @var string
+     * Base url.
      */
-    // TODO: check the actual type
-    protected $baseUrl;
+    protected string $baseUrl;
 
     /**
      * Default locale.
