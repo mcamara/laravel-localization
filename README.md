@@ -8,11 +8,6 @@
 
 Easy i18n localization for Laravel, an useful tool to combine with Laravel localization classes.
 
-This documentation covers version 3.x, compatible exclusively with Laravel 9 and later.
-We strongly recommend using this version, as it resolves numerous compatibility issues present in versions 1.x and 2.x, 
-and seamlessly integrates with Laravel's default caching. 
-If you need to use an older version, please switch to `legacy` branch by clicking [here](https://github.com/mcamara/laravel-localization/tree/legacy).
-
 The package offers the following:
 
  - Detect language from browser
@@ -42,11 +37,13 @@ The package offers the following:
 
 ## Laravel Compatibility
 
-| Laravel Version | laravel-localization Version | PHP Requirement         |
-|------------------|-----------------------------|--------------------------|
-| 9.x - 11.x       | 3.x                         | PHP >= 8.2               |
+| Package Version | Laravel Version | PHP Version | Support |
+|-----------------|-----------------|-------------|----------|
+| [0.x](https://github.com/mcamara/laravel-localization/tree/0.x) | 4.0.x - 4.2.x | 5.3 - 5.4 | Unsupported |
+| [1.x](https://github.com/mcamara/laravel-localization/tree/1.x) | 5.0.x - 10.x | 5.4 - 7.1 | Unsupported |
+| [2.x](https://github.com/mcamara/laravel-localization/tree/2.x) | 10.x - 11.x | >= 8.2 | Security fixes |
+| [3.x](https://github.com/mcamara/laravel-localization/tree/3.x) | 10.x - 11.x | >= 8.2 | Supported |
 
-For older versions (0.x to 2.x) switch to `legacy` branch by clicking [here](https://github.com/mcamara/laravel-localization/tree/legacy).
 
 ## Installation
 
