@@ -22,8 +22,8 @@ jobs:
           tools: composer:v2
           coverage: none
 
-        - name: Install facade documentor
-          run: composer require --dev laravel/facade-documenter
+      - name: Install facade documentor
+        run: composer require --dev laravel/facade-documenter
 
       - name: Update facade docblocks
         run: php -f vendor/bin/facade.php Mcamara\\LaravelLocalization\\Facades\\LaravelLocalization
