@@ -78,12 +78,12 @@ class LaravelLocalization
      * @throws UnsupportedLocaleException
      */
     public function __construct(
-        private readonly Application $app,
-        private readonly ConfigRepository $configRepository,
-        private readonly Translator $translator,
-        private readonly Router $router,
-        private readonly Request $request,
-        private readonly UrlGenerator $url
+        protected readonly Application $app,
+        protected readonly ConfigRepository $configRepository,
+        protected readonly Translator $translator,
+        protected readonly Router $router,
+        protected readonly Request $request,
+        protected readonly UrlGenerator $url
     ) {
         // set default locale
         $this->defaultLocale = $this->configRepository->get('app.locale');
