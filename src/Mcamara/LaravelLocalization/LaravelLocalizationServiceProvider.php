@@ -2,6 +2,7 @@
 
 namespace Mcamara\LaravelLocalization;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelLocalizationServiceProvider extends ServiceProvider
@@ -16,6 +17,8 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../../config/config.php' => config_path('laravellocalization.php'),
         ], 'config');
+
+        $this->registerMacros();
     }
 
     /**
@@ -42,8 +45,6 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         );
 
         $this->registerBindings();
-
-        $this->registerCommands();
     }
 
     /**
@@ -56,19 +57,25 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         $this->app->alias(LaravelLocalization::class, 'laravellocalization');
     }
 
-    /**
-     * Registers route caching commands.
-     */
-    protected function registerCommands()
+    protected function registerMacros(): void
     {
-        $this->app->singleton('laravellocalizationroutecache.cache', Commands\RouteTranslationsCacheCommand::class);
-        $this->app->singleton('laravellocalizationroutecache.clear', Commands\RouteTranslationsClearCommand::class);
-        $this->app->singleton('laravellocalizationroutecache.list', Commands\RouteTranslationsListCommand::class);
+        $localizationMacroName = config('laravellocalization.macro_name', 'localized');
 
-        $this->commands([
-            'laravellocalizationroutecache.cache',
-            'laravellocalizationroutecache.clear',
-            'laravellocalizationroutecache.list',
-        ]);
+        if (Route::hasMacro($localizationMacroName)) {
+            return;
+        }
+
+        Route::macro($localizationMacroName, function (callable $routes, array $middleware = []) {
+            Route::middleware($middleware)->group(function () use ($routes) {
+                Route::name('default_lang.')->group($routes);
+
+                $supportedLocales = array_keys(config('laravellocalization.supportedLocales', []));
+                $localesMapping = array_keys(config('laravellocalization.localesMapping', []));
+                $allowedLocales = implode('|', array_unique(array_merge($supportedLocales, $localesMapping)));
+                Route::prefix('/{locale}')
+                    ->where(['locale' => $allowedLocales])
+                    ->group($routes);
+            });
+        });
     }
 }

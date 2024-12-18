@@ -35,24 +35,19 @@ The package offers the following:
 - <a href="#changelog">Changelog</a>
 - <a href="#license">License</a>
 
-## Laravel compatibility
+## Laravel Compatibility
 
- Laravel      | laravel-localization
-:-------------|:----------
- 4.0.x        | 0.13.x
- 4.1.x        | 0.13.x
- 4.2.x        | 0.15.x
- 5.0.x/5.1.x  | 1.0.x
- 5.2.x-5.4.x (PHP 7 not required)  | 1.2.
- 5.2.0-6.x (PHP version >= 7 required) | 1.4.x
- 6.x-10.x (PHP version >= 7 required) | 1.8.x
- 10.x-11.x (PHP version >= 8.2 required) | 2.0.x
+| Package Version | Laravel Version | PHP Version | Support |
+|-----------------|-----------------|-------------|----------|
+| [0.x](https://github.com/mcamara/laravel-localization/tree/0.x) | 4.0.x - 4.2.x | 5.3 - 5.4 | Unsupported |
+| [1.x](https://github.com/mcamara/laravel-localization/tree/1.x) | 5.0.x - 10.x | 5.4 - 7.1 | Unsupported |
+| [2.x](https://github.com/mcamara/laravel-localization/tree/2.x) | 10.x - 11.x | >= 8.2 | Security fixes |
+| [3.x](https://github.com/mcamara/laravel-localization/tree/3.x) | 10.x - 11.x | >= 8.2 | Supported |
+
 
 ## Installation
 
 Install the package via composer: `composer require mcamara/laravel-localization`
-
-For Laravel 5.4 and below it necessary to [register the service provider](/ADDITIONS.md#for-laravel-5.4-and-below).
 
 ### Config Files
 
@@ -73,6 +68,8 @@ The configuration options are:
  - **localesMapping** Rename url locales.
  - **utf8suffix** Allow changing utf8suffix for CentOS etc.
  - **urlsIgnored** Ignore specific urls.
+
+
 
 ### Register Middleware
 
@@ -123,52 +120,65 @@ Add the following to your routes file:
 
 ```php
 // routes/web.php
+Route::localized(function () {
+    // put your routes here
+    // Example route..
+    Route::get('/', function()
+    {
+        return __('test.hi');
+	})->name('route_name_example_hi');
 
-Route::group(['prefix' => LaravelLocalization::setLocale()], function()
-{
-	/** ADD ALL LOCALIZED ROUTES INSIDE THIS GROUP **/
-	Route::get('/', function()
-	{
-		return View::make('hello');
-	});
+    Route::get('/test', function()
+    {
+        return __('test.color');
+	});   
+}, [\Mcamara\LaravelLocalization\Middleware\SetLocale::class]);
+```
+All routes in this group are localized. The package sets your application locale `App::getLocale()` according to your url. The locale may then be used for [Laravel's localization features](http://laravel.com/docs/localization).
 
-	Route::get('test',function(){
-		return View::make('test');
-	});
-});
+### Example
 
-/** OTHER PAGES THAT SHOULD NOT BE LOCALIZED **/
+Once you’ve added the localized group to your `routes/web.php` file, 
+your application supports all locales listed in the `supportedLocales` configuration (e.g., `en` and `es` by default).
+
+#### If `hideDefaultLocaleInURL` is set to `false`
+
+If `hideDefaultLocaleInURL` is set to `false`, routes are created **once**, using the `{locale}` placeholder in the URL.
+
+Command output from `php artisan route:list`
 
 ```
+GET|HEAD       {locale} ............. route_name_example_hi
+GET|HEAD       {locale}/test ..............................
+```
 
-Once this route group is added to the routes file, a user can access all locales added into `supportedLocales` (`en` and `es` by default).
-For example, the above route file creates the following addresses:
+For example, if `en` and `es` are configured as ``supportedLocales`, you can access these URLs:
 
 ```
-// Set application language to English
-http://url-to-laravel/en
-http://url-to-laravel/en/test
+// English (locale: 'en')
+localhost/en
+localhost/en/test
 
-// Set application language to Spanish
-http://url-to-laravel/es
-http://url-to-laravel/es/test
+// Spanish (locale: 'es')
+localhost/es
+localhost/es/test
+``` 
 
-// Set application language to English or Spanish (depending on browsers default locales)
-// if nothing found set to default locale
-http://url-to-laravel
-http://url-to-laravel/test
+#### If `hideDefaultLocaleInURL` is set to `true`
+If `hideDefaultLocaleInURL` is set to `true`, each route defined in the `localized` group is created **twice**:
+
+1. **With `{locale}` placeholder**: Allows URLs like `/en` or `/es`.
+2. **Without any prefix**: These routes serve as fallback routes for the default locale.
+
+Routes without a locale prefix are automatically named with the `default_lang.` prefix.
+
+Command output from `php artisan route:list`
+
 ```
-The package sets your application locale `App::getLocale()` according to your url. The locale may then be used for [Laravel's localization features](http://laravel.com/docs/localization).
-
-You may add middleware to your group like this:
-
-```php
-Route::group(
-[
-	'prefix' => LaravelLocalization::setLocale(),
-	'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ]
-], function(){ //...
-});
+GET|HEAD       / ....... default_lang.route_name_example_hi
+GET|HEAD       test ......................... default_lang.
+GET|HEAD       {locale} ............. route_name_example_hi
+GET|HEAD       {locale}/test ..............................
 ```
 
 ### Recommendations

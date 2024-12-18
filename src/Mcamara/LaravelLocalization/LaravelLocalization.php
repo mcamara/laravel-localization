@@ -17,53 +17,6 @@ use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 class LaravelLocalization
 {
     /**
-     * The env key that the forced locale for routing is stored in.
-     */
-    const ENV_ROUTE_KEY = 'ROUTING_LOCALE';
-
-    /**
-     * Config repository.
-     *
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $configRepository;
-
-    /**
-     * Illuminate translator class.
-     *
-     * @var \Illuminate\Contracts\Translation\Translator
-     */
-    protected $translator;
-
-    /**
-     * Illuminate router class.
-     *
-     * @var \Illuminate\Routing\Router
-     */
-    protected $router;
-
-    /**
-     * Illuminate request class.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
-
-    /**
-     * Illuminate url class.
-     *
-     * @var \Illuminate\Contracts\Routing\UrlGenerator
-     */
-    protected $url;
-
-    /**
-     * Illuminate request class.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
-    /**
      * Illuminate request class.
      *
      * @var string
@@ -125,20 +78,13 @@ class LaravelLocalization
      * @throws UnsupportedLocaleException
      */
     public function __construct(
-        Application $app,
-        ConfigRepository $configRepository,
-        Translator $translator,
-        Router $router,
-        Request $request,
-        UrlGenerator $url
+        private readonly Application $app,
+        private readonly ConfigRepository $configRepository,
+        private readonly Translator $translator,
+        private readonly Router $router,
+        private readonly Request $request,
+        private readonly UrlGenerator $url
     ) {
-        $this->app = $app;
-        $this->configRepository = $configRepository;
-        $this->translator = $translator;
-        $this->router = $router;
-        $this->request = $request;
-        $this->url = $url;
-
         // set default locale
         $this->defaultLocale = $this->configRepository->get('app.locale');
         $supportedLocales = $this->getSupportedLocales();
@@ -148,64 +94,6 @@ class LaravelLocalization
         }
     }
 
-    /**
-     * Set and return current locale.
-     *
-     * @param string $locale Locale to set the App to (optional)
-     *
-     * @return string Returns locale (if route has any) or null (if route does not have a locale)
-     */
-    public function setLocale($locale = null)
-    {
-        if (empty($locale) || !\is_string($locale)) {
-            // If the locale has not been passed through the function
-            // it tries to get it from the first segment of the url
-            $locale = $this->request->segment(1);
-
-            // If the locale is determined by env, use that
-            // Note that this is how per-locale route caching is performed.
-            if ( ! $locale) {
-                $locale = $this->getForcedLocale();
-            }
-        }
-
-        $locale = $this->getInversedLocaleFromMapping($locale);
-
-        if (!empty($this->supportedLocales[$locale])) {
-            $this->currentLocale = $locale;
-        } else {
-            // if the first segment/locale passed is not valid
-            // the system would ask which locale have to take
-            // it could be taken by the browser
-            // depending on your configuration
-
-            $locale = null;
-
-            // if we reached this point and hideDefaultLocaleInURL is true
-            // we have to assume we are routing to a defaultLocale route.
-            if ($this->hideDefaultLocaleInURL()) {
-                $this->currentLocale = $this->defaultLocale;
-            }
-            // but if hideDefaultLocaleInURL is false, we have
-            // to retrieve it from the browser...
-            else {
-                $this->currentLocale = $this->getCurrentLocale();
-            }
-        }
-
-        $this->app->setLocale($this->currentLocale);
-        $this->translator->setLocale($this->currentLocale);
-
-        // Regional locale such as de_DE, so formatLocalized works in Carbon
-        $regional = $this->getCurrentLocaleRegional();
-        $suffix = $this->configRepository->get('laravellocalization.utf8suffix');
-        if ($regional) {
-            setlocale(LC_TIME, $regional . $suffix);
-            setlocale(LC_MONETARY, $regional . $suffix);
-        }
-
-        return $this->getLocaleFromMapping($locale);
-    }
 
     /**
      * Check if $locale is default locale and supposed to be hidden in url
@@ -564,6 +452,10 @@ class LaravelLocalization
         return $this->supportedLocales[$this->getCurrentLocale()]['native'];
     }
 
+    public function setCurrentLocale(string $locale): void {
+        $this->currentLocale = $locale;
+    }
+
     /**
      * Returns current language.
      *
@@ -590,15 +482,15 @@ class LaravelLocalization
      *
      * @return string current regional
      */
-    public function getCurrentLocaleRegional()
+    public function getCurrentLocaleRegional(): string|null
     {
         // need to check if it exists, since 'regional' has been added
         // after version 1.0.11 and existing users will not have it
-        if (isset($this->supportedLocales[$this->getCurrentLocale()]['regional'])) {
-            return $this->supportedLocales[$this->getCurrentLocale()]['regional'];
-        } else {
-            return;
+        if (!isset($this->supportedLocales[$this->getCurrentLocale()]['regional'])) {
+            return null;
         }
+
+        return $this->supportedLocales[$this->getCurrentLocale()]['regional'];
     }
 
     /**
@@ -801,7 +693,7 @@ class LaravelLocalization
      *
      * @return bool Returns value of useAcceptLanguageHeader in config.
      */
-    protected function useAcceptLanguageHeader()
+    public function useAcceptLanguageHeader()
     {
         return $this->configRepository->get('laravellocalization.useAcceptLanguageHeader');
     }
@@ -1032,30 +924,4 @@ class LaravelLocalization
          }
          return $attributes;
      }
-
-    /**
-     * Returns the forced environment set route locale.
-     *
-     * @return string|null
-     */
-    protected function getForcedLocale()
-    {
-        if (version_compare($this->app->version(), '6') >= 0) {
-            return Env::get(static::ENV_ROUTE_KEY, function () {
-                $value = getenv(static::ENV_ROUTE_KEY);
-
-                if ($value !== false) {
-                    return $value;
-                }
-            });
-        } else {
-            return env(static::ENV_ROUTE_KEY, function () {
-                $value = getenv(static::ENV_ROUTE_KEY);
-
-                if ($value !== false) {
-                    return $value;
-                }
-            });
-        }
-    }
 }
