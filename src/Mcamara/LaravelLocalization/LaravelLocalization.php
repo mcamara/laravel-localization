@@ -47,7 +47,7 @@ class LaravelLocalization
     /**
      * Current locale.
      *
-     * @var string
+     * @var string|false
      */
     protected $currentLocale = false;
 
@@ -267,7 +267,7 @@ class LaravelLocalization
         if ($forceDefaultLocation || !($locale === $this->defaultLocale && $this->hideDefaultLocaleInURL())) {
             $route = '/'.$locale;
         }
-        if (\is_string($locale) && $this->translator->has($transKeyName, $locale)) {
+        if ($this->translator->has($transKeyName, $locale)) {
             $translation = $this->translator->get($transKeyName, [], $locale);
             $route .= '/'.$translation;
 
@@ -480,7 +480,7 @@ class LaravelLocalization
     /**
      * Returns current regional.
      *
-     * @return string current regional
+     * @return string|null current regional
      */
     public function getCurrentLocaleRegional(): string|null
     {

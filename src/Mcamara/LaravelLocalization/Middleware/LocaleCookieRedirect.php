@@ -24,9 +24,9 @@ class LocaleCookieRedirect extends LaravelLocalizationMiddlewareBase
         }
 
         $params = explode('/', $request->path());
-        $locale = $request->cookie('locale', false);
+        $locale = $request->cookie('locale') ?? false;
 
-        if (\count($params) > 0 && app('laravellocalization')->checkLocaleInSupportedLocales($params[0])) {
+        if (app('laravellocalization')->checkLocaleInSupportedLocales($params[0])) {
             return $next($request)->withCookie(cookie()->forever('locale', $params[0]));
         }
 
