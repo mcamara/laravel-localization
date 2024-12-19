@@ -2,23 +2,16 @@
 
 namespace Mcamara\LaravelLocalization\Middleware;
 
+use Illuminate\Http\Request;
 
 class LaravelLocalizationMiddlewareBase
 {
-    /**
-     * The URIs that should not be localized.
-     *
-     * @var array|null
-     */
-    protected $except = null;
+    protected array|null $except = null;
 
     /**
      * Determine if the request has a URI that should not be localized.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
-    protected function shouldIgnore($request)
+    protected function shouldIgnore(Request $request): bool
     {
         if (in_array($request->method(), config('laravellocalization.httpMethodsIgnored'))) {
             return true;

@@ -1,0 +1,35 @@
+name: facades
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    name: Facade DocBlocks
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: :php-psr
+          tools: composer:v2
+          coverage: none
+
+      - name: Install facade documentor
+        run: composer require --dev laravel/facade-documenter
+
+      - name: Update facade docblocks
+        run: php -f vendor/bin/facade.php Mcamara\\LaravelLocalization\\Facades\\LaravelLocalization
+
+      - name: Commit facade docblocks
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Update facade docblocks
+          file_pattern: src/
