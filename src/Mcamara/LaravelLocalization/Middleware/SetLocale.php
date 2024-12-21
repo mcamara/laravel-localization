@@ -24,7 +24,7 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
     ){
     }
 
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         // @toDo I am not 100% sure if we should skip this url for ignored urls.
         if ($this->shouldIgnore($request)) {
