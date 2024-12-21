@@ -94,7 +94,7 @@ class LaravelLocalization
       * Returns an URL adapted to $locale.
       *
       * @param string|false|null $locale Locale to adapt, false to remove locale
-      * @param string|bool|null $url URL to adapt in the current language. If not passed, the current url would be taken.
+      * @param string|false|null $url URL to adapt in the current language. If not passed, the current url would be taken.
       * @param array $attributes Attributes to add to the route, if empty, the system would try to extract them from the url.
       * @param bool $forceDefaultLocation Force to show default location even hideDefaultLocaleInURL set as TRUE
       *
