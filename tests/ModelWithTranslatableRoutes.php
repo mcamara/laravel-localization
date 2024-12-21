@@ -7,7 +7,7 @@ use Mcamara\LaravelLocalization\Interfaces\LocalizedUrlRoutable;
 
 class ModelWithTranslatableRoutes extends Model implements LocalizedUrlRoutable
 {
-    public function getLocalizedRouteKey($locale)
+    public function getLocalizedRouteKey(string $locale): string
     {
         if($locale == 'es'){
             return 'empresa';
