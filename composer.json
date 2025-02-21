@@ -17,10 +17,10 @@
     ],
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^10.0|^11.0"
+        "laravel/framework": "^10.0|^11.0|^12.0"
     },
     "require-dev": {
-        "orchestra/testbench-browser-kit": "^8.5|^9.0",
+        "orchestra/testbench-browser-kit": "^8.5|^9.0|^10.0",
         "phpunit/phpunit": "^10.1"
     },
     "suggest": {
