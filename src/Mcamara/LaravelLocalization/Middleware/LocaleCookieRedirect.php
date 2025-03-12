@@ -48,11 +48,7 @@ class LocaleCookieRedirect extends LaravelLocalizationMiddlewareBase
             $locale = app('laravellocalization')->getCurrentLocale();
         }
 
-        if (
-            $locale &&
-            app('laravellocalization')->checkLocaleInSupportedLocales($locale) &&
-            !(app('laravellocalization')->isHiddenDefault($locale))
-        ) {
+        if ($this->shouldRedirectToLocalizedUrl($locale)) {
             $redirection = app('laravellocalization')->getLocalizedURL($locale);
             $redirectResponse = new RedirectResponse($redirection, 302, ['Vary' => 'Accept-Language']);
 
