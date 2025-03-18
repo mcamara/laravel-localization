@@ -15,33 +15,10 @@ use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 
 class LaravelLocalization
 {
-    /**
-     * Default locale.
-     *
-     * @var string
-     */
-    protected $defaultLocale;
-
-    /**
-     * Supported Locales.
-     *
-     * @var array
-     */
-    protected $supportedLocales;
-
-    /**
-     * Locales mapping.
-     *
-     * @var array
-     */
-    protected $localesMapping;
-
-    /**
-     * Current locale.
-     *
-     * @var string
-     */
-    protected $currentLocale = false;
+    protected string $defaultLocale;
+    protected array $supportedLocales;
+    protected array $localesMapping;
+    protected string|bool $currentLocale = false;
 
     /**
      * @throws UnsupportedLocaleException
