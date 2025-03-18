@@ -17,13 +17,6 @@ use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 class LaravelLocalization
 {
     /**
-     * Illuminate request class.
-     *
-     * @var string
-     */
-    protected $baseUrl;
-
-    /**
      * Default locale.
      *
      * @var string
@@ -116,21 +109,6 @@ class LaravelLocalization
     public function setSupportedLocales($locales)
     {
         $this->supportedLocales = $locales;
-    }
-
-    /**
-     * Returns an URL adapted to $locale or current locale.
-     *
-     * @param string      $url    URL to adapt. If not passed, the current url would be taken.
-     * @param string|bool $locale Locale to adapt, false to remove locale
-     *
-     * @throws UnsupportedLocaleException
-     *
-     * @return string URL translated
-     */
-    public function localizeURL($url = null, $locale = null)
-    {
-        return $this->getLocalizedURL($locale, $url);
     }
 
     /**
