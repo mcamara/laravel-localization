@@ -23,6 +23,8 @@ If you notice something critical missing, please **open an issue**.
 - **Removed `getNonLocalizedURL()`**.
 - **All `translatableRoutes` related methods have been removed** from `LaravelLocalization`.
 - **Removed `LaravelLocalizationRoutes` middleware** and its associated `$routeName` attribute.
+- Removed `createUrlFromUri` method
+- Removed huge `extractAttributes` method, no longer needed
 
 If something crucial was removed by mistake or if you encounter missing functionality, feel free to **create an issue**.
 
