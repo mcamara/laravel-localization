@@ -115,8 +115,8 @@ class LaravelLocalization
      * Returns an URL adapted to $locale.
      *
      *
-     * @param string|bool  $locale     Locale to adapt, false to remove locale
-     * @param string|false $url        URL to adapt in the current language. If not passed, the current url would be taken.
+     * @param string|null  $locale     Locale to adapt, false to remove locale
+     * @param string|null $url        URL to adapt in the current language. If not passed, the current url would be taken.
      * @param array        $attributes Attributes to add to the route, if empty, the system would try to extract them from the url.
      * @param bool         $forceDefaultLocation Force to show default location even hideDefaultLocaleInURL set as TRUE
      *
@@ -125,95 +125,78 @@ class LaravelLocalization
      *
      * @return string|false URL translated, False if url does not exist
      */
-    public function getLocalizedURL($locale = null, $url = null, $attributes = [], $forceDefaultLocation = false)
+    public function getLocalizedURL(string|null $locale = null, string|null $url = null, array $attributes = [], bool $forceDefaultLocation = false): string|false
     {
-        if ($locale === null) {
-            $locale = $this->getCurrentLocale();
-        }
-
-        if (!$this->checkLocaleInSupportedLocales($locale)) {
-            throw new UnsupportedLocaleException('Locale \''.$locale.'\' is not in the list of supported locales.');
-        }
-
-        if (empty($attributes)) {
-            $attributes = $this->extractAttributes($url, $locale);
-        }
-
-        if (empty($url)) {
-            $url = $this->request->fullUrl();
-            $urlQuery = parse_url($url, PHP_URL_QUERY);
-            $urlQuery = $urlQuery ? '?'.$urlQuery : '';
-
-            if (!empty($this->routeName)) {
-                return $this->getURLFromRouteNameTranslated($locale, $this->routeName, $attributes, $forceDefaultLocation) . $urlQuery;
-            }
-        } else {
-            $urlQuery = parse_url($url, PHP_URL_QUERY);
-            $urlQuery = $urlQuery ? '?'.$urlQuery : '';
-
-            $url = $this->url->to($url);
-        }
-
-        $url = preg_replace('/'. preg_quote($urlQuery, '/') . '$/', '', $url);
-
-        if ($locale && $translatedRoute = $this->findTranslatedRouteByUrl($url, $attributes, $this->currentLocale)) {
-            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).$urlQuery;
-        }
-
-        $base_path = $this->request->getBaseUrl();
-        $parsed_url = parse_url($url);
-        $url_locale = $this->getDefaultLocale();
-
-        if (!$parsed_url || empty($parsed_url['path'])) {
-            $path = $parsed_url['path'] = '';
-        } else {
-            $parsed_url['path'] = str_replace($base_path, '', '/'.ltrim($parsed_url['path'], '/'));
-            $path = $parsed_url['path'];
-            foreach ($this->getSupportedLocales() as $localeCode => $lang) {
-                $localeCode = $this->getLocaleFromMapping($localeCode);
-
-                $parsed_url['path'] = preg_replace('%^/?'.$localeCode.'/%', '$1', $parsed_url['path']);
-                if ($parsed_url['path'] !== $path) {
-                    $url_locale = $localeCode;
-                    break;
-                }
-
-                $parsed_url['path'] = preg_replace('%^/?'.$localeCode.'$%', '$1', $parsed_url['path']);
-                if ($parsed_url['path'] !== $path) {
-                    $url_locale = $localeCode;
-                    break;
-                }
-            }
-        }
-
-        $parsed_url['path'] = ltrim($parsed_url['path'], '/');
-
-        if ($translatedRoute = $this->findTranslatedRouteByPath($parsed_url['path'], $url_locale)) {
-            return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).$urlQuery;
-        }
-
+        $locale = $locale ?: $this->getCurrentLocale();
         $locale = $this->getLocaleFromMapping($locale);
 
-        if (!empty($locale)) {
-            if ($forceDefaultLocation || $locale != $this->getDefaultLocale() || !$this->hideDefaultLocaleInURL()) {
-                $parsed_url['path'] = $locale.'/'.ltrim($parsed_url['path'], '/');
+        if (!$this->checkLocaleInSupportedLocales($locale)) {
+            throw new UnsupportedLocaleException("Locale '{$locale}' is not supported.");
+        }
+
+        if($url === null){
+            // Including protocol, domain and query , e.g. `https://example.com/posts?page=2&sort=asc`
+            $url = $this->request->fullUrl();
+        }
+
+        $route = $this->matchRouteForAnyRoute($url);
+
+        if ($route === null) {
+            return false;
+        }
+
+        if(empty($attributes)){
+           $attributes = $route->parameters();
+        }
+
+        $uri  = $route->uri();
+        $urlQuery = parse_url($url, PHP_URL_QUERY);
+        // urlQuery , e.g. `?page=2&sort=asc`
+        $urlQuery = $urlQuery ? '?'.$urlQuery : '';
+
+        if (!isset($attributes['locale'])){
+            if($locale === $this->getDefaultLocale()){
+                return $url;
+            }
+
+            // Locale must be different from default, therefore it should not be hidden
+            return $this->url->to($locale . '/' . $uri, $attributes) . $urlQuery;
+        }
+
+        $localeOfUrl = $attributes['locale'];
+
+        if($locale === $localeOfUrl){
+            return $url;
+        }
+
+        // if the locale is default and hidden by default, we need to workaround
+        if ($this->isHiddenDefault($locale)){
+            unset($attributes['locale']);
+            $cleanedUri = preg_replace('%^/?{locale}(/|$)%', '', $uri);
+            return $this->url->to($cleanedUri, $attributes) . $urlQuery;
+        }
+
+        // Update locale and move on
+        $attributes['locale'] = $locale;
+        return $this->url->to($uri, $attributes) . $urlQuery;
+    }
+
+    protected function matchRouteForAnyRoute(string $url): Route|null
+    {
+        $methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
+
+        foreach ($methods as $method) {
+            try {
+                $request = Request::create($url, $method);
+                $route = $this->router->getRoutes()->match($request);
+
+                return $route;
+            } catch (\Exception $e) {
+                continue;
             }
         }
-        $parsed_url['path'] = ltrim(ltrim($base_path, '/').'/'.$parsed_url['path'], '/');
 
-        //Make sure that the pass path is returned with a leading slash only if it come in with one.
-        if (Str::startsWith($path, '/') === true) {
-            $parsed_url['path'] = '/'.$parsed_url['path'];
-        }
-        $parsed_url['path'] = rtrim($parsed_url['path'], '/');
-
-        $url = $this->unparseUrl($parsed_url);
-
-        if ($this->checkUrl($url)) {
-            return $url.$urlQuery;
-        }
-
-        return $this->createUrlFromUri($url).$urlQuery;
+        return null;
     }
 
     /**
