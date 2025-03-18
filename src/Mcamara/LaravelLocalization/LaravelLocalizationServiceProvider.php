@@ -71,10 +71,18 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
 
                 $supportedLocales = array_keys(config('laravellocalization.supportedLocales', []));
                 $localesMapping = array_keys(config('laravellocalization.localesMapping', []));
+                $hideDefaultLocaleInURL = config('laravellocalization.hideDefaultLocaleInURL', false);
+
                 $allowedLocales = implode('|', array_unique(array_merge($supportedLocales, $localesMapping)));
                 Route::prefix('/{locale}')
                     ->where(['locale' => $allowedLocales])
                     ->group($routes);
+
+                //@toDo translatedRoutes need to be defined inhere aswell
+
+                if($hideDefaultLocaleInURL){
+                    Route::name('default_locale.')->group($routes);
+                }
             });
         });
     }
