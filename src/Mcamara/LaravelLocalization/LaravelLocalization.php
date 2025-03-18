@@ -43,14 +43,6 @@ class LaravelLocalization
      */
     protected $currentLocale = false;
 
-
-    /**
-     * Name of the translation key of the current route, it is used for url translations.
-     *
-     * @var string
-     */
-    protected $routeName;
-
     /**
      * @throws UnsupportedLocaleException
      */
@@ -400,16 +392,6 @@ class LaravelLocalization
         }
 
         return true;
-    }
-
-    /**
-     * Set current route name.
-     *
-     * @param string $routeName current route name
-     */
-    public function setRouteName($routeName)
-    {
-        $this->routeName = $routeName;
     }
 
     /**
