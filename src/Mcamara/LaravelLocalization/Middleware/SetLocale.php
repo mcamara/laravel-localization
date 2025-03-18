@@ -6,11 +6,8 @@ use Closure;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
-use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
-use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 use Mcamara\LaravelLocalization\LanguageNegotiator;
 use Mcamara\LaravelLocalization\LaravelLocalization;
 
@@ -33,8 +30,10 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
 
         $locale = $request->route('locale');
 
+        // The locale here cannot be an "inverse" mapping, as such cases are handled
+        // earlier by the locale mapping middleware.
         if($locale == null || empty($this->laravelLocalization->getSupportedLocales()[$locale])) {
-            $locale = $this->fallbackLocale($request);
+            $locale = $this->computeLocale($request);
         }
 
         $this->app->setLocale($locale);
@@ -42,7 +41,7 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
         $this->laravelLocalization->setCurrentLocale($locale);
         URL::defaults(['locale' => $locale]);
 
-        // Regional locale such as de_DE, so formatLocalized works in Carbon
+        // Configure regional locale settings (e.g., de_DE) for proper formatting in Carbon.
         $regional = $this->laravelLocalization->getCurrentLocaleRegional();
         $suffix = $this->configRepository->get('laravellocalization.utf8suffix');
         if ($regional) {
@@ -53,18 +52,18 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
         return $next($request);
     }
 
-    // if the first segment/locale passed is not valid the system would either take default locale,
-    // (if hideDefaultLocaleInURL is set, or retrieve it from the browser
-    protected function fallbackLocale(Request $request): string
+    protected function computeLocale(Request $request): string
     {
         $defaultLocale = $this->configRepository->get('app.locale');
 
-        // if we reached this point and hideDefaultLocaleInURL is true, take default
+        // If we reached this point and `hideDefaultLocaleInURL` is enabled, enforce the default locale.
+        // In this case, `useAcceptLanguageHeader` is only considered by the `LaravelSessionRedirect` middleware
+        // when no locale has been set in the session.
         if ($this->laravelLocalization->hideDefaultLocaleInURL()) {
             return $defaultLocale;
         }
 
-        // but if hideDefaultLocaleInURL is false, we may have to retrieve it from the browser...
+        // If browser language negotiation is enabled, attempt to detect the best match.
         if ($this->laravelLocalization->useAcceptLanguageHeader()) {
             $negotiator = new LanguageNegotiator($defaultLocale, $this->laravelLocalization->getSupportedLocales(), $request);
 
