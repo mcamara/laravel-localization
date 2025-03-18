@@ -8,9 +8,8 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Str;
-use Illuminate\Support\Env;
 use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
 use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 
@@ -44,12 +43,6 @@ class LaravelLocalization
      */
     protected $currentLocale = false;
 
-    /**
-     * An array that contains all routes that should be translated.
-     *
-     * @var array
-     */
-    protected $translatedRoutes = [];
 
     /**
      * Name of the translation key of the current route, it is used for url translations.
@@ -59,15 +52,6 @@ class LaravelLocalization
     protected $routeName;
 
     /**
-     * An array that contains all translated routes by url
-     *
-     * @var array
-     */
-    protected $cachedTranslatedRoutesByUrl = [];
-
-    /**
-     * Creates new instance.
-     *
      * @throws UnsupportedLocaleException
      */
     public function __construct(
@@ -78,7 +62,6 @@ class LaravelLocalization
         protected readonly Request $request,
         protected readonly UrlGenerator $url
     ) {
-        // set default locale
         $this->defaultLocale = $this->configRepository->get('app.locale');
         $supportedLocales = $this->getSupportedLocales();
 
@@ -87,19 +70,10 @@ class LaravelLocalization
         }
     }
 
-
-    /**
-     * Check if $locale is default locale and supposed to be hidden in url
-     *
-     * @param string $locale Locale to be checked
-     *
-     * @return boolean Returns true if above requirement are met, otherwise false
-     */
-
-     public function isHiddenDefault($locale)
-     {
-       return  ($this->getDefaultLocale() === $locale && $this->hideDefaultLocaleInURL());
-     }
+    public function isHiddenDefault($locale): bool
+    {
+        return  ($this->getDefaultLocale() === $locale && $this->hideDefaultLocaleInURL());
+    }
 
     /**
      * Set and return supported locales.
@@ -199,62 +173,6 @@ class LaravelLocalization
         return null;
     }
 
-    /**
-     * Returns an URL adapted to the route name and the locale given.
-     *
-     *
-     * @param string|bool $locale       Locale to adapt
-     * @param string      $transKeyName Translation key name of the url to adapt
-     * @param array       $attributes   Attributes for the route (only needed if transKeyName needs them)
-     * @param bool        $forceDefaultLocation Force to show default location even hideDefaultLocaleInURL set as TRUE
-     *
-     * @throws SupportedLocalesNotDefined
-     * @throws UnsupportedLocaleException
-     *
-     * @return string|false URL translated
-     */
-    public function getURLFromRouteNameTranslated($locale, $transKeyName, $attributes = [], $forceDefaultLocation = false)
-    {
-        if (!$this->checkLocaleInSupportedLocales($locale)) {
-            throw new UnsupportedLocaleException('Locale \''.$locale.'\' is not in the list of supported locales.');
-        }
-
-        if (!\is_string($locale)) {
-            $locale = $this->getDefaultLocale();
-        }
-
-        $route = '';
-
-        if ($forceDefaultLocation || !($locale === $this->defaultLocale && $this->hideDefaultLocaleInURL())) {
-            $route = '/'.$locale;
-        }
-        if (\is_string($locale) && $this->translator->has($transKeyName, $locale)) {
-            $translation = $this->translator->get($transKeyName, [], $locale);
-            $route .= '/'.$translation;
-
-            $route = $this->substituteAttributesInRoute($attributes, $route, $locale);
-        }
-
-        if (empty($route)) {
-            // This locale does not have any key for this route name
-            return false;
-        }
-
-        return rtrim($this->createUrlFromUri($route), '/');
-    }
-
-    /**
-     * It returns an URL without locale (if it has it)
-     * Convenience function wrapping getLocalizedURL(false).
-     *
-     * @param string|false $url URL to clean, if false, current url would be taken
-     *
-     * @return string URL with no locale in path
-     */
-    public function getNonLocalizedURL($url = null)
-    {
-        return $this->getLocalizedURL(false, $url);
-    }
 
     /**
      * Returns default locale.
@@ -485,42 +403,6 @@ class LaravelLocalization
     }
 
     /**
-     * Change route attributes for the ones in the $attributes array.
-     *
-     * @param $attributes array Array of attributes
-     * @param string $route string route to substitute
-     *
-     * @return string route with attributes changed
-     */
-    protected function substituteAttributesInRoute($attributes, $route, $locale = null)
-    {
-        foreach ($attributes as $key => $value) {
-            if ($value instanceOf Interfaces\LocalizedUrlRoutable) {
-                $value = $value->getLocalizedRouteKey($locale);
-            }
-            elseif ($value instanceOf UrlRoutable) {
-                $value = $value->getRouteKey();
-            }
-            $route = str_replace(array('{'.$key.'}', '{'.$key.'?}'), $value, $route);
-        }
-
-        // delete empty optional arguments that are not in the $attributes array
-        $route = preg_replace('/\/{[^)]+\?}/', '', $route);
-
-        return $route;
-    }
-
-    /**
-     * Returns translated routes.
-     *
-     * @return array translated routes
-     */
-    protected function getTranslatedRoutes()
-    {
-        return $this->translatedRoutes;
-    }
-
-    /**
      * Set current route name.
      *
      * @param string $routeName current route name
@@ -528,115 +410,6 @@ class LaravelLocalization
     public function setRouteName($routeName)
     {
         $this->routeName = $routeName;
-    }
-
-    /**
-     * Translate routes and save them to the translated routes array (used in the localize route filter).
-     *
-     * @param string $routeName Key of the translated string
-     *
-     * @return string Translated string
-     */
-    public function transRoute($routeName)
-    {
-        if (!\in_array($routeName, $this->translatedRoutes)) {
-            $this->translatedRoutes[] = $routeName;
-        }
-
-        return $this->translator->get($routeName);
-    }
-
-    /**
-     * Returns the translation key for a given path.
-     *
-     * @param string $path Path to get the key translated
-     *
-     * @return string|false Key for translation, false if not exist
-     */
-    public function getRouteNameFromAPath($path)
-    {
-        $attributes = $this->extractAttributes($path);
-
-        $path = parse_url($path)['path'];
-        $path = trim(str_replace('/'.$this->currentLocale.'/', '', $path), "/");
-
-        foreach ($this->translatedRoutes as $route) {
-            if (trim($this->substituteAttributesInRoute($attributes, $this->translator->get($route), $this->currentLocale), '/') === $path) {
-                return $route;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns the translated route for the path and the url given.
-     *
-     * @param string $path       Path to check if it is a translated route
-     * @param string $url_locale Language to check if the path exists
-     *
-     * @return string|false Key for translation, false if not exist
-     */
-    protected function findTranslatedRouteByPath($path, $url_locale)
-    {
-        // check if this url is a translated url
-        foreach ($this->translatedRoutes as $translatedRoute) {
-            if ($this->translator->get($translatedRoute, [], $url_locale) == rawurldecode($path)) {
-                return $translatedRoute;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns the translated route for an url and the attributes given and a locale.
-     *
-     *
-     * @param string|false|null $url        Url to check if it is a translated route
-     * @param array             $attributes Attributes to check if the url exists in the translated routes array
-     * @param string            $locale     Language to check if the url exists
-     *
-     * @throws SupportedLocalesNotDefined
-     * @throws UnsupportedLocaleException
-     *
-     * @return string|false Key for translation, false if not exist
-     */
-    protected function findTranslatedRouteByUrl($url, $attributes, $locale)
-    {
-        if (empty($url)) {
-            return false;
-        }
-
-        if (isset($this->cachedTranslatedRoutesByUrl[$locale][$url])) {
-            return $this->cachedTranslatedRoutesByUrl[$locale][$url];
-        }
-
-        // check if this url is a translated url
-        foreach ($this->translatedRoutes as $translatedRoute) {
-            $routeName = $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
-
-            // We can ignore extra url parts and compare only their url_path (ignore arguments that are not attributes)
-            if (parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH) == parse_url($this->getNonLocalizedURL(urldecode($url)), PHP_URL_PATH)) {
-                $this->cachedTranslatedRoutesByUrl[$locale][$url] = $translatedRoute;
-
-                return $translatedRoute;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns true if the string given is a valid url.
-     *
-     * @param string $url String to check if it is a valid url
-     *
-     * @return bool Is the string given a valid url?
-     */
-    protected function checkUrl($url)
-    {
-        return filter_var($url, FILTER_VALIDATE_URL);
     }
 
     /**
@@ -681,54 +454,10 @@ class LaravelLocalization
      *
      * @return string Url for the given uri
      */
-    public function createUrlFromUri($uri)
+    public function createUrlFromUri(string $uri): string
     {
         $uri = ltrim($uri, '/');
-
-        if (empty($this->baseUrl)) {
-            return app('url')->to($uri);
-        }
-
-        return $this->baseUrl.$uri;
-    }
-
-    /**
-     * Sets the base url for the site.
-     *
-     * @param string $url Base url for the site
-     */
-    public function setBaseUrl($url)
-    {
-        if (substr($url, -1) != '/') {
-            $url .= '/';
-        }
-
-        $this->baseUrl = $url;
-    }
-
-    /**
-     * Returns serialized translated routes for caching purposes.
-     *
-     * @return string
-     */
-    public function getSerializedTranslatedRoutes()
-    {
-        return base64_encode(serialize($this->translatedRoutes));
-    }
-
-    /**
-     * Sets the translated routes list.
-     * Only useful from a cached routes context.
-     *
-     * @param string $serializedRoutes
-     */
-    public function setSerializedTranslatedRoutes($serializedRoutes)
-    {
-        if ( ! $serializedRoutes) {
-            return;
-        }
-
-        $this->translatedRoutes = unserialize(base64_decode($serializedRoutes));
+        return app('url')->to($uri);
     }
 
     /**
