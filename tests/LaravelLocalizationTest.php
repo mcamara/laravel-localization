@@ -65,14 +65,14 @@ final class LaravelLocalizationTest extends TestCase
 
     /**
      * Create fake request
-     * @param  [type] $method     [description]
-     * @param  [type] $content    [description]
+     * @param  string $method     [description]
+     * @param  mixed $content    [description]
      * @param  string $uri        [description]
      * @param  array  $server     [description]
      * @param  array  $parameters [description]
      * @param  array  $cookies    [description]
      * @param  array  $files      [description]
-     * @return [type]             [description]
+     * @return \Illuminate\Http\Request             [description]
      */
     protected function createRequest(
         $uri = '/test',
@@ -101,7 +101,7 @@ final class LaravelLocalizationTest extends TestCase
     /**
      * Define environment setup.
      *
-     * @param Illuminate\Foundation\Application $app
+     * @param \Illuminate\Foundation\Application $app
      *
      * @return void
      */

@@ -4,19 +4,12 @@ namespace Mcamara\LaravelLocalization\Middleware;
 
 use Closure;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Mcamara\LaravelLocalization\LanguageNegotiator;
 
 class LocaleSessionRedirect extends LaravelLocalizationMiddlewareBase
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure                 $next
-     *
-     * @return mixed
-     */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         // If the URL of the request is in exceptions.
         if ($this->shouldIgnore($request)) {
@@ -26,7 +19,7 @@ class LocaleSessionRedirect extends LaravelLocalizationMiddlewareBase
         $params = explode('/', $request->path());
         $locale = session('locale', false);
 
-        if (\count($params) > 0 && app('laravellocalization')->checkLocaleInSupportedLocales($params[0])) {
+        if (app('laravellocalization')->checkLocaleInSupportedLocales($params[0])) {
             session(['locale' => $params[0]]);
 
             return $next($request);

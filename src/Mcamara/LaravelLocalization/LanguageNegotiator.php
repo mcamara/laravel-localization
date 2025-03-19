@@ -2,54 +2,21 @@
 
 namespace Mcamara\LaravelLocalization;
 
-use Illuminate\Config\Repository;
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Locale;
 
 class LanguageNegotiator
 {
+    protected ConfigRepository $configRepository;
+    protected Application $app;
+    private string $defaultLocale;
+    private array $supportedLanguages;
+    private Request $request;
+    private bool $use_intl = false;
 
-    /**
-     * Config repository.
-     *
-     * @var \Illuminate\Config\Repository
-     */
-    protected $configRepository;
-
-    /**
-     * Illuminate request class.
-     *
-     * @var Illuminate\Foundation\Application
-     */
-    protected $app;
-
-    /**
-     * @var string
-     */
-    private $defaultLocale;
-
-    /**
-     * @var array
-     */
-    private $supportedLanguages;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var bool
-     */
-    private $use_intl = false;
-
-    /**
-     * @param string  $defaultLocale
-     * @param array   $supportedLanguages
-     * @param Request $request
-     */
-    public function __construct($defaultLocale, $supportedLanguages, Request $request)
+    public function __construct(string $defaultLocale, array $supportedLanguages, Request $request)
     {
         $this->app = app();
 
@@ -95,7 +62,7 @@ class LanguageNegotiator
      *
      * @return string The negotiated language result or app.locale.
      */
-    public function negotiateLanguage()
+    public function negotiateLanguage(): string
     {
         $matches = $this->getMatchesFromAcceptedLanguages();
         foreach ($matches as $key => $q) {
@@ -149,7 +116,7 @@ class LanguageNegotiator
      *
      * @return array Matches from the header field Accept-Languages
      */
-    private function getMatchesFromAcceptedLanguages()
+    private function getMatchesFromAcceptedLanguages(): array
     {
         $matches = [];
 

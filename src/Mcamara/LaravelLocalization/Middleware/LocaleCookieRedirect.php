@@ -2,21 +2,13 @@
 
 use Closure;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Mcamara\LaravelLocalization\LanguageNegotiator;
 
 class LocaleCookieRedirect extends LaravelLocalizationMiddlewareBase
 {
-
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
-     *
-     * @return mixed
-     */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         // If the URL of the request is in exceptions.
         if ($this->shouldIgnore($request)) {
@@ -24,9 +16,9 @@ class LocaleCookieRedirect extends LaravelLocalizationMiddlewareBase
         }
 
         $params = explode('/', $request->path());
-        $locale = $request->cookie('locale', false);
+        $locale = $request->cookie('locale') ?? false;
 
-        if (\count($params) > 0 && app('laravellocalization')->checkLocaleInSupportedLocales($params[0])) {
+        if (app('laravellocalization')->checkLocaleInSupportedLocales($params[0])) {
             return $next($request)->withCookie(cookie()->forever('locale', $params[0]));
         }
 

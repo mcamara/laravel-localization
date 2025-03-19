@@ -9,12 +9,7 @@ use Illuminate\Support\ServiceProvider;
 
 class LaravelLocalizationServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap the application events.
-     *
-     * @return void
-     */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([
             __DIR__.'/../../config/config.php' => config_path('laravellocalization.php'),
@@ -23,22 +18,12 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         $this->registerMacros();
     }
 
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
+    public function provides(): array
     {
         return ['modules.handler', 'modules'];
     }
 
-    /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    public function register()
+    public function register(): void
     {
         $packageConfigFile = __DIR__.'/../../config/config.php';
 
@@ -49,10 +34,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         $this->registerBindings();
     }
 
-    /**
-     * Registers app bindings and aliases.
-     */
-    protected function registerBindings()
+    protected function registerBindings(): void
     {
         $this->app->singleton(LaravelLocalization::class);
 

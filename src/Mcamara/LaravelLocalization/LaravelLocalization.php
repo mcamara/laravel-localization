@@ -37,17 +37,15 @@ class LaravelLocalization
         }
     }
 
-    public function isHiddenDefault($locale): bool
+    public function isHiddenDefault(string $locale): bool
     {
         return  ($this->getDefaultLocale() === $locale && $this->hideDefaultLocaleInURL());
     }
 
     /**
      * Set and return supported locales.
-     *
-     * @param array $locales Locales that the App supports
      */
-    public function setSupportedLocales($locales)
+    public function setSupportedLocales(array $locales): void
     {
         $this->supportedLocales = $locales;
     }
@@ -92,20 +90,16 @@ class LaravelLocalization
 
     /**
      * Returns default locale.
-     *
-     * @return string
      */
-    public function getDefaultLocale()
+    public function getDefaultLocale(): string
     {
         return $this->defaultLocale;
     }
 
     /**
      * Return locales mapping.
-     *
-     * @return array
      */
-    public function getLocalesMapping()
+    public function getLocalesMapping(): array
     {
         if (empty($this->localesMapping)) {
             $this->localesMapping = $this->configRepository->get('laravellocalization.localesMapping');
@@ -116,24 +110,16 @@ class LaravelLocalization
 
     /**
      * Returns a locale from the mapping.
-     *
-     * @param string|null $locale
-     *
-     * @return string|null
      */
-    public function getLocaleFromMapping($locale)
+    public function getLocaleFromMapping(string | null $locale): string | null
     {
         return $this->getLocalesMapping()[$locale] ?? $locale;
     }
 
     /**
      * Returns inversed locale from the mapping.
-     *
-     * @param string|null $locale
-     *
-     * @return string|null
      */
-    public function getInversedLocaleFromMapping($locale)
+    public function getInversedLocaleFromMapping(string | null $locale): string | null
     {
         return \array_flip($this->getLocalesMapping())[$locale] ?? $locale;
     }
@@ -142,10 +128,8 @@ class LaravelLocalization
      * Return an array of all supported Locales.
      *
      * @throws SupportedLocalesNotDefined
-     *
-     * @return array
      */
-    public function getSupportedLocales()
+    public function getSupportedLocales(): array
     {
         if (!empty($this->supportedLocales)) {
             return $this->supportedLocales;
@@ -165,10 +149,8 @@ class LaravelLocalization
     /**
      * Return an array of all supported Locales but in the order the user
      * has specified in the config file. Useful for the language selector.
-     *
-     * @return array
      */
-    public function getLocalesOrder()
+    public function getLocalesOrder(): array
     {
         $locales = $this->getSupportedLocales();
 
@@ -185,30 +167,24 @@ class LaravelLocalization
 
     /**
      * Returns current locale name.
-     *
-     * @return string current locale name
      */
-    public function getCurrentLocaleName()
+    public function getCurrentLocaleName(): string
     {
         return $this->supportedLocales[$this->getCurrentLocale()]['name'];
     }
 
     /**
      * Returns current locale native name.
-     *
-     * @return string current locale native name
      */
-    public function getCurrentLocaleNative()
+    public function getCurrentLocaleNative(): string
     {
         return $this->supportedLocales[$this->getCurrentLocale()]['native'];
     }
 
     /**
      * Returns current locale direction.
-     *
-     * @return string current locale direction
      */
-    public function getCurrentLocaleDirection()
+    public function getCurrentLocaleDirection(): string
     {
         if (!empty($this->supportedLocales[$this->getCurrentLocale()]['dir'])) {
             return $this->supportedLocales[$this->getCurrentLocale()]['dir'];
@@ -229,20 +205,16 @@ class LaravelLocalization
 
     /**
      * Returns current locale script.
-     *
-     * @return string current locale script
      */
-    public function getCurrentLocaleScript()
+    public function getCurrentLocaleScript(): string
     {
         return $this->supportedLocales[$this->getCurrentLocale()]['script'];
     }
 
     /**
      * Returns current language's native reading.
-     *
-     * @return string current language's native reading
      */
-    public function getCurrentLocaleNativeReading()
+    public function getCurrentLocaleNativeReading(): string
     {
         return $this->supportedLocales[$this->getCurrentLocale()]['native'];
     }
@@ -253,10 +225,8 @@ class LaravelLocalization
 
     /**
      * Returns current language.
-     *
-     * @return string current language
      */
-    public function getCurrentLocale()
+    public function getCurrentLocale(): string
     {
         if ($this->currentLocale) {
             return $this->currentLocale;
@@ -274,10 +244,8 @@ class LaravelLocalization
 
     /**
      * Returns current regional.
-     *
-     * @return string current regional
      */
-    public function getCurrentLocaleRegional(): string|null
+    public function getCurrentLocaleRegional(): string | null
     {
         // need to check if it exists, since 'regional' has been added
         // after version 1.0.11 and existing users will not have it
@@ -290,10 +258,8 @@ class LaravelLocalization
 
     /**
      * Returns supported languages language key.
-     *
-     * @return array keys of supported languages
      */
-    public function getSupportedLanguagesKeys()
+    public function getSupportedLanguagesKeys(): array
     {
         return array_keys($this->supportedLocales);
     }
@@ -307,7 +273,7 @@ class LaravelLocalization
      *
      * @return bool is the locale supported?
      */
-    public function checkLocaleInSupportedLocales($locale)
+    public function checkLocaleInSupportedLocales($locale): bool
     {
         $inversedLocale = $this->getInversedLocaleFromMapping($locale);
         $locales = $this->getSupportedLocales();
@@ -320,35 +286,29 @@ class LaravelLocalization
 
     /**
      * Returns the config repository for this instance.
-     *
-     * @return \Illuminate\Contracts\Config\Repository Configuration repository
      */
-    public function getConfigRepository()
+    public function getConfigRepository(): ConfigRepository
     {
         return $this->configRepository;
     }
 
     /**
-     * Returns the translation key for a given path.
-     *
-     * @return bool Returns value of useAcceptLanguageHeader in config.
+     * Returns the value of useAcceptLanguageHeader in the config.
      */
-    public function useAcceptLanguageHeader()
+    public function useAcceptLanguageHeader(): bool
     {
         return $this->configRepository->get('laravellocalization.useAcceptLanguageHeader');
     }
 
-    public function hideUrlAndAcceptHeader()
+    public function hideUrlAndAcceptHeader(): bool
     {
       return $this->hideDefaultLocaleInURL() && $this->useAcceptLanguageHeader();
     }
 
     /**
-     * Returns the translation key for a given path.
-     *
-     * @return bool Returns value of hideDefaultLocaleInURL in config.
+     * Returns value of hideDefaultLocaleInURL in the config.
      */
-    public function hideDefaultLocaleInURL()
+    public function hideDefaultLocaleInURL(): bool
     {
         return $this->configRepository->get('laravellocalization.hideDefaultLocaleInURL');
     }

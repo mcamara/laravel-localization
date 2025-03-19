@@ -1,0 +1,9 @@
+parameters:
+    level: 5
+    paths:
+        - src
+        - tests
+    ignoreErrors:
+        - '#Call to an undefined method Illuminate\\Contracts\\Translation\\Translator::has#'
+        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Route::localized#'
+        - '#Argument of an invalid type Illuminate\\Routing\\RouteCollectionInterface supplied for foreach, only iterables are supported#'
