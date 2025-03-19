@@ -26,10 +26,8 @@ class LaravelLocalization
     public function __construct(
         protected readonly Application $app,
         protected readonly ConfigRepository $configRepository,
-        protected readonly Translator $translator,
-        protected readonly Router $router,
         protected readonly Request $request,
-        protected readonly UrlGenerator $url
+        protected readonly LocalizedUrlGenerator $localizationUrlGenerator,
     ) {
         $this->defaultLocale = $this->configRepository->get('app.locale');
         $supportedLocales = $this->getSupportedLocales();
@@ -82,66 +80,15 @@ class LaravelLocalization
             $url = $this->request->fullUrl();
         }
 
-        $route = $this->matchRouteForAnyRoute($url);
-
-        if ($route === null) {
-            return false;
-        }
-
-        if(empty($attributes)){
-           $attributes = $route->parameters();
-        }
-
-        $uri  = $route->uri();
-        $urlQuery = parse_url($url, PHP_URL_QUERY);
-        // urlQuery , e.g. `?page=2&sort=asc`
-        $urlQuery = $urlQuery ? '?'.$urlQuery : '';
-
-        if (!isset($attributes['locale'])){
-            if($locale === $this->getDefaultLocale()){
-                return $url;
-            }
-
-            // Locale must be different from default, therefore it should not be hidden
-            return $this->url->to($locale . '/' . $uri, $attributes) . $urlQuery;
-        }
-
-        $localeOfUrl = $attributes['locale'];
-
-        if($locale === $localeOfUrl){
-            return $url;
-        }
-
-        // if the locale is default and hidden by default, we need to workaround
-        if ($this->isHiddenDefault($locale)){
-            unset($attributes['locale']);
-            $cleanedUri = preg_replace('%^/?{locale}(/|$)%', '', $uri);
-            return $this->url->to($cleanedUri, $attributes) . $urlQuery;
-        }
-
-        // Update locale and move on
-        $attributes['locale'] = $locale;
-        return $this->url->to($uri, $attributes) . $urlQuery;
+        return $this->localizationUrlGenerator->getLocalizedURL(
+            locale: $locale,
+            url: $url,
+            attributes: $attributes,
+            forceDefaultLocation: $forceDefaultLocation,
+            defaultLocale: $this->defaultLocale,
+            hiddenDefault: $this->hideDefaultLocaleInURL()
+        );
     }
-
-    protected function matchRouteForAnyRoute(string $url): Route|null
-    {
-        $methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
-
-        foreach ($methods as $method) {
-            try {
-                $request = Request::create($url, $method);
-                $route = $this->router->getRoutes()->match($request);
-
-                return $route;
-            } catch (\Exception $e) {
-                continue;
-            }
-        }
-
-        return null;
-    }
-
 
     /**
      * Returns default locale.
