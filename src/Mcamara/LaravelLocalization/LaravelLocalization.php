@@ -4,21 +4,16 @@ namespace Mcamara\LaravelLocalization;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Routing\UrlGenerator;
-use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
-use Illuminate\Routing\Router;
 use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
 use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
+use Mcamara\LaravelLocalization\Services\LocalizedUrlGenerator;
 
 class LaravelLocalization
 {
     protected string $defaultLocale;
     protected array $supportedLocales;
     protected array $localesMapping;
-    protected string|bool $currentLocale = false;
+    protected string $currentLocale;
 
     /**
      * @throws UnsupportedLocaleException
@@ -26,15 +21,17 @@ class LaravelLocalization
     public function __construct(
         protected readonly Application $app,
         protected readonly ConfigRepository $configRepository,
-        protected readonly Request $request,
         protected readonly LocalizedUrlGenerator $localizationUrlGenerator,
     ) {
-        $this->defaultLocale = $this->configRepository->get('app.locale');
+        $locale = $this->configRepository->get('app.locale');
         $supportedLocales = $this->getSupportedLocales();
 
-        if (empty($supportedLocales[$this->defaultLocale])) {
+        if (empty($supportedLocales[$locale])) {
             throw new UnsupportedLocaleException('Laravel default locale is not in the supportedLocales array.');
         }
+
+        $this->defaultLocale = $locale;
+        $this->currentLocale = $locale;
     }
 
     public function isHiddenDefault(string $locale): bool
@@ -54,7 +51,7 @@ class LaravelLocalization
      * Returns an URL adapted to $locale.
      *
      *
-     * @param string|null  $locale     Locale to adapt, false to remove locale
+     * @param string|null  $locale     Locale to adapt
      * @param string|null $url        URL to adapt in the current language. If not passed, the current url would be taken.
      * @param array        $attributes Attributes to add to the route, if empty, the system would try to extract them from the url.
      * @param bool         $forceDefaultLocation Force to show default location even hideDefaultLocaleInURL set as TRUE
@@ -62,9 +59,9 @@ class LaravelLocalization
      * @throws SupportedLocalesNotDefined
      * @throws UnsupportedLocaleException
      *
-     * @return string|false URL translated, False if url does not exist
+     * @return string URL translated, returns same url if no route is found
      */
-    public function getLocalizedURL(string|null $locale = null, string|null $url = null, array $attributes = [], bool $forceDefaultLocation = false): string|false
+    public function getLocalizedURL(string|null $locale = null, string|null $url = null, array $attributes = [], bool $forceDefaultLocation = false): string
     {
         $locale = $locale ?: $this->getCurrentLocale();
         $locale = $this->getLocaleFromMapping($locale);
@@ -74,14 +71,19 @@ class LaravelLocalization
         }
 
         if($url === null){
-            // Including protocol, domain and query , e.g. `https://example.com/posts?page=2&sort=asc`
-            $url = $this->request->fullUrl();
+            // fullUrl() is including protocol, domain and query , e.g. `https://example.com/posts?page=2&sort=asc`
+
+            // Use the request() helper instead of $this->request,
+            // because the injected request may be stale if this class
+            // was constructed before the current request was bound.
+            $url = request()->fullUrl();
         }
 
         return $this->localizationUrlGenerator->getLocalizedURL(
             locale: $locale,
             url: $url,
             attributes: $attributes,
+            supportedLocales: $this->getSupportedLocales(),
             forceDefaultLocation: $forceDefaultLocation,
             defaultLocale: $this->defaultLocale,
             hiddenDefault: $this->hideDefaultLocaleInURL()
@@ -224,22 +226,11 @@ class LaravelLocalization
     }
 
     /**
-     * Returns current language.
+     * Returns current language of url request
      */
     public function getCurrentLocale(): string
     {
-        if ($this->currentLocale) {
-            return $this->currentLocale;
-        }
-
-        if ($this->useAcceptLanguageHeader() && !$this->app->runningInConsole()) {
-            $negotiator = new LanguageNegotiator($this->defaultLocale, $this->getSupportedLocales(), $this->request);
-
-            return $negotiator->negotiateLanguage();
-        }
-
-        // or get application default language
-        return $this->configRepository->get('app.locale');
+        return $this->currentLocale;
     }
 
     /**

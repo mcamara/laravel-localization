@@ -1,6 +1,6 @@
 <?php
 
-namespace Mcamara\LaravelLocalization;
+namespace Mcamara\LaravelLocalization\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -31,12 +31,18 @@ class LocalizedUrlGenerator
      *
      * @return string|false URL translated, False if url does not exist
      */
-    public function getLocalizedURL(string|null $locale = null, string $url,  string $defaultLocale, bool $hiddenDefault, array $attributes = [], bool $forceDefaultLocation = false): string|false
+    public function getLocalizedURL(string|null $locale = null, string $url,  string $defaultLocale, bool $hiddenDefault, array $supportedLocales, array $attributes = [], bool $forceDefaultLocation = false): string
     {
         $route = $this->matchRouteForAnyRoute($url);
 
-        if ($route === null) {
-            return false;
+        if ($route === null){
+            // If hideDefaultLocale is disabled and negotiator is disabled, then only routes with locale can be matched
+            $route = $this->attemptRouteMatchingWithDefaultLocale($url, $defaultLocale, $supportedLocales);
+        }
+
+        if ($route === null){
+            // no route found, gracefully return $url as fallback
+            return $url;
         }
 
         if(empty($attributes)){
@@ -47,21 +53,21 @@ class LocalizedUrlGenerator
         $urlQuery = parse_url($url, PHP_URL_QUERY);
         // e.g. `?page=2&sort=asc`
         $urlQuery = $urlQuery ? '?'.$urlQuery : '';
+        $hideLocaleInUrl = ($locale === $defaultLocale && !$forceDefaultLocation && $hiddenDefault);
 
-        // If the route is a translated route, get the corresponding localized route by name.
-        // Translated routes can have identical paths across languages, so we can't rely on the {locale} parameter.
-        // Even using `whereIn('locale', ['de'])` wouldn't work because routes with identical URLs overwrite each other,
-        // regardless of differing `whereIn` conditions.
+
+        // Handle transRoutes
         if ($route->getName()) {
             $routeName = $route->getName();
 
-            if (preg_match('/^translated_route_(.*?)_(.*)$/', $routeName, $matches)) {
-                $newRouteName = "translated_route_{$locale}_{$matches[2]}";
+            if (preg_match('/^trans_route_(with|no)_locale_(.*?)_(.*)$/', $routeName, $matches)) {
+                $type = ($hideLocaleInUrl) ? 'no' : 'with';
+                $newRouteName = "trans_route_{$type}_locale_{$locale}_{$matches[3]}";
                 return route($newRouteName, $attributes) . $urlQuery;
             }
         }
 
-        $hideLocaleInUrl = ($locale === $defaultLocale && !$forceDefaultLocation && $hiddenDefault);
+        // Since we deal now with normal routes, we only need to modify, add or remove the locale from uri
 
         if (!isset($attributes['locale'])){
             if($hideLocaleInUrl){
@@ -105,4 +111,26 @@ class LocalizedUrlGenerator
 
         return null;
     }
+
+
+    protected function attemptRouteMatchingWithDefaultLocale(string $url, string $defaultLocale, array $supportedLocales): ?Route
+    {
+        $uri = parse_url($url, PHP_URL_PATH);
+
+        // Extract the first segment of the URI
+        $segments = explode('/', trim($uri, '/'));
+        $firstSegment = $segments[0] ?? null;
+
+        if(!empty($supportedLocales[$firstSegment])){
+            array_unshift($segments, $defaultLocale);
+            $newUri = '/' . implode('/', $segments);
+            $url = preg_replace('/' . preg_quote($uri, '/') . '/', $newUri, $url, 1);
+            return $this->matchRouteForAnyRoute($url);
+        }
+
+        return null;
+    }
+
+
+
 }

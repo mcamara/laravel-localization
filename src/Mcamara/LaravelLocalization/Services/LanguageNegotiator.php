@@ -1,6 +1,6 @@
 <?php
 
-namespace Mcamara\LaravelLocalization;
+namespace Mcamara\LaravelLocalization\Services;
 
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Foundation\Application;

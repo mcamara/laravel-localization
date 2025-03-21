@@ -8,8 +8,8 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
-use Mcamara\LaravelLocalization\LanguageNegotiator;
 use Mcamara\LaravelLocalization\LaravelLocalization;
+use Mcamara\LaravelLocalization\Services\LanguageNegotiator;
 
 class SetLocale extends LaravelLocalizationMiddlewareBase
 {
@@ -29,6 +29,8 @@ class SetLocale extends LaravelLocalizationMiddlewareBase
         }
 
         $locale = $request->route('locale');
+
+        // @toDo translated routes need to be here, or I need to use {locale} for them aswell..
 
         // The locale here cannot be an "inverse" mapping, as such cases are handled
         // earlier by the locale mapping middleware.

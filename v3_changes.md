@@ -17,6 +17,7 @@ If you notice something critical missing, please **open an issue**.
 - **Removed `route.translation` event** – Documentation was unclear, there were open issues, and it was inconsistently triggered (only when the URL was empty during localization).
 - **The `data` attribute is no longer removed from routes attributes** – This should not be the responsibility of the package.
 - **`getLocalizedURL(locale: false)` no longer removes the locale from the URL**.
+- - **`getLocalizedURL()` no longer returns false if url is not found, instead, the same url is returned**.
 - **Dropped alias `localizeURL`** – If needed, you can define a custom helper.
 - **`translatedRoutes` is no longer stored inside `LaravelLocalization`**.
 - **`transRoute()` method is no longer supported** – Use `__('routes.*')` instead.
