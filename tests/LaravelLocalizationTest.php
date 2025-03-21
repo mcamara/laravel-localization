@@ -38,21 +38,6 @@ final class LaravelLocalizationTest extends TestCase
                 return __('routes.test_text');
             }]);
 
-            // Route::get(app('laravellocalization')->transRoute('LaravelLocalization::routes.about'), ['as' => 'about', function () {
-            //     return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
-            // }]);
-
-            Route::get(app('laravellocalization')->transRoute('LaravelLocalization::routes.view'), ['as' => 'view', function () {
-                 return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
-             }]);
-
-            Route::get(app('laravellocalization')->transRoute('LaravelLocalization::routes.view_project'), ['as' => 'view_project', function () {
-                return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
-            }]);
-
-            Route::get(app('laravellocalization')->transRoute('LaravelLocalization::routes.manage'), ['as' => 'manage', function () {
-                return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
-            }]);
         }, [
             SetLocale::class,
             LaravelLocalizationRedirectFilter::class,
@@ -61,6 +46,18 @@ final class LaravelLocalizationTest extends TestCase
 
         Route::transGet('about', [function () {
                  return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
+        }]);
+
+        Route::transGet('view', [function () {
+            return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
+        }]);
+
+        Route::transGet('view', [function () {
+            return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
+        }]);
+
+        Route::transGet('manage', [function () {
+            return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
         }]);
 
 
