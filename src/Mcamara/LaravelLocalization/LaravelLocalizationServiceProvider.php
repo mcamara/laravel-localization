@@ -2,7 +2,10 @@
 
 namespace Mcamara\LaravelLocalization;
 
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelLocalizationServiceProvider extends ServiceProvider
@@ -12,6 +15,8 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../../config/config.php' => config_path('laravellocalization.php'),
         ], 'config');
+
+        URL::defaults(['locale' => App::getLocale()]);
 
         $this->registerMacros();
     }
@@ -49,15 +54,29 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
 
         Route::macro($localizationMacroName, function (callable $routes, array $middleware = []) {
             Route::middleware($middleware)->group(function () use ($routes) {
-                Route::name('default_lang.')->group($routes);
-
                 $supportedLocales = array_keys(config('laravellocalization.supportedLocales', []));
                 $localesMapping = array_keys(config('laravellocalization.localesMapping', []));
+                $hideDefaultLocaleInURL = config('laravellocalization.hideDefaultLocaleInURL', false);
+                $useAcceptLanguageHeader = config('laravellocalization.useAcceptLanguageHeader', false);
+
                 $allowedLocales = implode('|', array_unique(array_merge($supportedLocales, $localesMapping)));
                 Route::prefix('/{locale}')
                     ->where(['locale' => $allowedLocales])
                     ->group($routes);
+
+                if($hideDefaultLocaleInURL || $useAcceptLanguageHeader){
+                    Route::name('without_locale.')->group($routes);
+                }
             });
         });
+
+
+        $transRouter = app(\Mcamara\LaravelLocalization\Services\TransRouter::class);
+
+        foreach (['get', 'post', 'put', 'delete'] as $method) {
+            Route::macro("trans" . ucfirst($method), function (string $routeKey, array $controller) use ($transRouter, $method) {
+                $transRouter->registerTransRoute($routeKey, $controller, $method);
+            });
+        }
     }
 }

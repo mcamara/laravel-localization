@@ -5,7 +5,7 @@ namespace Mcamara\LaravelLocalization\Middleware;
 use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Mcamara\LaravelLocalization\LanguageNegotiator;
+use Mcamara\LaravelLocalization\Services\LanguageNegotiator;
 
 class LocaleSessionRedirect extends LaravelLocalizationMiddlewareBase
 {

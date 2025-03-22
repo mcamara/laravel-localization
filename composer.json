@@ -34,7 +34,10 @@
         "classmap": [],
         "psr-0": {
             "Mcamara\\LaravelLocalization": "src/"
-        }
+        },
+        "files": [
+            "src/Mcamara/LaravelLocalization/helper.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
