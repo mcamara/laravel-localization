@@ -51,8 +51,6 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
 
         Route::macro($localizationMacroName, function (callable $routes, array $middleware = []) {
             Route::middleware($middleware)->group(function () use ($routes) {
-                Route::name('default_lang.')->group($routes);
-
                 $supportedLocales = array_keys(config('laravellocalization.supportedLocales', []));
                 $localesMapping = array_keys(config('laravellocalization.localesMapping', []));
                 $hideDefaultLocaleInURL = config('laravellocalization.hideDefaultLocaleInURL', false);
