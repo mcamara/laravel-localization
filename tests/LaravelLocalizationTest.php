@@ -24,11 +24,14 @@ final class LaravelLocalizationTest extends TestCase
         parent::setUp();
 
         $this->setUpRoutes();
+
+        // Manually refresh named route lookups because routes are defined in setUp()
+        // and no request has been made yet to trigger Laravel's automatic boot logic
+        app('router')->getRoutes()->refreshNameLookups();
     }
 
     protected function setUpRoutes(): void
     {
-
         Route::localized(function () {
             Route::get('/', ['as' => 'index', function () {
                 return __('routes.hello');
@@ -43,9 +46,8 @@ final class LaravelLocalizationTest extends TestCase
             LaravelLocalizationRedirectFilter::class,
         ]);
 
-
         Route::transGet('about', [function () {
-                 return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
+            return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
         }]);
 
         Route::transGet('view', [function () {
@@ -64,7 +66,6 @@ final class LaravelLocalizationTest extends TestCase
         Route::get('/skipped', ['as' => 'skipped', function () {
             return Request::url();
         }]);
-
     }
 
     /**
@@ -207,9 +208,9 @@ final class LaravelLocalizationTest extends TestCase
         return self::$testUrl . $uri;
     }
 
-
-    public function testGetLocalizedURL(): void
+    public function testGetLocalizedURLLong(): void
     {
+        /** @var LaravelLocalization $localization */
         $localization = app('laravellocalization');
 
         $this->assertEquals(

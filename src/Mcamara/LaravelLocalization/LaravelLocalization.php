@@ -65,12 +65,7 @@ class LaravelLocalization
 
         $routeName = "trans_route_for_locale_{$computedLocale}_{$key}";
 
-        // In tests, routes defined in setUp() are correctly registered but sometimes not recognized by
-        // Route::has(...), likely due to Laravel not populating the internal route name index (routesByName).
-        // This workaround manually checks route names to ensure they exist.
-        $routes = collect(Route::getRoutes())->pluck('action.as')->filter();
-
-        if (!$routes->contains($routeName)) {
+        if (!Route::has($routeName)) {
             return $key;
         }
 
