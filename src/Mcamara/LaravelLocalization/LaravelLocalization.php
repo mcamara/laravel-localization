@@ -4,6 +4,7 @@ namespace Mcamara\LaravelLocalization;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Exceptions\SupportedLocalesNotDefined;
 use Mcamara\LaravelLocalization\Exceptions\UnsupportedLocaleException;
 use Mcamara\LaravelLocalization\Services\LocalizedUrlGenerator;
@@ -45,6 +46,39 @@ class LaravelLocalization
     public function setSupportedLocales(array $locales): void
     {
         $this->supportedLocales = $locales;
+    }
+
+    public function route(string $key, array $parameters = [], string|null $locale = null): string
+    {
+        $computedLocale = $locale ?? $this->getCurrentLocale();
+
+        if($this->isHiddenDefault($computedLocale)){
+            return route('without_locale.' . $key, $parameters);
+        }
+
+        return route($key, $parameters);
+    }
+
+    public function transRoute(string $key, array $parameters = [], string|null $locale = null): string
+    {
+        $computedLocale = $locale ?? $this->getCurrentLocale();
+
+        $routeName = "trans_route_for_locale_{$computedLocale}_{$key}";
+
+        // In tests, routes defined in setUp() are correctly registered but sometimes not recognized by
+        // Route::has(...), likely due to Laravel not populating the internal route name index (routesByName).
+        // This workaround manually checks route names to ensure they exist.
+        $routes = collect(Route::getRoutes())->pluck('action.as')->filter();
+
+        if (!$routes->contains($routeName)) {
+            return $key;
+        }
+
+        if(!isset($parameters['locale'])) {
+            $parameters['locale'] = $computedLocale;
+        }
+
+        return route($routeName, $parameters);
     }
 
     /**

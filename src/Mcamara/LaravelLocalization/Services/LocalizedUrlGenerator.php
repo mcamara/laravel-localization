@@ -60,8 +60,8 @@ class LocalizedUrlGenerator
         if ($route->getName()) {
             $routeName = $route->getName();
 
-            if (preg_match('/^trans_route_(with|no)_locale_(.*?)_(.*)$/', $routeName, $matches)) {
-                $type = ($hideLocaleInUrl) ? 'no' : 'with';
+            if (preg_match('/^trans_route_(for|no)_locale_(.*?)_(.*)$/', $routeName, $matches)) {
+                $type = ($hideLocaleInUrl) ? 'no' : 'for';
                 $newRouteName = "trans_route_{$type}_locale_{$locale}_{$matches[3]}";
                 return route($newRouteName, $attributes) . $urlQuery;
             }

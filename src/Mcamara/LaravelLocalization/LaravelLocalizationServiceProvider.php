@@ -64,7 +64,7 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
                     ->group($routes);
 
                 if($hideDefaultLocaleInURL || $useAcceptLanguageHeader){
-                    Route::name('default_locale.')->group($routes);
+                    Route::name('without_locale.')->group($routes);
                 }
             });
         });

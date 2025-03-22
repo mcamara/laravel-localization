@@ -127,20 +127,20 @@ final class LaravelLocalizationTest extends TestCase
 
     public function testTranslatedRoutes(): void
     {
-        $this->assertEquals(localized_route('about'), 'http://localhost/about');
+        $this->assertEquals('http://localhost/en/about', localized_trans_route('about'));
 
-        $this->get(route('about', ['locale' => 'es']))
+        $this->get(localized_trans_route('about', ['locale' => 'es']))
             ->assertStatus(200);
 
         $this->assertEquals('es', app('laravellocalization')->getCurrentLocale());
-        $this->assertEquals(route('about'), 'http://localhost/acerca');
+        $this->assertEquals(localized_trans_route('about'), 'http://localhost/es/acerca');
 
-        $this->get(route('about', ['locale' => 'en']))
+        $this->get(localized_trans_route('about', ['locale' => 'en']))
             ->assertStatus(200);
 
-        $this->assertEquals(route('about'), 'http://localhost/about');
+        $this->assertEquals( 'http://localhost/en/about', localized_trans_route('about'));
 
-        $this->get(route('about', ['locale' => 'de']))
+        $this->get(localized_trans_route('about', ['locale' => 'de']))
             ->assertStatus(200);
 
         $this->assertEquals('en', app('laravellocalization')->getCurrentLocale());

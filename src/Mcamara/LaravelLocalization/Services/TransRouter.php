@@ -34,16 +34,16 @@ class TransRouter
             }
 
             $route = ltrim($route, '/');
-            $name = "trans_route_with_locale_{$locale}_{$routeKey}";
+            $name = "trans_route_for_locale_{$locale}_{$routeKey}";
 
-            $middleware = [SetLocale::class, LocaleSessionRedirect::class];
+            $middleware = [SetLocale::class];
 
             if ($this->hideDefaultLocaleInURL && $locale === App::getLocale()) {
                 Route::$methodType($route, $controller)
                     ->middleware($middleware)
                     ->name($name);
             } else {
-                Route::$methodType($locale . '/' . $route, $controller)
+                Route::prefix('/{locale}')->$methodType($route, $controller)
                     ->middleware($middleware)
                     ->name($name);
 
