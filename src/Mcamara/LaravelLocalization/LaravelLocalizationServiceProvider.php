@@ -5,6 +5,7 @@ namespace Mcamara\LaravelLocalization;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelLocalizationServiceProvider extends ServiceProvider
@@ -14,6 +15,8 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../../config/config.php' => config_path('laravellocalization.php'),
         ], 'config');
+
+        URL::defaults(['locale' => App::getLocale()]);
 
         $this->registerMacros();
     }
