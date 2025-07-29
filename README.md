@@ -523,6 +523,9 @@ In your App's `AppServiceProvider`, use the `CachedTranslatedRouteLoader` class 
 
 ```php
 <?php
+
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
+
 class AppServiceProvider extends ServiceProvider
 {  
     use \Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
