@@ -589,32 +589,77 @@ To localize your post url see the example in [POST is not working](#post-is-not-
 
 ## Testing
 
-During the test setup, the called route is not yet known. This means no language can be set.
-When a request is made during a test, this results in a 404 - without the prefix set the localized route does not seem to exist.
+In a typical request lifecycle, your application is bootstrapped automatically — allowing this package to detect the active route and set the appropriate locale.
+However, when running tests, the application is bootstrapped before any request is made. As a result, the package can’t determine the current route, which often leads to a `404` error.
 
-To fix this, you can use this function to manually set the language prefix:
+To handle this, you can manually define the locale prefix in your tests by refreshing the application with a specific locale:
+
+### PHPUnit
 ```php
-// TestCase.php
-protected function refreshApplicationWithLocale($locale)
-{
-    self::tearDown();
-    putenv(LaravelLocalization::ENV_ROUTE_KEY . '=' . $locale);
-    self::setUp();
-}
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Mcamara\LaravelLocalization\LaravelLocalization;
 
-protected function tearDown(): void
+abstract class TestCase extends BaseTestCase
 {
-    putenv(LaravelLocalization::ENV_ROUTE_KEY);
-    parent::tearDown();
-}
+    protected function refreshApplicationWithLocale(string $locale): void
+    {
+        self::tearDown();
+        putenv(LaravelLocalization::ENV_ROUTE_KEY . '=' . $locale);
+        self::setUp();
+    }
 
-// YourTest.php
-public function testBasicTest()
-{
-    $this->refreshApplicationWithLocale('en');
-    // Testing code
+    protected function tearDown(): void
+    {
+        putenv(LaravelLocalization::ENV_ROUTE_KEY);
+        parent::tearDown();
+    }
 }
 ```
+
+```php
+final class HomeControllerTest extends TestCase
+{
+    public function it_can_visit_the_home_page()
+    {
+        $this->refreshApplicationWithLocale('en');
+
+        $response = $this->get('/en');
+
+        $response->assertStatus(200);
+    }
+}
+```
+
+### Pest
+```php
+// Pest.php
+use Mcamara\LaravelLocalization\LaravelLocalization;
+
+function refreshApplicationWithLocale(string $locale): void
+{
+    /** @var \Tests\TestCase $test */
+    $test = test();
+
+    $test->tearDown();
+    putenv(LaravelLocalization::ENV_ROUTE_KEY . '=' . $locale);
+    $test->setUp();
+}
+
+pest()->afterEach(function () {
+    putenv(LaravelLocalization::ENV_ROUTE_KEY);
+});
+```
+```php
+// YourTest.php
+test('it can visit the home page', function () {
+    refreshApplicationWithLocale('en');
+
+    $response = $this->get('/en');
+
+    $response->assertStatus(200);
+});
+```
+
 
 ## Collaborators
 - [Adam Nielsen (iwasherefirst2)](https://github.com/iwasherefirst2)
