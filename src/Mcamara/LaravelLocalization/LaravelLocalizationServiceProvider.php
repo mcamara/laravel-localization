@@ -16,6 +16,8 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../../config/config.php' => config_path('laravellocalization.php'),
         ], 'config');
+
+        $this->correctLivewireRoutes();
     }
 
     /**
@@ -71,4 +73,28 @@ class LaravelLocalizationServiceProvider extends ServiceProvider
             'laravellocalizationroutecache.list',
         ]);
     }
+
+    /**
+     * Integrates Laravel Livewire to ensure that Livewire routes
+     * respect the current localization.
+     */
+    protected function correctLivewireRoutes()
+    {
+        // 1. Check if Livewire is available through the service container
+        if (! $this->app->bound('livewire')) {
+            return;
+        }
+
+        // 2. Get the Livewire instance from the container and apply localization
+        $livewire = $this->app->make('livewire');
+        
+        if (method_exists($livewire, 'setUpdateRoute')) {
+            $livewire::setUpdateRoute(function ($handle) {
+                return \Illuminate\Support\Facades\Route::post('/livewire/update', $handle)
+                    ->middleware('web')
+                    ->prefix(\Mcamara\LaravelLocalization\Facades\LaravelLocalization::setLocale());
+            });
+        }
+    }
+
 }
