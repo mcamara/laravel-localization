@@ -520,6 +520,7 @@ class RouteServiceProvider extends ServiceProvider
 For Laravel 11 and newer, add the `LoadsTranslatedCachedRoutes` trait to your `AppServiceProvider`, and register the cached routes within the boot method:
 
 ```php
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
 
