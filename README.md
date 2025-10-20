@@ -500,10 +500,10 @@ Be sure to pass the locale and the attributes as parameters to the closure. You 
 > By default, this package is not compatible with Laravel’s route caching.
 > Running commands such as `php artisan route:cache` or `php artisan optimize` will cause localized routes to return 404 errors.
 
-To enable route caching for your localized routes, you may use the `Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes` trait provided by this package.
-Depending on your Laravel version, you’ll need to apply the trait differently:
+To enable route caching for your localized routes, you may use the `LoadsTranslatedCachedRoutes` trait provided by this package.
+Depending on your Laravel version, you will need to apply the trait differently:
 
-**Before Laravel 11**
+**Before Laravel 11**    
 If your application includes a `RouteServiceProvider`, add the `LoadsTranslatedCachedRoutes` trait to it:
 
 ```php
@@ -516,7 +516,7 @@ class RouteServiceProvider extends ServiceProvider
 }
 ```
 
-**After Laravel 11**
+**After Laravel 11**    
 For Laravel 11 and newer, add the `LoadsTranslatedCachedRoutes` trait to your `AppServiceProvider`, and register the cached routes within the boot method:
 
 ```php
@@ -530,6 +530,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RouteServiceProvider::loadCachedRoutesUsing(fn () => $this->loadCachedRoutes());
+
         // ...
     }
 }
@@ -545,7 +546,7 @@ To clear the localized route cache, use:
 php artisan route:trans:clear
 ```
 
-To get a list routes for a given locale, use:
+To get a list of routes for a given locale, use:
 ```bash
 php artisan route:trans:list {locale}
 
