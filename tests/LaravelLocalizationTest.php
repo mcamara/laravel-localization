@@ -252,19 +252,15 @@ final class LaravelLocalizationTest extends TestCase
 
         app('laravellocalization')->setLocale('en');
 
-        $crawler = $this->call(
-            'GET',
-            self::TEST_URL.'about',
-            [],
-            [],
-            [],
-            ['HTTP_ACCEPT_LANGUAGE' => 'en,es']
+        $response = $this->get(
+            uri: self::TEST_URL.'about',
+            headers: ['HTTP_ACCEPT_LANGUAGE' => 'en,es']
         );
 
-        $this->assertResponseOk();
+        $response->assertStatus(200);
         $this->assertEquals(
             self::TEST_URL.'es/acerca',
-            $crawler->getContent()
+            $response->getContent()
         );
 
         $this->refreshApplication();
@@ -281,19 +277,15 @@ final class LaravelLocalizationTest extends TestCase
             app('laravellocalization')->getLocalizedURL('en', self::TEST_URL.'test?a=1')
         );
 
-        $crawler = $this->call(
-            'GET',
-            app('laravellocalization')->getLocalizedURL('en', self::TEST_URL.'test'),
-            [],
-            [],
-            [],
-            ['HTTP_ACCEPT_LANGUAGE' => 'en,es']
+        $response = $this->get(
+            uri: app('laravellocalization')->getLocalizedURL('en', self::TEST_URL.'test'),
+            headers: ['HTTP_ACCEPT_LANGUAGE' => 'en,es']
         );
 
-        $this->assertResponseOk();
+        $response->assertStatus(200);
         $this->assertEquals(
             'Test text',
-            $crawler->getContent()
+            $response->getContent()
         );
 
         $this->refreshApplication('es');
@@ -370,19 +362,15 @@ final class LaravelLocalizationTest extends TestCase
     }
 
     public function testGetLocalizedUrlForIgnoredUrls(): void {
-        $crawler = $this->call(
-            'GET',
-            self::TEST_URL.'skipped',
-            [],
-            [],
-            [],
-            ['HTTP_ACCEPT_LANGUAGE' => 'en,es']
+        $response = $this->get(
+            uri: self::TEST_URL.'skipped',
+            headers: ['HTTP_ACCEPT_LANGUAGE' => 'en,es']
         );
 
-        $this->assertResponseOk();
+        $response->assertStatus(200);
         $this->assertEquals(
             self::TEST_URL.'skipped',
-            $crawler->getContent()
+            $response->getContent()
         );
     }
 
@@ -881,19 +869,10 @@ final class LaravelLocalizationTest extends TestCase
 
         $savedLocale = 'es';
 
-        $crawler = $this->call(
-            'GET',
-            self::TEST_URL,
-            [],
-            ['locale' => $savedLocale],
-            [],
-            []
-        );
+        $response = $this->withUnencryptedCookie('locale', $savedLocale)->get(self::TEST_URL);
 
-        $this->assertResponseStatus(302);
-        $this->assertRedirectedTo(self::TEST_URL . $savedLocale);
-
-        $localeCookie = $crawler->headers->getCookies()[0];
-        $this->assertEquals($savedLocale, $localeCookie->getValue());
+        $response->assertStatus(302);
+        $response->assertRedirect(self::TEST_URL . $savedLocale);
+        $response->assertPlainCookie('locale', $savedLocale);
     }
 }
