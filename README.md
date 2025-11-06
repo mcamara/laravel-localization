@@ -496,52 +496,64 @@ Be sure to pass the locale and the attributes as parameters to the closure. You 
 
 ## Caching routes
 
-To cache your routes, use:
+> [!CAUTION]
+> By default, this package is not compatible with Laravel’s route caching.
+> Running commands such as `php artisan route:cache` or `php artisan optimize` will cause localized routes to return 404 errors.
 
-``` bash
+To enable route caching for your localized routes, you may use the `LoadsTranslatedCachedRoutes` trait provided by this package.
+Depending on your Laravel version, you will need to apply the trait differently:
+
+**Before Laravel 11**    
+If your application includes a `RouteServiceProvider`, add the `LoadsTranslatedCachedRoutes` trait to it:
+
+```php
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
+
+class RouteServiceProvider extends ServiceProvider
+{
+    use LoadsTranslatedCachedRoutes;
+}
+```
+
+**After Laravel 11**    
+For Laravel 11 and newer, add the `LoadsTranslatedCachedRoutes` trait to your `AppServiceProvider`, and register the cached routes within the boot method:
+
+```php
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
+use Illuminate\Support\ServiceProvider;
+use Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
+
+class AppServiceProvider extends ServiceProvider
+{
+    use LoadsTranslatedCachedRoutes;
+
+    public function boot(): void
+    {
+        RouteServiceProvider::loadCachedRoutesUsing(fn () => $this->loadCachedRoutes());
+
+        // ...
+    }
+}
+```
+
+Once configured, use the following command to cache your localized routes instead of `php artisan route:cache`:
+```bash
 php artisan route:trans:cache
 ```
 
-... instead of the normal `route:cache` command. Using `artisan route:cache` will **not** work correctly!
-
-For the route caching solution to work, it is required to make a minor adjustment to your application route provision.
-
-**before laravel 11** 
-
-In your App's `RouteServiceProvider`, use the `LoadsTranslatedCachedRoutes` trait:
-
-```php
-<?php
-class RouteServiceProvider extends ServiceProvider
-{
-    use \Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
+To clear the localized route cache, use:
+```bash
+php artisan route:trans:clear
 ```
 
-**after laravel 11** 
+To get a list of routes for a given locale, use:
+```bash
+php artisan route:trans:list {locale}
 
-In your App's `AppServiceProvider`, use the `CachedTranslatedRouteLoader` class in register method:
-
-```php
-<?php
-
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
-
-class AppServiceProvider extends ServiceProvider
-{  
-    use \Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
-    {
-        RouteServiceProvider::loadCachedRoutesUsing(fn() => $this->loadCachedRoutes());
-        ...
-    }   
+# Example:
+php artisan route:trans:list en
 ```
-
-
-
-For more details see [here](CACHING.md).
 
 ## Common Issues
 
