@@ -134,8 +134,6 @@ final class LaravelLocalizationTest extends TestCase
         app('translator')->load('LaravelLocalization', 'routes', 'en');
 
         app('laravellocalization')->setBaseUrl(self::TEST_URL);
-
-        $this->setRoutes();
     }
 
     public function testSetLocale(): void
