@@ -329,7 +329,7 @@ class LaravelLocalization
         $locale = $this->getLocaleFromMapping($locale);
 
         if (!empty($locale)) {
-            if ($forceDefaultLocation || $locale != $this->getDefaultLocale() || !$this->hideDefaultLocaleInURL()) {
+            if ($forceDefaultLocation || $locale != $this->getLocaleFromMapping($this->getDefaultLocale()) || !$this->hideDefaultLocaleInURL()) {
                 $parsed_url['path'] = $locale.'/'.ltrim($parsed_url['path'], '/');
             }
         }
