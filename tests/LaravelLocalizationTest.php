@@ -12,6 +12,8 @@ use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter;
 use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes;
 use Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect;
 
+use function Orchestra\Testbench\refresh_router_lookups;
+
 final class LaravelLocalizationTest extends TestCase
 {
     protected const TEST_URL = 'http://localhost/';
@@ -66,6 +68,8 @@ final class LaravelLocalizationTest extends TestCase
         Route::get('/skipped', function () {
             return Request::url();
         })->name('skipped');
+
+        refresh_router_lookups(Route::getFacadeRoot());
     }
 
     /**
