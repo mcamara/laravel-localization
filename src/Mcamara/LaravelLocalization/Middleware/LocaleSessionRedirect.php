@@ -50,11 +50,7 @@ class LocaleSessionRedirect extends LaravelLocalizationMiddlewareBase
             $locale = app('laravellocalization')->getCurrentLocale();
         }
 
-        if (
-            $locale &&
-            app('laravellocalization')->checkLocaleInSupportedLocales($locale) &&
-            !(app('laravellocalization')->isHiddenDefault($locale))
-        ) {
+        if ($this->shouldRedirectToLocalizedUrl($locale)) {
             app('session')->reflash();
             $redirection = app('laravellocalization')->getLocalizedURL($locale);
 
