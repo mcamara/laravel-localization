@@ -769,8 +769,10 @@ final class LaravelLocalizationTest extends TestCase
 
         $full_config = include __DIR__ . '/full-config/config.php';
 
-        $request = $this->createMock(\Illuminate\Http\Request::class);
-        $request->expects($this->any())->method('header')->with('Accept-Language')->willReturn($accept_string);
+        $request = Request::create(
+            uri: '/',
+            server: ['HTTP_ACCEPT_LANGUAGE' => $accept_string],
+        );
 
         $negotiator = app(LanguageNegotiator::class, [
             'defaultLocale' => 'wrong',
@@ -822,8 +824,10 @@ final class LaravelLocalizationTest extends TestCase
 
         app('config')->set('laravellocalization.localesMapping', $mapping);
 
-        $request = $this->createMock(\Illuminate\Http\Request::class);
-        $request->expects($this->any())->method('header')->with('Accept-Language')->willReturn($accept_string);
+        $request = Request::create(
+            uri: '/',
+            server: ['HTTP_ACCEPT_LANGUAGE' => $accept_string],
+        );
 
         $negotiator = app(LanguageNegotiator::class, [
             'defaultLocale' => 'wrong',
