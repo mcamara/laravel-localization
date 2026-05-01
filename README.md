@@ -6,6 +6,19 @@
 [![Open Source Helpers](https://www.codetriage.com/mcamara/laravel-localization/badges/users.svg)](https://www.codetriage.com/mcamara/laravel-localization)
 [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
+> **This package is no longer actively maintained.**
+>
+> Active development has moved to
+> [**niels-numbers/laravel-localizer**](https://github.com/niels-numbers/laravel-localizer)
+> - a from-scratch rebuild that fixes long-standing issues
+> (`route:cache` compatibility, package-ecosystem conflicts,
+> POST/PUT/DELETE redirect handling) while keeping the same feature set
+> (translated URI paths, hide-default-locale, browser detection) and
+> adding adapters for Ziggy and Wayfinder.
+>
+> New users should start there. Existing users will find the migration
+> straightforward - see the [README](https://github.com/niels-numbers/laravel-localizer#readme).
+
 Easy i18n localization for Laravel, an useful tool to combine with Laravel localization classes.
 
 The package offers the following:
