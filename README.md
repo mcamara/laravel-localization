@@ -6,18 +6,28 @@
 [![Open Source Helpers](https://www.codetriage.com/mcamara/laravel-localization/badges/users.svg)](https://www.codetriage.com/mcamara/laravel-localization)
 [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
-> **This package is no longer actively maintained.**
+> **Architecture note & recommended successor**
 >
-> Active development has moved to
+> This package's `setLocale()`-in-routes design is structurally
+> incompatible with `php artisan route:cache`, `php artisan optimize`,
+> Laravel Octane, Laravel Nova, and other packages that read the route
+> table at boot. These limits cannot be fixed without an architectural
+> rewrite.
+>
+> For new projects or migrations,
 > [**niels-numbers/laravel-localizer**](https://github.com/niels-numbers/laravel-localizer)
-> - a from-scratch rebuild that fixes long-standing issues
-> (`route:cache` compatibility, package-ecosystem conflicts,
-> POST/PUT/DELETE redirect handling) while keeping the same feature set
-> (translated URI paths, hide-default-locale, browser detection) and
-> adding adapters for Ziggy and Wayfinder.
+> is the recommended modern successor — same feature set
+> (translated URI paths, hide-default-locale, browser detection) on a
+> middleware-based architecture that resolves all of the above, plus
+> adapters for Ziggy and Wayfinder. See the
+> [migration guide](https://github.com/niels-numbers/laravel-localizer/blob/main/docs/migrating-from-laravel-localization.md)
+> for the swap.
 >
-> New users should start there. Existing users will find the migration
-> straightforward - see the [README](https://github.com/niels-numbers/laravel-localizer#readme).
+> This package remains actively maintained by
+> [@jordyvanderhaegen](https://github.com/jordyvanderhaegen) for users
+> who need to stay on the current architecture. Compatibility updates
+> (Laravel/PHP versions, security, small bug fixes) continue here;
+> architectural issues are closed with pointers to the successor.
 
 Easy i18n localization for Laravel, an useful tool to combine with Laravel localization classes.
 

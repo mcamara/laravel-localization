@@ -51,6 +51,5 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "abandoned": "niels-numbers/laravel-localizer"
+    "prefer-stable": true
 }
