@@ -8,26 +8,20 @@
 
 > **Architecture note & recommended successor**
 >
-> This package's `setLocale()`-in-routes design is structurally
-> incompatible with `php artisan route:cache`, `php artisan optimize`,
-> Laravel Octane, Laravel Nova, and other packages that read the route
-> table at boot. These limits cannot be fixed without an architectural
-> rewrite.
->
-> For new projects or migrations,
+> This package generates routes dynamically per request, which has a
+> number of side effects - most notably, `php artisan route:cache`
+> isn't supported out of the box. For new projects or apps planning to
+> migrate,
 > [**niels-numbers/laravel-localizer**](https://github.com/niels-numbers/laravel-localizer)
-> is the recommended modern successor — same feature set
-> (translated URI paths, hide-default-locale, browser detection) on a
-> middleware-based architecture that resolves all of the above, plus
-> adapters for Ziggy and Wayfinder. See the
-> [migration guide](https://github.com/niels-numbers/laravel-localizer/blob/main/docs/migrating-from-laravel-localization.md)
+> is the recommended modern successor - same feature set, but with
+> statically registered routes that support `route:cache` natively. See
+> the [migration guide](https://localizer.adam-nielsen.de/migrating-from-laravel-localization)
 > for the swap.
 >
 > This package remains actively maintained by
 > [@jordyvanderhaegen](https://github.com/jordyvanderhaegen) for users
 > who need to stay on the current architecture. Compatibility updates
-> (Laravel/PHP versions, security, small bug fixes) continue here;
-> architectural issues are closed with pointers to the successor.
+> (Laravel/PHP versions, security, small bug fixes) continue here.
 
 Easy i18n localization for Laravel, an useful tool to combine with Laravel localization classes.
 
