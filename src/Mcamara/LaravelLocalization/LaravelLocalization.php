@@ -171,7 +171,7 @@ class LaravelLocalization
 
         $locale = $this->getInversedLocaleFromMapping($locale);
 
-        if (!empty($this->supportedLocales[$locale])) {
+        if (!empty($locale) && !empty($this->supportedLocales[$locale])) {
             $this->currentLocale = $locale;
         } else {
             // if the first segment/locale passed is not valid
@@ -440,6 +440,10 @@ class LaravelLocalization
      */
     public function getLocaleFromMapping($locale)
     {
+        if ($locale === null) {
+            return null;
+        }
+
         return $this->getLocalesMapping()[$locale] ?? $locale;
     }
 
@@ -452,6 +456,10 @@ class LaravelLocalization
      */
     public function getInversedLocaleFromMapping($locale)
     {
+        if ($locale === null) {
+            return null;
+        }
+
         return \array_flip($this->getLocalesMapping())[$locale] ?? $locale;
     }
 
@@ -622,6 +630,10 @@ class LaravelLocalization
      */
     public function checkLocaleInSupportedLocales($locale)
     {
+        if ($locale === null) {
+            return false;
+        }
+
         $inversedLocale = $this->getInversedLocaleFromMapping($locale);
         $locales = $this->getSupportedLocales();
         if ($locale !== false && empty($locales[$locale]) && empty($locales[$inversedLocale])) {
