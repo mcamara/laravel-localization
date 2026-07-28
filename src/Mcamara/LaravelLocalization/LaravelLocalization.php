@@ -630,9 +630,13 @@ class LaravelLocalization
      */
     public function checkLocaleInSupportedLocales($locale)
     {
+        if ($locale === null) {
+            return false;
+        }
+
         $inversedLocale = $this->getInversedLocaleFromMapping($locale);
         $locales = $this->getSupportedLocales();
-        if ($locale !== false && $locale !== null && empty($locales[$locale]) && empty($locales[$inversedLocale])) {
+        if ($locale !== false && empty($locales[$locale]) && empty($locales[$inversedLocale])) {
             return false;
         }
 
