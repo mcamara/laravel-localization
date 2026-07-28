@@ -63,6 +63,14 @@ final class LaravelLocalizationTest extends TestCase
             Route::get(app('laravellocalization')->transRoute('LaravelLocalization::routes.manage'), function () {
                 return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
             })->name('manage');
+
+            Route::get(app('laravellocalization')->transRoute('LaravelLocalization::routes.view_with_slug'), function (string $post) {
+                return $post;
+            })->name('view_with_slug');
+
+            Route::get(app('laravellocalization')->transRoute('LaravelLocalization::routes.view_post_comment'), function (string $post, ?string $comment = null) {
+                return implode('/', array_filter([$post, $comment]));
+            })->name('view_post_comment');
         });
 
         Route::get('/skipped', function () {
@@ -591,12 +599,12 @@ final class LaravelLocalizationTest extends TestCase
         $model = new ModelWithCustomRouteKey(['slug' => $slug]);
 
         $this->assertEquals(
-            self::TEST_URL."en/view/{$slug}",
+            self::TEST_URL."en/posts/{$slug}",
             app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view_with_slug', ['post' => $model])
         );
 
         $this->assertEquals(
-            self::TEST_URL."es/ver/{$slug}",
+            self::TEST_URL."es/publicaciones/{$slug}",
             app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view_with_slug', ['post' => $model])
         );
     }
@@ -607,12 +615,12 @@ final class LaravelLocalizationTest extends TestCase
         $post = new ModelWithCustomRouteKey(['slug' => 'my-post']);
 
         $this->assertEquals(
-            self::TEST_URL.'en/view/my-category/my-post',
+            self::TEST_URL.'en/posts/my-category/my-post',
             app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view_category_post', ['category' => $category, 'post' => $post])
         );
 
         $this->assertEquals(
-            self::TEST_URL.'es/ver/my-category/my-post',
+            self::TEST_URL.'es/publicaciones/my-category/my-post',
             app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view_category_post', ['category' => $category, 'post' => $post])
         );
     }
@@ -623,12 +631,12 @@ final class LaravelLocalizationTest extends TestCase
         $comment = new ModelWithCustomRouteKey(['slug' => 'my-comment']);
 
         $this->assertEquals(
-            self::TEST_URL.'en/view/my-post/my-comment',
+            self::TEST_URL.'en/posts/my-post/my-comment',
             app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view_post_comment', ['post' => $post, 'comment' => $comment])
         );
 
         $this->assertEquals(
-            self::TEST_URL.'es/ver/my-post/my-comment',
+            self::TEST_URL.'es/publicaciones/my-post/my-comment',
             app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view_post_comment', ['post' => $post, 'comment' => $comment])
         );
     }
@@ -638,12 +646,12 @@ final class LaravelLocalizationTest extends TestCase
         $post = new ModelWithCustomRouteKey(['slug' => 'my-post']);
 
         $this->assertEquals(
-            self::TEST_URL.'en/view/my-post',
+            self::TEST_URL.'en/posts/my-post',
             app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view_post_comment', ['post' => $post])
         );
 
         $this->assertEquals(
-            self::TEST_URL.'es/ver/my-post',
+            self::TEST_URL.'es/publicaciones/my-post',
             app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view_post_comment', ['post' => $post])
         );
     }
@@ -651,14 +659,35 @@ final class LaravelLocalizationTest extends TestCase
     public function testGetURLFromRouteNameTranslatedWithColumnBindingAndStringValue(): void
     {
         $this->assertEquals(
-            self::TEST_URL.'en/view/my-post',
+            self::TEST_URL.'en/posts/my-post',
             app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view_with_slug', ['post' => 'my-post'], true)
         );
 
         $this->assertEquals(
-            self::TEST_URL.'es/ver/my-post',
+            self::TEST_URL.'es/publicaciones/my-post',
             app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view_with_slug', ['post' => 'my-post'], true)
         );
+    }
+
+    public function testRouteWithColumnBindingMatchesAndExtractsParameter(): void
+    {
+        $response = $this->get(self::TEST_URL.'posts/my-post');
+        $response->assertStatus(200);
+        $this->assertEquals('my-post', $response->getContent());
+    }
+
+    public function testRouteWithOptionalColumnBindingExtractsParameterWhenProvided(): void
+    {
+        $response = $this->get(self::TEST_URL.'posts/my-post/my-comment');
+        $response->assertStatus(200);
+        $this->assertEquals('my-post/my-comment', $response->getContent());
+    }
+
+    public function testRouteWithOptionalColumnBindingMatchesWhenOmitted(): void
+    {
+        $response = $this->get(self::TEST_URL.'posts/my-post');
+        $response->assertStatus(200);
+        $this->assertEquals('my-post', $response->getContent());
     }
 
     public static function customRouteKeySlugDataProvider(): array
