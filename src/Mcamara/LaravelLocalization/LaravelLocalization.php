@@ -653,18 +653,32 @@ class LaravelLocalization
      */
     protected function substituteAttributesInRoute($attributes, $route, $locale = null)
     {
-        foreach ($attributes as $key => $value) {
-            if ($value instanceOf Interfaces\LocalizedUrlRoutable) {
-                $value = $value->getLocalizedRouteKey($locale);
-            }
-            elseif ($value instanceOf UrlRoutable) {
-                $value = $value->getRouteKey();
-            }
-            $route = str_replace(array('{'.$key.'}', '{'.$key.'?}'), $value, $route);
-        }
+        // Single-pass replacement mirroring Laravel's RouteUrlGenerator::replaceNamedParameters:
+        // strips any ":column" binding hint from the placeholder name (it's only used for model
+        // resolution, not URL generation) and delegates value extraction to getRouteKey() /
+        // getLocalizedRouteKey(), exactly as the framework does.
+        $route = preg_replace_callback('/\{(\w+)(?::\w+)?(\?)?\}/', function ($matches) use ($attributes, $locale) {
+            $key = $matches[1];
 
-        // delete empty optional arguments that are not in the $attributes array
-        $route = preg_replace('/\/{[^)]+\?}/', '', $route);
+            if (!array_key_exists($key, $attributes)) {
+                return $matches[0];
+            }
+
+            $value = $attributes[$key];
+
+            if ($value instanceof Interfaces\LocalizedUrlRoutable) {
+                return $value->getLocalizedRouteKey($locale);
+            }
+
+            if ($value instanceof UrlRoutable) {
+                return $value->getRouteKey();
+            }
+
+            return $value;
+        }, $route);
+
+        // Remove remaining optional placeholders that were not provided in $attributes.
+        $route = preg_replace('/\/{[^}]+\?}/', '', $route);
 
         return $route;
     }
