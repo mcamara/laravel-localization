@@ -17,6 +17,15 @@ class RouteTranslationsCacheCommand extends RouteCacheCommand
     protected $name = 'route:trans:cache';
 
     /**
+     * The parent RouteCacheCommand declares `$signature = 'route:cache'`. Illuminate\Console\Command
+     * checks `$signature` before `$name`, so without overriding it here this command silently
+     * registers as `route:cache` instead of `route:trans:cache`, hijacking Laravel's native command.
+     *
+     * @var string
+     */
+    protected $signature = 'route:trans:cache';
+
+    /**
      * @var string
      */
     protected $description = 'Create a route cache file for faster route registration for all locales';
