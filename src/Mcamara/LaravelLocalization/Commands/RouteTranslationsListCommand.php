@@ -6,6 +6,7 @@ use Mcamara\LaravelLocalization\LaravelLocalization;
 use Mcamara\LaravelLocalization\Traits\TranslatedRouteCommandContext;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Console\RouteListCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 
 class RouteTranslationsListCommand extends RouteListCommand
@@ -22,6 +23,25 @@ class RouteTranslationsListCommand extends RouteListCommand
      */
     protected $description = 'List all registered routes for specific locales';
 
+
+    /**
+     * Configure the console command using a fluent definition.
+     *
+     * Laravel 13.24 moved RouteListCommand to a `$signature`, which takes precedence over
+     * `$name`, so without this the command registers itself as `route:list`. Rewriting the
+     * inherited signature keeps the parent's options instead of restating them; `locale`
+     * moves in here because `getArguments()` is not consulted on this path.
+     *
+     * @return void
+     */
+    #[\Override]
+    protected function configureUsingFluentDefinition()
+    {
+        $this->signature = Str::replaceFirst('route:list', $this->name, $this->signature)
+            . ' {locale : The locale to list routes for.}';
+
+        parent::configureUsingFluentDefinition();
+    }
 
     /**
      * Execute the console command.
