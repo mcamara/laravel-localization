@@ -63,6 +63,14 @@ final class LaravelLocalizationTest extends TestCase
             Route::get(app('laravellocalization')->transRoute('LaravelLocalization::routes.manage'), function () {
                 return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
             })->name('manage');
+
+            Route::get(app('laravellocalization')->transRoute('LaravelLocalization::routes.view_with_slug'), function (string $post) {
+                return $post;
+            })->name('view_with_slug');
+
+            Route::get(app('laravellocalization')->transRoute('LaravelLocalization::routes.view_post_comment'), function (string $post, ?string $comment = null) {
+                return implode('/', array_filter([$post, $comment]));
+            })->name('view_post_comment');
         });
 
         Route::get('/skipped', function () {
@@ -583,6 +591,119 @@ final class LaravelLocalizationTest extends TestCase
             self::TEST_URL.'es/ver/empresa',
             app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view', ['id' => $model])
         );
+    }
+
+    #[DataProvider('customRouteKeySlugDataProvider')]
+    public function testGetURLFromRouteNameTranslatedWithCustomRouteKey(string $slug): void
+    {
+        $model = new ModelWithCustomRouteKey(['slug' => $slug]);
+
+        $this->assertEquals(
+            self::TEST_URL."en/posts/{$slug}",
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view_with_slug', ['post' => $model])
+        );
+
+        $this->assertEquals(
+            self::TEST_URL."es/publicaciones/{$slug}",
+            app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view_with_slug', ['post' => $model])
+        );
+    }
+
+    public function testGetURLFromRouteNameTranslatedWithMultipleCustomRouteKeys(): void
+    {
+        $category = new ModelWithCustomRouteKey(['slug' => 'my-category']);
+        $post = new ModelWithCustomRouteKey(['slug' => 'my-post']);
+
+        $this->assertEquals(
+            self::TEST_URL.'en/posts/my-category/my-post',
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view_category_post', ['category' => $category, 'post' => $post])
+        );
+
+        $this->assertEquals(
+            self::TEST_URL.'es/publicaciones/my-category/my-post',
+            app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view_category_post', ['category' => $category, 'post' => $post])
+        );
+    }
+
+    public function testGetURLFromRouteNameTranslatedWithOptionalCustomRouteKeyProvided(): void
+    {
+        $post = new ModelWithCustomRouteKey(['slug' => 'my-post']);
+        $comment = new ModelWithCustomRouteKey(['slug' => 'my-comment']);
+
+        $this->assertEquals(
+            self::TEST_URL.'en/posts/my-post/my-comment',
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view_post_comment', ['post' => $post, 'comment' => $comment])
+        );
+
+        $this->assertEquals(
+            self::TEST_URL.'es/publicaciones/my-post/my-comment',
+            app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view_post_comment', ['post' => $post, 'comment' => $comment])
+        );
+    }
+
+    public function testGetURLFromRouteNameTranslatedWithOptionalCustomRouteKeyOmitted(): void
+    {
+        $post = new ModelWithCustomRouteKey(['slug' => 'my-post']);
+
+        $this->assertEquals(
+            self::TEST_URL.'en/posts/my-post',
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view_post_comment', ['post' => $post])
+        );
+
+        $this->assertEquals(
+            self::TEST_URL.'es/publicaciones/my-post',
+            app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view_post_comment', ['post' => $post])
+        );
+    }
+
+    public function testGetURLFromRouteNameTranslatedWithColumnBindingAndStringValue(): void
+    {
+        $this->assertEquals(
+            self::TEST_URL.'en/posts/my-post',
+            app('laravellocalization')->getURLFromRouteNameTranslated('en', 'LaravelLocalization::routes.view_with_slug', ['post' => 'my-post'], true)
+        );
+
+        $this->assertEquals(
+            self::TEST_URL.'es/publicaciones/my-post',
+            app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view_with_slug', ['post' => 'my-post'], true)
+        );
+    }
+
+    public function testRouteWithColumnBindingMatchesAndExtractsParameter(): void
+    {
+        $response = $this->get(self::TEST_URL.'posts/my-post');
+        $response->assertStatus(200);
+        $this->assertEquals('my-post', $response->getContent());
+    }
+
+    public function testRouteWithOptionalColumnBindingExtractsParameterWhenProvided(): void
+    {
+        $response = $this->get(self::TEST_URL.'posts/my-post/my-comment');
+        $response->assertStatus(200);
+        $this->assertEquals('my-post/my-comment', $response->getContent());
+    }
+
+    public function testRouteWithOptionalColumnBindingMatchesWhenOmitted(): void
+    {
+        $response = $this->get(self::TEST_URL.'posts/my-post');
+        $response->assertStatus(200);
+        $this->assertEquals('my-post', $response->getContent());
+    }
+
+    public static function customRouteKeySlugDataProvider(): array
+    {
+        return [
+            'simple slug'                            => ['my-post'],
+            'slug with hyphens'                      => ['my-long-post-title'],
+            'slug with underscores'                  => ['my_post_title'],
+            'slug with numbers'                      => ['post-123'],
+            'slug with hyphens and numbers'          => ['2024-my-post-title'],
+            'slug with mixed hyphens and underscores' => ['my_post-title_here'],
+            'slug with dots'                         => ['v1.2.3-release'],
+            'numeric only slug'                      => ['123456'],
+            'slug with unicode characters'           => ['über-den-wolken'],
+            'slug with accented characters'          => ['cañon-del-rio'],
+        ];
     }
 
     public function testGetNonLocalizedURL(): void
