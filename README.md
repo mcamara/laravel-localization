@@ -6,7 +6,7 @@
 [![Open Source Helpers](https://www.codetriage.com/mcamara/laravel-localization/badges/users.svg)](https://www.codetriage.com/mcamara/laravel-localization)
 [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
-> [!WARNING]
+> [!IMPORTANT]
 > **Architecture note & recommended successor**
 >
 > This package generates routes dynamically per request, which has a
