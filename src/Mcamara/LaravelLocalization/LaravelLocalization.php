@@ -915,7 +915,8 @@ class LaravelLocalization
             return;
         }
 
-        $this->translatedRoutes = unserialize(base64_decode($serializedRoutes));
+        // The cache holds a list of translation keys, so unserialize() must never create objects.
+        $this->translatedRoutes = unserialize(base64_decode($serializedRoutes), ['allowed_classes' => false]);
     }
 
     /**

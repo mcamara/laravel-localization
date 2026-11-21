@@ -652,6 +652,26 @@ final class LaravelLocalizationTest extends TestCase
         $this->assertSame('https://example.com/es/test', $url);
     }
 
+    public function testLoadingCachedTranslatedRoutesNeverWakesUpObjects(): void
+    {
+        WakeupRecorder::$wokenUp = false;
+        $payload = base64_encode(serialize([new WakeupRecorder()]));
+
+        app('laravellocalization')->setSerializedTranslatedRoutes($payload);
+
+        $this->assertFalse(WakeupRecorder::$wokenUp);
+    }
+
+    public function testCachedTranslatedRoutesStillTranslateUrlsAfterLoading(): void
+    {
+        $localization = app(LaravelLocalization::class, ['request' => $this->createRequest('about')]);
+        $payload = base64_encode(serialize(['LaravelLocalization::routes.about']));
+
+        $localization->setSerializedTranslatedRoutes($payload);
+
+        $this->assertSame(self::TEST_URL.'es/acerca', $localization->getLocalizedURL('es', self::TEST_URL.'about'));
+    }
+
     public function testGetNonLocalizedURL(): void
     {
         $this->assertEquals(
