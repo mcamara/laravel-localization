@@ -391,7 +391,27 @@ class LaravelLocalization
             return false;
         }
 
-        return rtrim($this->createUrlFromUri($route), '/');
+        return rtrim($this->createUrlFromUri($this->encodeUnsafeUrlCharacters($route)), '/');
+    }
+
+    /**
+     * Percent-encode the characters that can break the context of a URL.
+     *
+     * Route attributes can hold decoded request input, such as a line break
+     * that ends a Location header. This method encodes control characters,
+     * the space, and the characters " < > \ and `. It keeps all other
+     * characters, existing percent-escapes, and non-ASCII text unchanged.
+     *
+     * @param  string  $uri
+     * @return string
+     */
+    protected function encodeUnsafeUrlCharacters(string $uri): string
+    {
+        return preg_replace_callback(
+            '/[\x00-\x20\x7F"<>\\\\`]/',
+            fn (array $matches) => rawurlencode($matches[0]),
+            $uri
+        );
     }
 
     /**
@@ -775,8 +795,9 @@ class LaravelLocalization
         foreach ($this->translatedRoutes as $translatedRoute) {
             $routeName = $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
 
-            // We can ignore extra url parts and compare only their url_path (ignore arguments that are not attributes)
-            if (parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH) == parse_url($this->getNonLocalizedURL(urldecode($url)), PHP_URL_PATH)) {
+            // We can ignore extra url parts and compare only their url_path (ignore arguments that are not attributes).
+            // Decode both sides, because the generated URL holds percent-encoded attributes.
+            if (parse_url($this->getNonLocalizedURL(urldecode($routeName)), PHP_URL_PATH) == parse_url($this->getNonLocalizedURL(urldecode($url)), PHP_URL_PATH)) {
                 $this->cachedTranslatedRoutesByUrl[$locale][$url] = $translatedRoute;
 
                 return $translatedRoute;

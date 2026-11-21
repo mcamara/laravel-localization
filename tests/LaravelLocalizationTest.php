@@ -585,6 +585,41 @@ final class LaravelLocalizationTest extends TestCase
         );
     }
 
+    #[DataProvider('routeAttributeEncodingDataProvider')]
+    public function testTranslatedRouteUrlPercentEncodesUnsafeCharactersInAttributes(string $attribute, string $expectedURL): void
+    {
+        $url = app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view', ['id' => $attribute]);
+
+        $this->assertSame($expectedURL, $url);
+    }
+
+    public static function routeAttributeEncodingDataProvider(): array
+    {
+        return [
+            'line break' => ["1\r\nX-Injected: yes", self::TEST_URL.'es/ver/1%0D%0AX-Injected:%20yes'],
+            'space' => ['hello world', self::TEST_URL.'es/ver/hello%20world'],
+            'markup' => ['"><script>', self::TEST_URL.'es/ver/%22%3E%3Cscript%3E'],
+            'backslash' => ['a\\b', self::TEST_URL.'es/ver/a%5Cb'],
+            'non-ASCII text stays readable' => ['café', self::TEST_URL.'es/ver/café'],
+            'existing escape stays' => ['caf%C3%A9', self::TEST_URL.'es/ver/caf%C3%A9'],
+        ];
+    }
+
+    public function testLocalizedUrlOfCurrentRoutePercentEncodesLineBreaksFromTheRequest(): void
+    {
+        $response = $this->get(self::TEST_URL.'view/%0D%0AX-Injected:%20yes');
+
+        $response->assertOk();
+        $this->assertSame(self::TEST_URL.'es/ver/%0D%0AX-Injected:%20yes', $response->getContent());
+    }
+
+    public function testLocalizedUrlStillTranslatesRoutesWithEncodedAttributes(): void
+    {
+        $url = app('laravellocalization')->getLocalizedURL('es', self::TEST_URL.'view/hello%20world');
+
+        $this->assertSame(self::TEST_URL.'es/ver/hello%20world', $url);
+    }
+
     public function testGetNonLocalizedURL(): void
     {
         $this->assertEquals(
