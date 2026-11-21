@@ -4,7 +4,6 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/mcamara/laravel-localization.svg?style=flat-square)](https://packagist.org/packages/mcamara/laravel-localization)
 ![GitHub Actions](https://github.com/mcamara/laravel-localization/actions/workflows/run-tests.yml/badge.svg)
 [![Open Source Helpers](https://www.codetriage.com/mcamara/laravel-localization/badges/users.svg)](https://www.codetriage.com/mcamara/laravel-localization)
-[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 > **Architecture note & recommended successor**
 >
