@@ -422,25 +422,6 @@ class LaravelLocalization
     }
 
     /**
-     * Decode the percent-escapes that encodeUnsafeUrlCharacters() creates.
-     *
-     * This method decodes only control characters, the space, and the
-     * characters " < > \ and `. It keeps all other escapes, such as %23
-     * and %2B, so the URL keeps its structure.
-     *
-     * @param  string  $uri
-     * @return string
-     */
-    protected function decodeUnsafeUrlCharacters(string $uri): string
-    {
-        return preg_replace_callback(
-            '/%(?:[01][0-9A-F]|20|22|3C|3E|5C|60|7F)/i',
-            fn (array $matches) => rawurldecode($matches[0]),
-            $uri
-        );
-    }
-
-    /**
      * It returns an URL without locale (if it has it)
      * Convenience function wrapping getLocalizedURL(false).
      *
@@ -817,17 +798,19 @@ class LaravelLocalization
             return $this->cachedTranslatedRoutesByUrl[$locale][$url];
         }
 
+        // Extract the encoded path before decoding so escapes do not change the URL structure.
+        $urlPath = parse_url($this->getNonLocalizedURL($url), PHP_URL_PATH);
+        if (!\is_string($urlPath)) {
+            return false;
+        }
+        $urlPath = rawurldecode($urlPath);
+
         // check if this url is a translated url
         foreach ($this->translatedRoutes as $translatedRoute) {
             $routeName = $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
+            $routePath = parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH);
 
-            // Undo only the encoding that getURLFromRouteNameTranslated() added, so the paths compare as they did before it.
-            if (\is_string($routeName)) {
-                $routeName = $this->decodeUnsafeUrlCharacters($routeName);
-            }
-
-            // We can ignore extra url parts and compare only their url_path (ignore arguments that are not attributes)
-            if (parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH) == parse_url($this->getNonLocalizedURL(urldecode($url)), PHP_URL_PATH)) {
+            if (\is_string($routePath) && rawurldecode($routePath) === $urlPath) {
                 $this->cachedTranslatedRoutesByUrl[$locale][$url] = $translatedRoute;
 
                 return $translatedRoute;

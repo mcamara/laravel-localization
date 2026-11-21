@@ -626,16 +626,17 @@ final class LaravelLocalizationTest extends TestCase
 
     public function testLocalizedUrlKeepsALiteralPlusSignInAnAttribute(): void
     {
-        $url = app('laravellocalization')->getLocalizedURL('es', self::TEST_URL.'view/a%2Bb', ['id' => 'a+b']);
+        $localization = app('laravellocalization');
 
-        $this->assertSame(self::TEST_URL.'es/ver/a+b', $url);
+        $this->assertSame(self::TEST_URL.'es/ver/a+b', $localization->getLocalizedURL('es', self::TEST_URL.'view/a+b'));
+        $this->assertSame(self::TEST_URL.'es/ver/a+b', $localization->getLocalizedURL('es', self::TEST_URL.'view/a%2Bb', ['id' => 'a+b']));
     }
 
     public function testLocalizedUrlKeepsEveryPathSegmentAfterAnEncodedHash(): void
     {
         $url = app('laravellocalization')->getLocalizedURL('es', self::TEST_URL.'view/a%23b/project');
 
-        $this->assertSame(self::TEST_URL.'es/view/a%23b/project', $url);
+        $this->assertSame(self::TEST_URL.'es/ver/a%23b/proyecto', $url);
     }
 
     #[DataProvider('scriptUrlDataProvider')]
