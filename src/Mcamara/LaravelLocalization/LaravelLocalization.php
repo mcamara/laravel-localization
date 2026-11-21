@@ -422,6 +422,25 @@ class LaravelLocalization
     }
 
     /**
+     * Decode the percent-escapes that encodeUnsafeUrlCharacters() creates.
+     *
+     * This method decodes only control characters, the space, and the
+     * characters " < > \ and `. It keeps all other escapes, such as %23
+     * and %2B, so the URL keeps its structure.
+     *
+     * @param  string  $uri
+     * @return string
+     */
+    protected function decodeUnsafeUrlCharacters(string $uri): string
+    {
+        return preg_replace_callback(
+            '/%(?:[01][0-9A-F]|20|22|3C|3E|5C|60|7F)/i',
+            fn (array $matches) => rawurldecode($matches[0]),
+            $uri
+        );
+    }
+
+    /**
      * It returns an URL without locale (if it has it)
      * Convenience function wrapping getLocalizedURL(false).
      *
@@ -802,9 +821,13 @@ class LaravelLocalization
         foreach ($this->translatedRoutes as $translatedRoute) {
             $routeName = $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
 
-            // We can ignore extra url parts and compare only their url_path (ignore arguments that are not attributes).
-            // Decode both sides, because the generated URL holds percent-encoded attributes.
-            if (parse_url($this->getNonLocalizedURL(urldecode($routeName)), PHP_URL_PATH) == parse_url($this->getNonLocalizedURL(urldecode($url)), PHP_URL_PATH)) {
+            // Undo only the encoding that getURLFromRouteNameTranslated() added, so the paths compare as they did before it.
+            if (\is_string($routeName)) {
+                $routeName = $this->decodeUnsafeUrlCharacters($routeName);
+            }
+
+            // We can ignore extra url parts and compare only their url_path (ignore arguments that are not attributes)
+            if (parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH) == parse_url($this->getNonLocalizedURL(urldecode($url)), PHP_URL_PATH)) {
                 $this->cachedTranslatedRoutesByUrl[$locale][$url] = $translatedRoute;
 
                 return $translatedRoute;
