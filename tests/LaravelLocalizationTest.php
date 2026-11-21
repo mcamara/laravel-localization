@@ -620,6 +620,38 @@ final class LaravelLocalizationTest extends TestCase
         $this->assertSame(self::TEST_URL.'es/ver/hello%20world', $url);
     }
 
+    #[DataProvider('scriptUrlDataProvider')]
+    public function testLocalizedUrlIsFalseForScriptUrls(string $url): void
+    {
+        $localizedURL = app('laravellocalization')->getLocalizedURL('es', $url);
+
+        $this->assertFalse($localizedURL);
+    }
+
+    public static function scriptUrlDataProvider(): array
+    {
+        return [
+            'javascript' => ['javascript://example.com/%0Aalert(1)'],
+            'javascript in mixed case' => ['JavaScript://example.com/%0Aalert(1)'],
+            'vbscript' => ['vbscript://example.com/%0Amsgbox(1)'],
+            'data' => ['data://text/html;base64,PHNjcmlwdD4='],
+        ];
+    }
+
+    public function testLocalizedUrlKeepsUrlsWithOtherSchemes(): void
+    {
+        $url = app('laravellocalization')->getLocalizedURL('es', 'ftp://files.example.com/test');
+
+        $this->assertSame('ftp://files.example.com/es/test', $url);
+    }
+
+    public function testLocalizedUrlKeepsTheHostOfAnAbsoluteHttpsUrl(): void
+    {
+        $url = app('laravellocalization')->getLocalizedURL('es', 'https://example.com/test');
+
+        $this->assertSame('https://example.com/es/test', $url);
+    }
+
     public function testGetNonLocalizedURL(): void
     {
         $this->assertEquals(

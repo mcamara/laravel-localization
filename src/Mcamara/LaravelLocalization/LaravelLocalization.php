@@ -238,7 +238,7 @@ class LaravelLocalization
      *
      * @throws UnsupportedLocaleException
      *
-     * @return string URL translated
+     * @return string|false URL translated, False for a javascript:, vbscript:, or data: URL
      */
     public function localizeURL($url = null, $locale = null)
     {
@@ -257,7 +257,7 @@ class LaravelLocalization
      * @throws SupportedLocalesNotDefined
      * @throws UnsupportedLocaleException
      *
-     * @return string|false URL translated, False if url does not exist
+     * @return string|false URL translated, False if url does not exist or is a javascript:, vbscript:, or data: URL
      */
     public function getLocalizedURL($locale = null, $url = null, $attributes = [], $forceDefaultLocation = false)
     {
@@ -286,6 +286,13 @@ class LaravelLocalization
             $urlQuery = $urlQuery ? '?'.$urlQuery : '';
 
             $url = $this->url->to($url);
+
+            // Refuse script URLs. A javascript:, vbscript:, or data: URL in a link can run code when a user clicks it.
+            $scheme = parse_url($url, PHP_URL_SCHEME);
+
+            if (\is_string($scheme) && \in_array(strtolower($scheme), ['javascript', 'vbscript', 'data'], true)) {
+                return false;
+            }
         }
 
         $url = preg_replace('/'. preg_quote($urlQuery, '/') . '$/', '', $url);

@@ -261,6 +261,13 @@ Get current URL in specific locale:
 {{ LaravelLocalization::getLocalizedURL('en') }}
 ```
 
+#### URLs from user input
+
+`localizeURL()` and `getLocalizedURL()` keep the host of an absolute URL. For example, `https://example.com/test` becomes `https://example.com/es/test`.
+Do not pass user input, such as a `redirect` query parameter, to these methods and then redirect to the result. That creates an open redirect. Check the host first, or pass only a path.
+
+Both methods return `false` for a `javascript:`, `vbscript:`, or `data:` URL.
+
 ### Get Clean routes
 
 Returns a URL clean of any localization.
