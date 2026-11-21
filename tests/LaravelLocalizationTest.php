@@ -1025,6 +1025,9 @@ final class LaravelLocalizationTest extends TestCase
     public function testViewPathMiddlewareAddsOnlyTheViewFolderOfTheCurrentLocale(): void
     {
         $request = Request::create(self::TEST_URL.'..%2F..%2Fsecret/about');
+        $localization = app(LaravelLocalization::class, ['request' => $request]);
+        $this->app->instance(LaravelLocalization::class, $localization);
+        $localization->setLocale();
 
         (new LaravelLocalizationViewPath())->handle($request, fn () => response('next'));
 
