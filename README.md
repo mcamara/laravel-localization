@@ -53,16 +53,19 @@ The package offers the following:
 
 ## Laravel compatibility
 
- Laravel      | laravel-localization
-:-------------|:----------
- 4.0.x        | 0.13.x
- 4.1.x        | 0.13.x
- 4.2.x        | 0.15.x
- 5.0.x/5.1.x  | 1.0.x
- 5.2.x-5.4.x (PHP 7 not required)  | 1.2.x
- 5.2.0-6.x (PHP version >= 7 required) | 1.4.x
- 6.x-10.x (PHP version >= 7 required) | 1.8.x
- 10.x-13.x (PHP version >= 8.2 required) | 2.0.x
+Use the first row that matches your Laravel version and your PHP version.
+
+| Laravel     | laravel-localization | PHP    |
+|:------------|:---------------------|:-------|
+| 12.x-13.x   | 2.5.x                | >= 8.2 |
+| 11.x        | 2.4.x                | >= 8.2 |
+| 10.x        | 2.3.x                | >= 8.2 |
+| 5.2.x-10.x  | 1.8.x                | >= 7.1 |
+| 5.2.x-5.6.x | 1.3.x                | >= 7.0 |
+| 5.2.x-5.4.x | 1.2.x                | >= 5.6 |
+| 5.0.x-5.1.x | 1.0.x                | >= 5.4 |
+| 4.2.x       | 0.15.x               | >= 5.4 |
+| 4.0.x-4.1.x | 0.13.x               | >= 5.3 |
 
 ## Installation
 
@@ -116,7 +119,7 @@ class Kernel extends HttpKernel {
 }
 ```
 
-If you are using Laravel 11, you may register in `bootstrap/app.php` file in closure `withMiddleware`:
+If you are using Laravel 11 or newer, you may register in `bootstrap/app.php` file in closure `withMiddleware`:
 
 ```php
 return Application::configure(basePath: dirname(__DIR__))
