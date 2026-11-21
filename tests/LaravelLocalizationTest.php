@@ -639,6 +639,8 @@ final class LaravelLocalizationTest extends TestCase
             'javascript in mixed case' => ['JavaScript://example.com/%0Aalert(1)'],
             'vbscript' => ['vbscript://example.com/%0Amsgbox(1)'],
             'data' => ['data://text/html;base64,PHNjcmlwdD4='],
+            'javascript without a host' => ['javascript:alert(1)'],
+            'data without a host' => ['data:text/html,<script>alert(1)</script>'],
         ];
     }
 

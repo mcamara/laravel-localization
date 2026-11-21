@@ -282,17 +282,17 @@ class LaravelLocalization
                 return $this->getURLFromRouteNameTranslated($locale, $this->routeName, $attributes, $forceDefaultLocation) . $urlQuery;
             }
         } else {
-            $urlQuery = parse_url($url, PHP_URL_QUERY);
-            $urlQuery = $urlQuery ? '?'.$urlQuery : '';
-
-            $url = $this->url->to($url);
-
-            // Refuse script URLs. A javascript:, vbscript:, or data: URL in a link can run code when a user clicks it.
+            // Refuse script URLs, with or without a host. A javascript:, vbscript:, or data: URL in a link can run code when a user clicks it.
             $scheme = parse_url($url, PHP_URL_SCHEME);
 
             if (\is_string($scheme) && \in_array(strtolower($scheme), ['javascript', 'vbscript', 'data'], true)) {
                 return false;
             }
+
+            $urlQuery = parse_url($url, PHP_URL_QUERY);
+            $urlQuery = $urlQuery ? '?'.$urlQuery : '';
+
+            $url = $this->url->to($url);
         }
 
         $url = preg_replace('/'. preg_quote($urlQuery, '/') . '$/', '', $url);
