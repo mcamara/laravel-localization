@@ -5,12 +5,16 @@ namespace Mcamara\LaravelLocalization\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
+use Illuminate\Testing\TestResponse;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization as LaravelLocalizationFacade;
 use Mcamara\LaravelLocalization\LanguageNegotiator;
 use Mcamara\LaravelLocalization\LaravelLocalization;
 use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter;
 use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes;
+use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath;
 use Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect;
+use Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect;
 
 use function Orchestra\Testbench\refresh_router_lookups;
 
@@ -885,6 +889,7 @@ final class LaravelLocalizationTest extends TestCase
             ['fr-150', 'fr'],
             ['zh-Hant-cn', 'zh-Hant'],
             ['zh-cn', 'zh'],
+            ['../../etc/passwd', 'wrong'],
         ];
 
         $dataset = [];
@@ -967,6 +972,47 @@ final class LaravelLocalizationTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirect(self::TEST_URL . $savedLocale);
         $response->assertPlainCookie('locale', $savedLocale);
+    }
+
+    public function testSessionRedirectKeepsAProtocolRelativePathOnTheAppHost(): void
+    {
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
+        $request = Request::create(self::TEST_URL.'/evil.com', server: ['HTTP_ACCEPT_LANGUAGE' => 'es']);
+        $this->app->instance(LaravelLocalization::class, app(LaravelLocalization::class, ['request' => $request]));
+
+        $response = (new LocaleSessionRedirect())->handle($request, fn () => response('next'));
+
+        TestResponse::fromBaseResponse($response)->assertRedirect(self::TEST_URL.'es/evil.com');
+    }
+
+    public function testRedirectFilterKeepsADoubleSlashPathOnTheAppHost(): void
+    {
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
+        $request = Request::create(self::TEST_URL.'en//evil.com');
+        $this->app->instance(LaravelLocalization::class, app(LaravelLocalization::class, ['request' => $request]));
+
+        $response = (new LaravelLocalizationRedirectFilter())->handle($request, fn () => response('next'));
+
+        TestResponse::fromBaseResponse($response)->assertRedirect(self::TEST_URL.'evil.com');
+    }
+
+    public function testCookieRedirectIgnoresALocaleCookieWithAnUnsupportedValue(): void
+    {
+        $request = Request::create(self::TEST_URL.'about', cookies: ['locale' => '//evil.com']);
+        $this->app->instance(LaravelLocalization::class, app(LaravelLocalization::class, ['request' => $request]));
+
+        $response = (new LocaleCookieRedirect())->handle($request, fn () => response('next'));
+
+        $this->assertSame('next', $response->getContent());
+    }
+
+    public function testViewPathMiddlewareAddsOnlyTheViewFolderOfTheCurrentLocale(): void
+    {
+        $request = Request::create(self::TEST_URL.'..%2F..%2Fsecret/about');
+
+        (new LaravelLocalizationViewPath())->handle($request, fn () => response('next'));
+
+        $this->assertSame(resource_path('views/en'), last(View::getFinder()->getPaths()));
     }
 
     /**
