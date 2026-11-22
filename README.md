@@ -4,7 +4,6 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/mcamara/laravel-localization.svg?style=flat-square)](https://packagist.org/packages/mcamara/laravel-localization)
 ![GitHub Actions](https://github.com/mcamara/laravel-localization/actions/workflows/run-tests.yml/badge.svg)
 [![Open Source Helpers](https://www.codetriage.com/mcamara/laravel-localization/badges/users.svg)](https://www.codetriage.com/mcamara/laravel-localization)
-[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 > **Architecture note & recommended successor**
 >
@@ -54,16 +53,19 @@ The package offers the following:
 
 ## Laravel compatibility
 
- Laravel      | laravel-localization
-:-------------|:----------
- 4.0.x        | 0.13.x
- 4.1.x        | 0.13.x
- 4.2.x        | 0.15.x
- 5.0.x/5.1.x  | 1.0.x
- 5.2.x-5.4.x (PHP 7 not required)  | 1.2.x
- 5.2.0-6.x (PHP version >= 7 required) | 1.4.x
- 6.x-10.x (PHP version >= 7 required) | 1.8.x
- 10.x-13.x (PHP version >= 8.2 required) | 2.0.x
+Use the first row that matches your Laravel version and your PHP version.
+
+| Laravel     | laravel-localization | PHP    |
+|:------------|:---------------------|:-------|
+| 12.x-13.x   | 2.5.x                | >= 8.2 |
+| 11.x        | 2.4.x                | >= 8.2 |
+| 10.x        | 2.3.x                | >= 8.2 |
+| 5.2.x-10.x  | 1.8.x                | >= 7.1 |
+| 5.2.x-5.6.x | 1.3.x                | >= 7.0 |
+| 5.2.x-5.4.x | 1.2.x                | >= 5.6 |
+| 5.0.x-5.1.x | 1.0.x                | >= 5.4 |
+| 4.2.x       | 0.15.x               | >= 5.4 |
+| 4.0.x-4.1.x | 0.13.x               | >= 5.3 |
 
 ## Installation
 
@@ -117,7 +119,7 @@ class Kernel extends HttpKernel {
 }
 ```
 
-If you are using Laravel 11, you may register in `bootstrap/app.php` file in closure `withMiddleware`:
+If you are using Laravel 11 or newer, you may register in `bootstrap/app.php` file in closure `withMiddleware`:
 
 ```php
 return Application::configure(basePath: dirname(__DIR__))
@@ -261,6 +263,13 @@ Get current URL in specific locale:
 // Returns current url with English locale.
 {{ LaravelLocalization::getLocalizedURL('en') }}
 ```
+
+#### URLs from user input
+
+`localizeURL()` and `getLocalizedURL()` keep the host of an absolute URL. For example, `https://example.com/test` becomes `https://example.com/es/test`.
+Do not pass user input, such as a `redirect` query parameter, to these methods and then redirect to the result. That creates an open redirect. Check the host first, or pass only a path.
+
+Both methods return `false` for a `javascript:`, `vbscript:`, or `data:` URL.
 
 ### Get Clean routes
 

@@ -238,7 +238,7 @@ class LaravelLocalization
      *
      * @throws UnsupportedLocaleException
      *
-     * @return string URL translated
+     * @return string|false URL translated, False for a javascript:, vbscript:, or data: URL
      */
     public function localizeURL($url = null, $locale = null)
     {
@@ -257,7 +257,7 @@ class LaravelLocalization
      * @throws SupportedLocalesNotDefined
      * @throws UnsupportedLocaleException
      *
-     * @return string|false URL translated, False if url does not exist
+     * @return string|false URL translated, False if url does not exist or is a javascript:, vbscript:, or data: URL
      */
     public function getLocalizedURL($locale = null, $url = null, $attributes = [], $forceDefaultLocation = false)
     {
@@ -282,6 +282,13 @@ class LaravelLocalization
                 return $this->getURLFromRouteNameTranslated($locale, $this->routeName, $attributes, $forceDefaultLocation) . $urlQuery;
             }
         } else {
+            // Refuse script URLs, with or without a host. A javascript:, vbscript:, or data: URL in a link can run code when a user clicks it.
+            $scheme = parse_url($url, PHP_URL_SCHEME);
+
+            if (\is_string($scheme) && \in_array(strtolower($scheme), ['javascript', 'vbscript', 'data'], true)) {
+                return false;
+            }
+
             $urlQuery = parse_url($url, PHP_URL_QUERY);
             $urlQuery = $urlQuery ? '?'.$urlQuery : '';
 
@@ -391,7 +398,42 @@ class LaravelLocalization
             return false;
         }
 
-        return rtrim($this->createUrlFromUri($route), '/');
+        return rtrim($this->createUrlFromUri($this->encodeUnsafeUrlCharacters($route)), '/');
+    }
+
+    /**
+     * Percent-encode the characters that can break the context of a URL.
+     *
+     * Route attributes can hold decoded request input, such as a line break
+     * that ends a Location header. This method encodes control characters,
+     * the space, and the characters " < > \ and `. It keeps all other
+     * characters, existing percent-escapes, and non-ASCII text unchanged.
+     *
+     * @param  string  $uri
+     * @return string
+     */
+    protected function encodeUnsafeUrlCharacters(string $uri): string
+    {
+        return preg_replace_callback(
+            '/[\x00-\x20\x7F"<>\\\\`]/',
+            fn (array $matches) => rawurlencode($matches[0]),
+            $uri
+        );
+    }
+
+    /**
+     * Decode a URL for a path comparison, but keep its delimiters encoded.
+     *
+     * This method keeps %23 (#) and %3F (?) as escapes, so a decoded
+     * character cannot end the path. It decodes %2F to /, as the Laravel
+     * router does. A literal + stays a +.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function decodeUrlKeepingDelimiters(string $url): string
+    {
+        return rawurldecode(preg_replace('/%(23|3F)/i', '%25$1', $url));
     }
 
     /**
@@ -771,12 +813,20 @@ class LaravelLocalization
             return $this->cachedTranslatedRoutesByUrl[$locale][$url];
         }
 
+        // Decode both URLs the same way before they go through getNonLocalizedURL(), so both get the same treatment.
+        // Keep the escaped delimiters, so a decoded # or ? cannot cut a path.
+        $urlPath = parse_url($this->getNonLocalizedURL($this->decodeUrlKeepingDelimiters($url)), PHP_URL_PATH);
+
         // check if this url is a translated url
         foreach ($this->translatedRoutes as $translatedRoute) {
             $routeName = $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
 
+            if (\is_string($routeName)) {
+                $routeName = $this->decodeUrlKeepingDelimiters($routeName);
+            }
+
             // We can ignore extra url parts and compare only their url_path (ignore arguments that are not attributes)
-            if (parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH) == parse_url($this->getNonLocalizedURL(urldecode($url)), PHP_URL_PATH)) {
+            if (parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH) == $urlPath) {
                 $this->cachedTranslatedRoutesByUrl[$locale][$url] = $translatedRoute;
 
                 return $translatedRoute;
@@ -887,7 +937,8 @@ class LaravelLocalization
             return;
         }
 
-        $this->translatedRoutes = unserialize(base64_decode($serializedRoutes));
+        // The cache holds a list of translation keys, so unserialize() must never create objects.
+        $this->translatedRoutes = unserialize(base64_decode($serializedRoutes), ['allowed_classes' => false]);
     }
 
     /**

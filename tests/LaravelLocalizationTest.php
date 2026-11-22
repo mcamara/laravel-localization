@@ -5,12 +5,16 @@ namespace Mcamara\LaravelLocalization\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
+use Illuminate\Testing\TestResponse;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization as LaravelLocalizationFacade;
 use Mcamara\LaravelLocalization\LanguageNegotiator;
 use Mcamara\LaravelLocalization\LaravelLocalization;
 use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter;
 use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes;
+use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath;
 use Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect;
+use Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect;
 
 use function Orchestra\Testbench\refresh_router_lookups;
 
@@ -585,6 +589,132 @@ final class LaravelLocalizationTest extends TestCase
         );
     }
 
+    #[DataProvider('routeAttributeEncodingDataProvider')]
+    public function testTranslatedRouteUrlPercentEncodesUnsafeCharactersInAttributes(string $attribute, string $expectedURL): void
+    {
+        $url = app('laravellocalization')->getURLFromRouteNameTranslated('es', 'LaravelLocalization::routes.view', ['id' => $attribute]);
+
+        $this->assertSame($expectedURL, $url);
+    }
+
+    public static function routeAttributeEncodingDataProvider(): array
+    {
+        return [
+            'line break' => ["1\r\nX-Injected: yes", self::TEST_URL.'es/ver/1%0D%0AX-Injected:%20yes'],
+            'space' => ['hello world', self::TEST_URL.'es/ver/hello%20world'],
+            'markup' => ['"><script>', self::TEST_URL.'es/ver/%22%3E%3Cscript%3E'],
+            'backslash' => ['a\\b', self::TEST_URL.'es/ver/a%5Cb'],
+            'non-ASCII text stays readable' => ['café', self::TEST_URL.'es/ver/café'],
+            'existing escape stays' => ['caf%C3%A9', self::TEST_URL.'es/ver/caf%C3%A9'],
+        ];
+    }
+
+    public function testLocalizedUrlOfCurrentRoutePercentEncodesLineBreaksFromTheRequest(): void
+    {
+        $response = $this->get(self::TEST_URL.'view/%0D%0AX-Injected:%20yes');
+
+        $response->assertOk();
+        $this->assertSame(self::TEST_URL.'es/ver/%0D%0AX-Injected:%20yes', $response->getContent());
+    }
+
+    public function testLocalizedUrlStillTranslatesRoutesWithEncodedAttributes(): void
+    {
+        $url = app('laravellocalization')->getLocalizedURL('es', self::TEST_URL.'view/hello%20world');
+
+        $this->assertSame(self::TEST_URL.'es/ver/hello%20world', $url);
+    }
+
+    public function testLocalizedUrlKeepsALiteralPlusSignInAnAttribute(): void
+    {
+        $localization = app('laravellocalization');
+
+        $this->assertSame(self::TEST_URL.'es/ver/a+b', $localization->getLocalizedURL('es', self::TEST_URL.'view/a+b'));
+        $this->assertSame(self::TEST_URL.'es/ver/a+b', $localization->getLocalizedURL('es', self::TEST_URL.'view/a%2Bb', ['id' => 'a+b']));
+    }
+
+    public function testLocalizedUrlTranslatesARouteWhenAnAttributeHoldsAnEncodedHash(): void
+    {
+        $url = app('laravellocalization')->getLocalizedURL('es', self::TEST_URL.'view/a%23b/project');
+
+        $this->assertSame(self::TEST_URL.'es/ver/a%23b/proyecto', $url);
+    }
+
+    public function testLocalizedUrlTranslatesARouteWhenAnAttributeHoldsASlash(): void
+    {
+        $localization = app('laravellocalization');
+
+        $this->assertSame(self::TEST_URL.'es/ver/a/b', $localization->getLocalizedURL('es', self::TEST_URL.'view/a/b', ['id' => 'a/b']));
+        $this->assertSame(self::TEST_URL.'es/ver/a/b', $localization->getLocalizedURL('es', self::TEST_URL.'view/a%2Fb', ['id' => 'a/b']));
+    }
+
+    public function testLocalizedUrlTranslatesARouteWhenAnAttributeHoldsEncodedNonAsciiText(): void
+    {
+        $url = app('laravellocalization')->getLocalizedURL('es', self::TEST_URL.'view/caf%C3%A9');
+
+        $this->assertSame(self::TEST_URL.'es/ver/caf%C3%A9', $url);
+    }
+
+    public function testLocalizedUrlTranslatesARouteWhenAnAttributeHoldsNonAsciiText(): void
+    {
+        $url = app('laravellocalization')->getLocalizedURL('es', self::TEST_URL.'view/caf%C3%A9', ['id' => 'café']);
+
+        $this->assertSame(self::TEST_URL.'es/ver/café', $url);
+    }
+
+    #[DataProvider('scriptUrlDataProvider')]
+    public function testLocalizedUrlIsFalseForScriptUrls(string $url): void
+    {
+        $localizedURL = app('laravellocalization')->getLocalizedURL('es', $url);
+
+        $this->assertFalse($localizedURL);
+    }
+
+    public static function scriptUrlDataProvider(): array
+    {
+        return [
+            'javascript' => ['javascript://example.com/%0Aalert(1)'],
+            'javascript in mixed case' => ['JavaScript://example.com/%0Aalert(1)'],
+            'vbscript' => ['vbscript://example.com/%0Amsgbox(1)'],
+            'data' => ['data://text/html;base64,PHNjcmlwdD4='],
+            'javascript without a host' => ['javascript:alert(1)'],
+            'data without a host' => ['data:text/html,<script>alert(1)</script>'],
+        ];
+    }
+
+    public function testLocalizedUrlKeepsUrlsWithOtherSchemes(): void
+    {
+        $url = app('laravellocalization')->getLocalizedURL('es', 'ftp://files.example.com/test');
+
+        $this->assertSame('ftp://files.example.com/es/test', $url);
+    }
+
+    public function testLocalizedUrlKeepsTheHostOfAnAbsoluteHttpsUrl(): void
+    {
+        $url = app('laravellocalization')->getLocalizedURL('es', 'https://example.com/test');
+
+        $this->assertSame('https://example.com/es/test', $url);
+    }
+
+    public function testLoadingCachedTranslatedRoutesNeverWakesUpObjects(): void
+    {
+        WakeupRecorder::$wokenUp = false;
+        $payload = base64_encode(serialize([new WakeupRecorder()]));
+
+        app('laravellocalization')->setSerializedTranslatedRoutes($payload);
+
+        $this->assertFalse(WakeupRecorder::$wokenUp);
+    }
+
+    public function testCachedTranslatedRoutesStillTranslateUrlsAfterLoading(): void
+    {
+        $localization = app(LaravelLocalization::class, ['request' => $this->createRequest('about')]);
+        $payload = base64_encode(serialize(['LaravelLocalization::routes.about']));
+
+        $localization->setSerializedTranslatedRoutes($payload);
+
+        $this->assertSame(self::TEST_URL.'es/acerca', $localization->getLocalizedURL('es', self::TEST_URL.'about'));
+    }
+
     public function testGetNonLocalizedURL(): void
     {
         $this->assertEquals(
@@ -798,6 +928,7 @@ final class LaravelLocalizationTest extends TestCase
             ['fr-150', 'fr'],
             ['zh-Hant-cn', 'zh-Hant'],
             ['zh-cn', 'zh'],
+            ['../../etc/passwd', 'wrong'],
         ];
 
         $dataset = [];
@@ -880,6 +1011,50 @@ final class LaravelLocalizationTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirect(self::TEST_URL . $savedLocale);
         $response->assertPlainCookie('locale', $savedLocale);
+    }
+
+    public function testSessionRedirectKeepsAProtocolRelativePathOnTheAppHost(): void
+    {
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
+        $request = Request::create(self::TEST_URL.'/evil.com', server: ['HTTP_ACCEPT_LANGUAGE' => 'es']);
+        $this->app->instance(LaravelLocalization::class, app(LaravelLocalization::class, ['request' => $request]));
+
+        $response = (new LocaleSessionRedirect())->handle($request, fn () => response('next'));
+
+        TestResponse::fromBaseResponse($response)->assertRedirect(self::TEST_URL.'es/evil.com');
+    }
+
+    public function testRedirectFilterKeepsADoubleSlashPathOnTheAppHost(): void
+    {
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
+        $request = Request::create(self::TEST_URL.'en//evil.com');
+        $this->app->instance(LaravelLocalization::class, app(LaravelLocalization::class, ['request' => $request]));
+
+        $response = (new LaravelLocalizationRedirectFilter())->handle($request, fn () => response('next'));
+
+        TestResponse::fromBaseResponse($response)->assertRedirect(self::TEST_URL.'evil.com');
+    }
+
+    public function testCookieRedirectIgnoresALocaleCookieWithAnUnsupportedValue(): void
+    {
+        $request = Request::create(self::TEST_URL.'about', cookies: ['locale' => '//evil.com']);
+        $this->app->instance(LaravelLocalization::class, app(LaravelLocalization::class, ['request' => $request]));
+
+        $response = (new LocaleCookieRedirect())->handle($request, fn () => response('next'));
+
+        $this->assertSame('next', $response->getContent());
+    }
+
+    public function testViewPathMiddlewareAddsOnlyTheViewFolderOfTheCurrentLocale(): void
+    {
+        $request = Request::create(self::TEST_URL.'..%2F..%2Fsecret/about');
+        $localization = app(LaravelLocalization::class, ['request' => $request]);
+        $this->app->instance(LaravelLocalization::class, $localization);
+        $localization->setLocale();
+
+        (new LaravelLocalizationViewPath())->handle($request, fn () => response('next'));
+
+        $this->assertSame(resource_path('views/en'), last(View::getFinder()->getPaths()));
     }
 
     /**
