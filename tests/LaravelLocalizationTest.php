@@ -639,6 +639,14 @@ final class LaravelLocalizationTest extends TestCase
         $this->assertSame(self::TEST_URL.'es/ver/a%23b/proyecto', $url);
     }
 
+    public function testLocalizedUrlTranslatesARouteWhenAnAttributeHoldsASlash(): void
+    {
+        $localization = app('laravellocalization');
+
+        $this->assertSame(self::TEST_URL.'es/ver/a/b', $localization->getLocalizedURL('es', self::TEST_URL.'view/a/b', ['id' => 'a/b']));
+        $this->assertSame(self::TEST_URL.'es/ver/a/b', $localization->getLocalizedURL('es', self::TEST_URL.'view/a%2Fb', ['id' => 'a/b']));
+    }
+
     public function testLocalizedUrlTranslatesARouteWhenAnAttributeHoldsEncodedNonAsciiText(): void
     {
         $url = app('laravellocalization')->getLocalizedURL('es', self::TEST_URL.'view/caf%C3%A9');

@@ -424,16 +424,16 @@ class LaravelLocalization
     /**
      * Decode a URL for a path comparison, but keep its delimiters encoded.
      *
-     * This method keeps %23 (#), %3F (?), and %2F (/) as escapes, so a
-     * decoded character cannot end the path or add a segment. A literal +
-     * stays a +.
+     * This method keeps %23 (#) and %3F (?) as escapes, so a decoded
+     * character cannot end the path. It decodes %2F to /, as the Laravel
+     * router does. A literal + stays a +.
      *
      * @param  string  $url
      * @return string
      */
     protected function decodeUrlKeepingDelimiters(string $url): string
     {
-        return rawurldecode(preg_replace('/%(23|3F|2F)/i', '%25$1', $url));
+        return rawurldecode(preg_replace('/%(23|3F)/i', '%25$1', $url));
     }
 
     /**
