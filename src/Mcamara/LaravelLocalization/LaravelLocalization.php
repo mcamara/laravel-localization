@@ -422,6 +422,21 @@ class LaravelLocalization
     }
 
     /**
+     * Decode a URL for a path comparison, but keep its delimiters encoded.
+     *
+     * This method keeps %23 (#), %3F (?), and %2F (/) as escapes, so a
+     * decoded character cannot end the path or add a segment. A literal +
+     * stays a +.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function decodeUrlKeepingDelimiters(string $url): string
+    {
+        return rawurldecode(preg_replace('/%(23|3F|2F)/i', '%25$1', $url));
+    }
+
+    /**
      * It returns an URL without locale (if it has it)
      * Convenience function wrapping getLocalizedURL(false).
      *
@@ -798,19 +813,20 @@ class LaravelLocalization
             return $this->cachedTranslatedRoutesByUrl[$locale][$url];
         }
 
-        // Extract the encoded path before decoding so escapes do not change the URL structure.
-        $urlPath = parse_url($this->getNonLocalizedURL($url), PHP_URL_PATH);
-        if (!\is_string($urlPath)) {
-            return false;
-        }
-        $urlPath = rawurldecode($urlPath);
+        // Decode both URLs the same way before they go through getNonLocalizedURL(), so both get the same treatment.
+        // Keep the escaped delimiters, so a decoded # or ? cannot cut a path.
+        $urlPath = parse_url($this->getNonLocalizedURL($this->decodeUrlKeepingDelimiters($url)), PHP_URL_PATH);
 
         // check if this url is a translated url
         foreach ($this->translatedRoutes as $translatedRoute) {
             $routeName = $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes);
-            $routePath = parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH);
 
-            if (\is_string($routePath) && rawurldecode($routePath) === $urlPath) {
+            if (\is_string($routeName)) {
+                $routeName = $this->decodeUrlKeepingDelimiters($routeName);
+            }
+
+            // We can ignore extra url parts and compare only their url_path (ignore arguments that are not attributes)
+            if (parse_url($this->getNonLocalizedURL($routeName), PHP_URL_PATH) == $urlPath) {
                 $this->cachedTranslatedRoutesByUrl[$locale][$url] = $translatedRoute;
 
                 return $translatedRoute;

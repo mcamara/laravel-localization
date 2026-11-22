@@ -632,11 +632,25 @@ final class LaravelLocalizationTest extends TestCase
         $this->assertSame(self::TEST_URL.'es/ver/a+b', $localization->getLocalizedURL('es', self::TEST_URL.'view/a%2Bb', ['id' => 'a+b']));
     }
 
-    public function testLocalizedUrlKeepsEveryPathSegmentAfterAnEncodedHash(): void
+    public function testLocalizedUrlTranslatesARouteWhenAnAttributeHoldsAnEncodedHash(): void
     {
         $url = app('laravellocalization')->getLocalizedURL('es', self::TEST_URL.'view/a%23b/project');
 
         $this->assertSame(self::TEST_URL.'es/ver/a%23b/proyecto', $url);
+    }
+
+    public function testLocalizedUrlTranslatesARouteWhenAnAttributeHoldsEncodedNonAsciiText(): void
+    {
+        $url = app('laravellocalization')->getLocalizedURL('es', self::TEST_URL.'view/caf%C3%A9');
+
+        $this->assertSame(self::TEST_URL.'es/ver/caf%C3%A9', $url);
+    }
+
+    public function testLocalizedUrlTranslatesARouteWhenAnAttributeHoldsNonAsciiText(): void
+    {
+        $url = app('laravellocalization')->getLocalizedURL('es', self::TEST_URL.'view/caf%C3%A9', ['id' => 'café']);
+
+        $this->assertSame(self::TEST_URL.'es/ver/café', $url);
     }
 
     #[DataProvider('scriptUrlDataProvider')]
