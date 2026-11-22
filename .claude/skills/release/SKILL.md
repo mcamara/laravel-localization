@@ -1,6 +1,6 @@
 ---
 name: release
-description: Use when a maintainer asks to release, tag, or publish a new version of mcamara/laravel-localization, to write the release notes for its GitHub release page, or to check that Packagist shows a new version.
+description: Use when a maintainer asks to release, tag, or publish a new version of mcamara/laravel-localization, to finish a release that stopped after the tag push, to write the release notes for its GitHub release page, or to check that Packagist shows a new version.
 ---
 
 # Release a New Version
@@ -32,7 +32,7 @@ Packagist reads new tags through the repository webhook, so a pushed tag updates
 3. Set `SHA` to the output of `git rev-parse origin/master`.
 4. Run `gh run list --branch master --workflow run-tests.yml --limit 1 --json headSha,conclusion`.
 5. Stop if `headSha` is not `SHA` or `conclusion` is not `success`. Tell the maintainer why.
-6. Run `git log --first-parent --format='%s' "$PREV"..origin/master` to list the changes.
+6. Run `git log --first-parent --format='%s' "$PREV".."$SHA"` to list the changes.
 7. Collect the pull request numbers (`#123`) from those subjects.
 8. Run `gh pr view NUMBER --json title,author,body,url` for each pull request number.
 9. Choose the version with the table above. Set `TAG` to it, for example `v2.5.0`.
@@ -45,6 +45,21 @@ Packagist reads new tags through the repository webhook, so a pushed tag updates
 16. Run `gh release create "$TAG" --verify-tag --title "$TAG" --notes-file NOTES_FILE`.
 17. Add `--latest=false` to that command when `TAG` is lower than the current latest release.
 18. Check Packagist. Use the section below.
+
+## Resume a Release
+
+Use this section when step 15 pushed the tag, but a later step failed.
+Do not start the procedure again. Step 2 then sets `PREV` to the new tag.
+Step 14 then fails, because the tag exists.
+Do not delete or move the tag. Packagist can serve the version as soon as the tag exists.
+
+1. Run `git fetch origin --tags`.
+2. Set `TAG` to the output of `git describe --tags --abbrev=0 origin/master`.
+3. Set `SHA` to the output of `git rev-parse "$TAG^{commit}"`.
+4. Set `PREV` to the output of `git describe --tags --abbrev=0 "$TAG^"`.
+5. Run `gh release view "$TAG" --json url --jq .url`. If it prints a URL, go to step 18 of the procedure.
+6. If you do not have the approved release notes file, do steps 6 to 8, 12, and 13 of the procedure again.
+7. Do steps 16 to 18 of the procedure.
 
 ## Release Notes Format
 
@@ -79,4 +94,5 @@ Also ask the maintainer to check the recent deliveries of the packagist.org webh
 | Tag a commit before CI passes | Packagist serves an untested version | Steps 4 and 5 |
 | Run `gh release create` without `--verify-tag` | GitHub creates the tag at a different commit | Always pass `--verify-tag` |
 | Move a tag after the push | Apps that installed the version have different code | Release a new PATCH version |
+| Start the procedure again after the tag push | `PREV` is the new tag, and step 14 fails | Use **Resume a Release** |
 | Copy commit subjects into the release notes | The release notes describe code, not the effect on apps | Read each pull request description |
