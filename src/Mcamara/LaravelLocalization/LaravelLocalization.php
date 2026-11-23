@@ -321,8 +321,13 @@ class LaravelLocalization
         }
 
         $parsed_url['path'] = ltrim($parsed_url['path'], '/');
+        $routeAttributes = $locale === false ? null : $attributes;
 
-        if ($translatedRoute = $this->findTranslatedRouteByPath($parsed_url['path'], $url_locale)) {
+        if ($translatedRoute = $this->findTranslatedRouteByPath($parsed_url['path'], $url_locale, $routeAttributes)) {
+            if ($locale !== false) {
+                $attributes = array_merge($routeAttributes, $attributes);
+            }
+
             return $this->getURLFromRouteNameTranslated($locale, $translatedRoute, $attributes, $forceDefaultLocation).$urlQuery;
         }
 
@@ -733,16 +738,63 @@ class LaravelLocalization
      *
      * @param string $path       Path to check if it is a translated route
      * @param string $url_locale Language to check if the path exists
+     * @param array|null $attributes Attributes to populate from route parameters
      *
      * @return string|false Key for translation, false if not exist
      */
-    protected function findTranslatedRouteByPath($path, $url_locale)
+    protected function findTranslatedRouteByPath($path, $url_locale, &$attributes = null)
     {
+        $path = rawurldecode($path);
+        $parameterizedRoutes = [];
+
         // check if this url is a translated url
         foreach ($this->translatedRoutes as $translatedRoute) {
-            if ($this->translator->get($translatedRoute, [], $url_locale) == rawurldecode($path)) {
+            $translation = $this->translator->get($translatedRoute, [], $url_locale);
+
+            if ($translation == $path) {
                 return $translatedRoute;
             }
+
+            if ($attributes !== null && str_contains($translation, '{')) {
+                $parameterizedRoutes[$translatedRoute] = $translation;
+            }
+        }
+
+        if ($attributes === null) {
+            return false;
+        }
+
+        foreach ($parameterizedRoutes as $translatedRoute => $translation) {
+            $pattern = '';
+            $parameters = [];
+
+            foreach (explode('/', $translation) as $index => $segment) {
+                $separator = $index === 0 ? '' : '/';
+
+                if (preg_match('/^\{(\w+)(\?)?\}$/', $segment, $matches)) {
+                    $parameters[] = $matches[1];
+
+                    if (!empty($matches[2])) {
+                        $pattern .= '(?:'.$separator.'([^/]+))?';
+                    } else {
+                        $pattern .= $separator.'([^/]+)';
+                    }
+                } else {
+                    $pattern .= $separator.preg_quote($segment, '#');
+                }
+            }
+
+            if (!preg_match('#^'.$pattern.'$#', $path, $matches)) {
+                continue;
+            }
+
+            foreach ($parameters as $index => $parameter) {
+                if (isset($matches[$index + 1]) && $matches[$index + 1] !== '') {
+                    $attributes[$parameter] = $matches[$index + 1];
+                }
+            }
+
+            return $translatedRoute;
         }
 
         return false;

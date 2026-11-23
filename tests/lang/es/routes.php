@@ -3,6 +3,7 @@
 return [
     'about'               => 'acerca',
     'view'                => 'ver/{id}',
+    'view_literal'        => 'ver/especial',
     'view_project'        => 'ver/{id}/proyecto/{project_id?}',
     'manage'              => 'administrar/{file_id?}',
     'hello'               => 'Hola mundo',

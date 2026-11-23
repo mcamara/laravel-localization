@@ -3,6 +3,7 @@
 return [
     'about'               => 'about',
     'view'                => 'view/{id}',
+    'view_literal'        => 'view/special',
     'view_project'        => 'view/{id}/project/{project_id?}',
     'manage'              => 'manage/{file_id?}',
     'hello'               => 'Hello world',

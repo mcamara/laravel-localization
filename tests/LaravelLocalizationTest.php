@@ -56,6 +56,10 @@ final class LaravelLocalizationTest extends TestCase
                 return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
             })->name('view');
 
+            Route::get(app('laravellocalization')->transRoute('LaravelLocalization::routes.view_literal'), function () {
+                return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
+            })->name('view_literal');
+
             Route::get(app('laravellocalization')->transRoute('LaravelLocalization::routes.view_project'), function () {
                 return app('laravellocalization')->getLocalizedURL('es') ?: 'Not url available';
             })->name('view_project');
@@ -513,6 +517,41 @@ final class LaravelLocalizationTest extends TestCase
         ];
     }
 
+    #[DataProvider('translatedPathWithParametersDataProvider')]
+    public function testGetLocalizedURLFromTranslatedPathWithParameters($locale, $path, $expectedURL): void
+    {
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
+
+        $this->assertSame(
+            self::TEST_URL.$expectedURL,
+            app('laravellocalization')->getLocalizedURL($locale, self::TEST_URL.$path)
+        );
+    }
+
+    public static function translatedPathWithParametersDataProvider(): array
+    {
+        return [
+            ['en', 'es/ver/42', 'view/42'],
+            ['es', 'es/ver/42', 'es/ver/42'],
+            ['en', 'es/ver/42/proyecto', 'view/42/project'],
+            ['en', 'es/ver/42/proyecto/7', 'view/42/project/7'],
+            ['en', 'es/administrar', 'manage'],
+            ['en', 'es/administrar/0', 'manage/0'],
+            ['en', 'es/ver/a%2Bb?page=2', 'view/a+b?page=2'],
+            ['en', 'es/ver/especial', 'view/special'],
+        ];
+    }
+
+    public function testExplicitAttributesTakePrecedenceOverTranslatedPathParameters(): void
+    {
+        app('config')->set('laravellocalization.hideDefaultLocaleInURL', true);
+
+        $this->assertSame(
+            self::TEST_URL.'view/replacement',
+            app('laravellocalization')->getLocalizedURL('en', self::TEST_URL.'es/ver/original', ['id' => 'replacement'])
+        );
+    }
+
     public function testGetURLFromRouteNameTranslated(): void
     {
         $this->assertEquals(
@@ -602,6 +641,10 @@ final class LaravelLocalizationTest extends TestCase
         $this->assertEquals(
             self::TEST_URL.'ver/1',
             app('laravellocalization')->getNonLocalizedURL(self::TEST_URL.'es/ver/1')
+        );
+        $this->assertEquals(
+            self::TEST_URL.'ver/1/proyecto/2',
+            app('laravellocalization')->getNonLocalizedURL(self::TEST_URL.'es/ver/1/proyecto/2')
         );
     }
 
